@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  color: var(--text-primary);
+}
+
+.pixel-modal-layout {
+  padding: 1.25rem;
+  min-width: 22rem;
+}
+
+select, option {
+  color-scheme: dark;
+}

@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+    display: none;
+}
+
+:root {
+    --bg-dark: #0a0a0f;
+    --bg-secondary: #0f0f1a;
+    --neon-cyan: #00aaff;
+    --neon-magenta: #ff3333;
+    --neon-blue: #0066cc;
+    --text-primary: #ffffff;
+    --text-secondary: #8888aa;
+
+    --pixel-panel-bg: #12121e;
+    --pixel-panel-pattern-color: rgba(0, 170, 255, 0.04);
+    --pixel-panel-pattern-size: 4px;
+    --pixel-panel-glow-color: rgba(0, 170, 255, 0.15);
+    --pixel-panel-glow-size: 20px;
+
+    --pixel-border-top-left: #0a0a1e;
+    --pixel-border-bottom-right: #2a2a4e;
+    --pixel-border-hover-top-left: #080818;
+    --pixel-border-hover-bottom-right: #3a3a5e;
+
+    --pixel-card-bg: #1a1a2e;
+    --pixel-hover-bg: #1e1e34;
+    --pixel-input-bg: #0a0a1e;
+    --pixel-focus-bg: #0e0e1a;
+    --pixel-active-bg: #0e0e1a;
+    --pixel-active-shadow: #1a1a2e;
+}
+
+.scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    font-family: 'Press Start 2P', 'Share Tech Mono', monospace;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow: hidden;
+    image-rendering: pixelated;
+}
+
+.auth-transition-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(10, 10, 26, 0);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    opacity: 1;
+    pointer-events: auto;
+    overflow: hidden;
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.55s;
+}
+
+.auth-transition-overlay.active {
+    background-color: rgba(10, 10, 26, 1);
+}
+
+.auth-transition-pokeball-scaler {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(var(--auth-tx, 0px), var(--auth-ty, 0px)) scale(var(--auth-initial-scale, 1));
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.auth-transition-overlay.active .auth-transition-pokeball-scaler {
+    transform: scale(1);
+}
+
+.auth-transition-pokeball-spinner {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: auth-transition-spin 1s linear infinite;
+    filter: drop-shadow(0 0 30px rgba(0, 170, 255, 0.4));
+}
+
+.auth-transition-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0;
+}
+
+.auth-transition-overlay.active .auth-transition-text {
+    animation:
+        auth-transition-text-enter 0.35s ease-out 0.9s forwards,
+        auth-transition-text-pulse 1.5s ease-in-out 1.3s infinite;
+}
+
+@keyframes auth-transition-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes auth-transition-text-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes auth-transition-text-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+.auth-transition-overlay.expanding .auth-transition-pokeball-scaler {
+    transform: scale(25);
+    transition: transform 0.7s cubic-bezier(0.6, 0, 0.9, 0.15);
+}
+
+.auth-transition-overlay.expanding .auth-transition-text {
+    opacity: 0;
+    animation: none;
+    transition: opacity 0.2s ease;
+}
+
+.auth-transition-overlay.expanding {
+    animation: auth-transition-overlay-fade 1.3s ease-in forwards;
+}
+
+@keyframes auth-transition-overlay-fade {
+    0%, 55% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ── EX / Ultra Rare holo foil effect ── */
+
+.card-holo {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-holo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 230, 200, 0.45) 0%,
+        rgba(50, 200, 255, 0.35) 15%,
+        rgba(180, 80, 255, 0.40) 30%,
+        rgba(255, 100, 180, 0.35) 45%,
+        rgba(255, 200, 80, 0.35) 60%,
+        rgba(0, 230, 200, 0.45) 75%,
+        rgba(50, 200, 255, 0.35) 90%,
+        rgba(0, 230, 200, 0.45) 100%
+    );
+    background-size: 300% 300%;
+    animation: holoShift 3s ease-in-out infinite;
+    mix-blend-mode: color-dodge;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+.card-holo::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.6) 0%,
+        rgba(255, 255, 255, 0) 40%
+    );
+    animation: holoSparkle 4s ease-in-out infinite;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 2;
+    border-radius: inherit;
+}
+
+.card-holo img {
+    position: relative;
+    z-index: 0;
+}
+
+@keyframes holoShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes holoSparkle {
+    0% { transform: translate(-10%, -10%) scale(1.3); opacity: 0.1; }
+    25% { transform: translate(60%, 20%) scale(1.3); opacity: 0.7; }
+    50% { transform: translate(30%, 70%) scale(1.3); opacity: 0.2; }
+    75% { transform: translate(-20%, 50%) scale(1.3); opacity: 0.6; }
+    100% { transform: translate(-10%, -10%) scale(1.3); opacity: 0.1; }
+}

@@ -1,0 +1,61 @@
+<my-modal
+  [open]="open"
+  [title]="title"
+  variant="pixel"
+  [closeOnBackdrop]="false"
+  [showClose]="false"
+  width="40rem"
+  (close)="onCancel()">
+  <div class="picker">
+    @if (prompt) {
+      <p class="picker__prompt">{{ prompt }}</p>
+    }
+    <p class="picker__hint">
+      @if (allowReorder) {
+        {{ 'BATTLE.REORDER_HINT' | translate }}
+      } @else if (maxPick === minPick) {
+        {{ 'BATTLE.PICKER_HINT_EXACT' | translate: { count: maxPick } }}
+      } @else {
+        {{ 'BATTLE.PICKER_HINT_RANGE' | translate: { min: minPick, max: maxPick } }}
+      }
+    </p>
+    @if (!allowReorder && pickedCount() > 0) {
+      <div class="picker__counter">{{ pickedCount() }} / {{ maxPick }} seleccionadas</div>
+    }
+
+    @if (allowReorder) {
+      <ul class="picker__reorder-list">
+        @for (card of orderedCards(); track card.id; let i = $index) {
+          <li class="picker__reorder-row">
+            <span class="picker__order">{{ i + 1 }}</span>
+            <img [src]="card.imageUrl" [alt]="card.name" class="picker__thumb" />
+            <span class="picker__name">{{ card.name }}</span>
+            <button class="picker__nav" [disabled]="i === 0" (click)="moveUp(i)">▲</button>
+            <button class="picker__nav" [disabled]="i === orderedCards().length - 1" (click)="moveDown(i)">▼</button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="picker__grid">
+        @for (card of cards; track card.id; let i = $index) {
+          <button
+            class="picker__card"
+            [class.picker__card--picked]="isPicked(i)"
+            (click)="onCardClick(card, i)">
+            <img [src]="card.imageUrl" [alt]="card.name" class="picker__img" />
+            <span class="picker__name">{{ card.name }}</span>
+          </button>
+        }
+        @if (cards.length === 0) {
+          <p class="picker__empty">{{ 'BATTLE.PICKER_EMPTY' | translate }}</p>
+        }
+      </div>
+    }
+
+    <div class="picker__actions">
+      <button class="picker__btn picker__btn--confirm" [disabled]="!canConfirm()" (click)="onConfirm()">
+        {{ 'BATTLE.CONFIRM' | translate }}
+      </button>
+    </div>
+  </div>
+</my-modal>

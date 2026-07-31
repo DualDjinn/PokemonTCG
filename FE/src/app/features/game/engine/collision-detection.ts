@@ -1,0 +1,14 @@
+export interface Rect {
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+}
+
+export function rectangularCollision({ rectangle1, rectangle2 }: { rectangle1: Rect; rectangle2: Rect }): boolean {
+  return (
+    rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
+    rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
+    rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
+    rectangle1.position.y + rectangle1.height >= rectangle2.position.y
+  );
+}

@@ -1,0 +1,315 @@
+.battle-board {
+  position: relative;
+  width: min(75vw, 850px);
+  min-height: min(45vh, 420px);
+  margin-top: -8.80rem;
+  border-radius: 50% 50% 50% 50% / 80px 80px 80px 80px;
+  border: 8px solid #c9a530;
+  background-color: var(--pixel-panel-bg);
+  background-image:
+    linear-gradient(45deg, rgba(0,170,255,0.04) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0,170,255,0.04) 25%, transparent 25%);
+  background-size: 4px 4px, 4px 4px;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat, repeat;
+  box-shadow:
+    0 10px 0 0 #a0800e,
+    0 10px 10px -6px rgba(0,0,0,0.6),
+    0 0 30px rgba(201,165,48,0.15);
+  transform: rotateX(20deg);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.battle-board::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.03) 45%,
+    rgba(255,255,255,0.06) 50%,
+    rgba(255,255,255,0.03) 55%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: board-shimmer 10s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@keyframes board-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.board-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.board-divider {
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+/* ===== Setup glow animation ===== */
+
+@keyframes setup-glow-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 30px 8px rgba(0, 200, 255, 0.35), 0 0 24px 6px rgba(0, 200, 255, 0.4);
+    background-color: rgba(0, 200, 255, 0.1);
+  }
+  50% {
+    box-shadow: inset 0 0 50px 14px rgba(0, 220, 255, 0.55), 0 0 40px 12px rgba(0, 220, 255, 0.6);
+    background-color: rgba(0, 220, 255, 0.2);
+  }
+}
+
+.setup-glow {
+  animation: setup-glow-pulse 1.4s ease-in-out infinite;
+  border-radius: 8px;
+  border: 2px solid var(--neon-cyan, #00aaff);
+}
+
+/* ===== Drop target effects ===== */
+
+.board-zone--player {
+  cursor: default;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.board-zone--player.can-receive:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+@keyframes drop-target-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px 6px rgba(0, 200, 255, 0.4);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px 12px rgba(0, 220, 255, 0.7);
+    transform: scale(1.03);
+  }
+}
+
+.active-slot-placeholder.is-drop-target {
+  animation: drop-target-pulse 0.8s ease-in-out infinite;
+  border: 2px solid var(--neon-cyan, #00aaff) !important;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+/* ===== Active slot placeholder ===== */
+
+.active-slot-placeholder {
+  width: 6rem;
+  aspect-ratio: 2.5 / 3.5;
+  background: rgba(0, 200, 255, 0.08);
+  border: 2px solid var(--neon-cyan, #00aaff);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Opponent hover ===== */
+
+.board-zone--opponent {
+  transition: transform 0.35s ease-out, filter 0.35s ease-out;
+}
+
+.board-zone--opponent.opponent-hover {
+  transform: translate(-40px, -30px) scale(1.12);
+  filter: drop-shadow(0 12px 30px rgba(0, 170, 255, 0.5));
+}
+
+.opponent-float--active {
+  animation: opponent-float 2.5s ease-in-out infinite;
+}
+
+@keyframes opponent-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* ===== Board background ===== */
+
+.board-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* ===== Living background animation ===== */
+
+.board-bg--live {
+  animation: bg-live 14s ease-in-out infinite alternate;
+}
+
+@keyframes bg-live {
+  0%   { filter: brightness(1); background-position: center; }
+  30%  { filter: brightness(1.08); background-position: 52% 48%; }
+  70%  { filter: brightness(0.92); background-position: 48% 52%; }
+  100% { filter: brightness(1.02); background-position: 51% 49%; }
+}
+
+/* ===== Floating particles ===== */
+
+.board-particle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 8px currentColor;
+  animation: particle-drift linear infinite;
+}
+
+@keyframes particle-drift {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  15%  { opacity: 0.7; transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) scale(1); }
+  50%  { opacity: 0.8; transform: translate(calc(var(--dx) * 0.7), calc(var(--dy) * 0.7)) scale(1.2); }
+  80%  { opacity: 0.5; transform: translate(calc(var(--dx) * 0.9), calc(var(--dy) * 0.9)) scale(0.8); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+}
+
+/* ===== Attack lunge (player) ===== */
+
+.board-zone--player.attack-lunge {
+  animation: attacker-rising 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes attacker-rising {
+  0% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(-5px, -18px) scale(1.05); }
+  30% { transform: translate(60px, -8px) scale(1.15); }
+  55% { transform: translate(60px, -8px) scale(1.15); }
+  75% { transform: translate(10px, -3px) scale(1.02); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* ===== Attack lunge (opponent) ===== */
+
+.board-zone--opponent.attack-lunge {
+  animation: opponent-rising 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes opponent-rising {
+  0% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(5px, -18px) scale(1.05); }
+  30% { transform: translate(-60px, -8px) scale(1.15); }
+  55% { transform: translate(-60px, -8px) scale(1.15); }
+  75% { transform: translate(-10px, -3px) scale(1.02); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* ===== Trainer card flanks (stadium left, played right) ===== */
+
+.board-trainer-card {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6.5rem;
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0.9;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.board-trainer-card:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.board-trainer-card--stadium {
+  left: clamp(30px, 6vw, 80px);
+  box-shadow: 0 0 8px rgba(100, 200, 255, 0.3);
+  border: 1px solid rgba(100, 200, 255, 0.4);
+}
+
+.board-trainer-card--played {
+  right: clamp(30px, 6vw, 80px);
+  box-shadow: 0 0 8px rgba(255, 200, 60, 0.3);
+  border: 1px solid rgba(255, 200, 60, 0.4);
+  animation: trainer-card-enter 0.3s ease-out;
+}
+
+.board-trainer-card--fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+
+.board-trainer-card--glow {
+  box-shadow: 0 0 20px rgba(255, 200, 60, 0.6), 0 0 40px rgba(255, 200, 60, 0.3);
+  border-color: rgba(255, 200, 60, 0.8);
+  animation: trainer-glow-pulse 1.5s ease-in-out infinite;
+}
+
+.board-trainer-card--empty {
+  right: clamp(30px, 6vw, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 200, 60, 0.3);
+  background: rgba(255, 200, 60, 0.04);
+}
+
+@keyframes trainer-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 200, 60, 0.6), 0 0 40px rgba(255, 200, 60, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(255, 200, 60, 0.8), 0 0 60px rgba(255, 200, 60, 0.5); }
+}
+
+@keyframes trainer-card-enter {
+  from { opacity: 0; transform: translateY(-50%) scale(0.8); }
+  to { opacity: 0.9; transform: translateY(-50%) scale(1); }
+}
+
+.board-trainer-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== Defender shake ===== */
+
+.board-zone--player.defender-shake {
+  animation: defender-shake 0.6s ease-in-out 0.45s forwards;
+}
+
+.board-zone--opponent.defender-shake {
+  animation: defender-shake 0.6s ease-in-out 0.45s forwards;
+}
+
+@keyframes defender-shake {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-14px, 6px); }
+  20% { transform: translate(12px, -4px); }
+  35% { transform: translate(-10px, 3px); }
+  50% { transform: translate(8px, -2px); }
+  65% { transform: translate(-5px, 1px); }
+  80% { transform: translate(3px, 0); }
+  100% { transform: translate(0, 0); }
+}

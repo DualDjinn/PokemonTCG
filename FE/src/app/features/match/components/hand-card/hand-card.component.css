@@ -1,0 +1,194 @@
+.hand-card-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ===== Setup arrow (shown during setup phase for Basic Pokemon) ===== */
+
+.setup-arrow {
+  position: absolute;
+  top: -1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--neon-cyan, #00aaff);
+  font-size: 1.2rem;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 20;
+  animation: setup-arrow-bounce 1.2s ease-in-out infinite;
+  text-shadow: 0 0 12px rgba(0, 200, 255, 0.9);
+}
+
+@keyframes setup-arrow-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+.hand-card-wrapper:hover {
+  z-index: 10;
+}
+
+.hand-card-wrapper:not(.is-drag-source):hover .hand-card,
+.hand-card-wrapper:not(.is-drag-source):hover .hand-card-stack {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 12px 2px rgba(0, 180, 255, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Drag source ===== */
+
+.hand-card-wrapper.is-drag-source {
+  cursor: grabbing;
+}
+
+.hand-card-wrapper.is-drag-source:not(.is-stack) .hand-card {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ===== Selected state ===== */
+
+.hand-card-wrapper.is-selected .hand-card,
+.hand-card-wrapper.is-selected .hand-card-stack {
+  outline: 2px solid rgba(0, 220, 255, 0.7);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 16px 8px rgba(0, 200, 255, 0.7),
+    0 0 40px 20px rgba(0, 200, 255, 0.3),
+    0 0 80px 32px rgba(0, 150, 255, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: selectedGlow 2s ease-in-out infinite;
+}
+
+.hand-card-wrapper.is-selected .hand-card::after,
+.hand-card-wrapper.is-selected .hand-card-stack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(80, 200, 255, 0.25) 45%,
+    rgba(80, 200, 255, 0.15) 55%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes selectedGlow {
+  0%, 100% {
+    outline-color: rgba(0, 220, 255, 0.7);
+    box-shadow:
+      0 0 16px 8px rgba(0, 200, 255, 0.7),
+      0 0 40px 20px rgba(0, 200, 255, 0.3),
+      0 0 80px 32px rgba(0, 150, 255, 0.1),
+      0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    outline-color: rgba(0, 240, 255, 0.95);
+    box-shadow:
+      0 0 20px 12px rgba(0, 220, 255, 0.9),
+      0 0 56px 28px rgba(0, 220, 255, 0.4),
+      0 0 100px 40px rgba(0, 150, 255, 0.15),
+      0 8px 40px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ===== Card visuals ===== */
+
+.hand-card {
+  width: 6.5rem;
+  aspect-ratio: 2.5 / 3.5;
+  overflow: hidden;
+  border-radius: 4px;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hand-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hand-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #8888aa;
+  font-size: 0.75rem;
+  background: #1a1a2e;
+}
+
+.hand-card-stack {
+  position: relative;
+  width: 6.5rem;
+  aspect-ratio: 2.5 / 3.5;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hand-card-stacked {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.hand-card-stacked .hand-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== Glow effect (playable card indicator) ===== */
+
+@keyframes setup-glow-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 30px 8px rgba(0, 200, 255, 0.35), 0 0 24px 6px rgba(0, 200, 255, 0.4);
+    background-color: rgba(0, 200, 255, 0.1);
+  }
+  50% {
+    box-shadow: inset 0 0 50px 14px rgba(0, 220, 255, 0.55), 0 0 40px 12px rgba(0, 220, 255, 0.6);
+    background-color: rgba(0, 220, 255, 0.2);
+  }
+}
+
+.setup-glow {
+  animation: setup-glow-pulse 1.4s ease-in-out infinite;
+  border-radius: 8px;
+  border: 2px solid var(--neon-cyan, #00aaff);
+}
+
+.stack-badge {
+  position: absolute;
+  top: -0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: #0088cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.65rem;
+  line-height: 1;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}

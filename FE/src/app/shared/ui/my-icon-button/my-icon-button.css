@@ -1,0 +1,26 @@
+:host { display: contents; }
+
+.pixel-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  border: 2px solid;
+  border-color: var(--pixel-border-top-left) var(--pixel-border-bottom-right) var(--pixel-border-bottom-right) var(--pixel-border-top-left);
+  border-radius: 0;
+  background: var(--pixel-card-bg);
+  font-family: 'Press Start 2P', 'Segoe UI Symbol', 'Arial Unicode MS', monospace;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.pixel-icon-btn:hover:not(:disabled) {
+  background: var(--pixel-hover-bg);
+  border-color: var(--pixel-border-hover-top-left) var(--pixel-border-hover-bottom-right) var(--pixel-border-hover-bottom-right) var(--pixel-border-hover-top-left);
+}
+
+.pixel-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

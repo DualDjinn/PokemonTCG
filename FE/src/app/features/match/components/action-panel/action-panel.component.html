@@ -1,0 +1,70 @@
+@if (isMainPhase()) {
+  <div class="flex flex-col gap-3 p-4">
+    <span class="text-sm font-bold text-[#8888aa] uppercase tracking-widest">{{ 'ACTION_PANEL.ACTIONS' | translate }}</span>
+    <my-button
+      [text]="'ACTION_PANEL.ATTACH_ENERGY' | translate"
+      variant="pixel"
+      size="small"
+      [disabled]="!canAttachEnergy()"
+      (clicked)="emitAction('ATTACH_ENERGY')"
+    />
+    <my-button
+      [text]="'ACTION_PANEL.RETREAT' | translate"
+      variant="pixel"
+      size="small"
+      [disabled]="!canRetreat()"
+      (clicked)="emitAction('RETREAT')"
+    />
+    <my-button
+      [text]="'ACTION_PANEL.PASS_TO_ATTACK' | translate"
+      variant="pixel"
+      size="small"
+      (clicked)="emitAction('END_TURN')"
+    />
+  </div>
+}
+
+@if (isAttackPhase()) {
+  <div class="flex flex-col gap-3 p-4">
+    <span class="text-sm font-bold text-[#8888aa] uppercase tracking-widest">{{ 'ACTION_PANEL.ATTACKS' | translate }}</span>
+    @for (item of attacksWithDisabled(); track $index) {
+      @let atk = item.attack;
+      <div
+        class="flex items-center gap-3 p-3 border-2 bg-[rgba(15,15,26,0.9)] transition-all duration-200 cursor-pointer"
+        [style.borderColor]="'var(--pixel-border-bottom-right)'"
+        [style.borderTopColor]="'var(--pixel-border-top-left)'"
+        [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+        [class.opacity-40]="item.disabled"
+        [class.cursor-not-allowed]="item.disabled"
+        [class.hover:border-[#00aaff]]="!item.disabled"
+        [class.hover:shadow-[0_0_12px_rgba(0,170,255,0.25)]]="!item.disabled"
+        (click)="!item.disabled && emitAction('ATTACK', $index)"
+        role="button"
+        [attr.aria-label]="atk.name"
+        [attr.tabindex]="item.disabled ? -1 : 0"
+      >
+        <div class="flex-1 min-w-0">
+          <span class="block text-sm font-bold text-white truncate">{{ atk.name }}</span>
+          <span class="block text-xs text-[#8888aa]">{{ atk.damage }} {{ 'ACTION_PANEL.DAMAGE' | translate }}</span>
+        </div>
+        @if ((atk.cost ?? []).length) {
+          <div class="flex gap-1 flex-shrink-0">
+            @for (e of atk.cost; track $index) {
+              <span
+                class="w-4 h-4 rounded-full border border-white/30 flex-shrink-0"
+                [style.background]="energyBg(e)"
+                [title]="e"
+              ></span>
+            }
+          </div>
+        }
+      </div>
+    }
+    <my-button
+      [text]="'ACTION_PANEL.PASS_ATTACK' | translate"
+      variant="pixel"
+      size="small"
+      (clicked)="emitAction('PASS_ATTACK')"
+    />
+  </div>
+}

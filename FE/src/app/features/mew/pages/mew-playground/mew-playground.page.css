@@ -1,0 +1,218 @@
+.playground {
+  min-height: 100vh;
+  padding: 32px 28px 120px;
+  background:
+    linear-gradient(rgba(5, 5, 18, 0.95), rgba(5, 5, 18, 0.85)),
+    radial-gradient(circle at 80% 20%, rgba(255, 150, 200, 0.08), transparent 50%);
+  color: #e0e0f0;
+  font-family: 'Share Tech Mono', monospace;
+  box-sizing: border-box;
+}
+
+.playground__header {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+}
+
+.playground__header h1 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.2rem;
+  color: #ffc0e0;
+  margin: 0 0 8px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 12px rgba(255, 150, 200, 0.5);
+}
+
+.playground__header p {
+  color: #8888aa;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.playground__grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: #12121e;
+  border: 3px solid;
+  border-color: #0a0a1e #2a2a5e #2a2a5e #0a0a1e;
+  padding: 18px;
+  box-shadow:
+    0 0 0 1px #050510,
+    inset 0 0 18px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: var(--neon-cyan, #00aaff);
+  margin: 0;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+.card .hint {
+  color: #8888aa;
+  font-size: 0.78rem;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.card code {
+  background: rgba(0, 170, 255, 0.1);
+  border: 1px solid rgba(0, 170, 255, 0.2);
+  padding: 1px 4px;
+  font-size: 0.78rem;
+  color: #c8e4f8;
+}
+
+.card--preview {
+  grid-column: 1 / -1;
+}
+
+.preview-stage {
+  position: relative;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0 10px, transparent 10px 20px),
+    radial-gradient(circle at center, rgba(255, 192, 224, 0.06), transparent 60%);
+  border: 1px dashed rgba(0, 170, 255, 0.2);
+}
+
+.state-readout {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.state-readout strong {
+  color: #ffc0e0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  margin-left: 6px;
+}
+
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  padding: 10px 14px;
+  background: #1a1a2e;
+  border: 2px solid;
+  border-color: #0a0a1e #2a2a4e #2a2a4e #0a0a1e;
+  color: #e0e0f0;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: linear-gradient(180deg, #d62890 0%, #a01868 100%);
+  border-color: #ff80c0 #4a0028 #4a0028 #ff80c0;
+  color: #ffffff;
+  text-shadow: 0 1px 0 #4a0028;
+}
+
+.btn--reset {
+  background: #1a3a2e;
+  border-color: #0a1a14 #2a5e4a #2a5e4a #0a1a14;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  color: var(--neon-cyan, #00aaff);
+  letter-spacing: 0.06em;
+}
+
+.input,
+.ta {
+  background: #0a0a1e;
+  border: 2px solid;
+  border-color: #050510 #1e1e48 #1e1e48 #050510;
+  color: #e0e0f0;
+  padding: 8px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.input:focus,
+.ta:focus {
+  border-color: var(--neon-cyan, #00aaff) rgba(0, 170, 255, 0.4) rgba(0, 170, 255, 0.4) var(--neon-cyan, #00aaff);
+}
+
+.ta {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.card--be {
+  grid-column: span 2;
+}
+
+.response {
+  background: #050510;
+  border: 1px solid rgba(0, 170, 255, 0.25);
+  padding: 12px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #c8e4f8;
+  overflow-x: auto;
+  max-height: 260px;
+  margin: 0;
+}
+
+.error {
+  color: #ff6680;
+  font-size: 0.85rem;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(255, 50, 100, 0.1);
+  border-left: 3px solid #ff6680;
+}
+
+@media (max-width: 720px) {
+  .card--be {
+    grid-column: 1 / -1;
+  }
+}

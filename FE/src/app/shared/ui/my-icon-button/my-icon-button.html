@@ -1,0 +1,30 @@
+@if (variant === 'pixel') {
+  <button
+    class="pixel-icon-btn"
+    type="button"
+    [disabled]="disabled"
+    [attr.aria-label]="ariaLabel || icon"
+    [style.color]="color"
+    [style.width]="dimension"
+    [style.height]="dimension"
+    [style.fontSize]="fontSize"
+    (click)="onClick($event)"
+  >
+    {{ icon }}
+  </button>
+} @else {
+  <button
+    class="pixel-icon-btn"
+    type="button"
+    [disabled]="disabled"
+    [attr.aria-label]="ariaLabel || icon"
+    [style.color]="color"
+    [style.background]="background"
+    [style.width]="dimension"
+    [style.height]="dimension"
+    [style.fontSize]="fontSize"
+    (click)="onClick($event)"
+  >
+    {{ icon }}
+  </button>
+}

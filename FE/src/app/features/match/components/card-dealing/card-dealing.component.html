@@ -1,0 +1,34 @@
+<div class="dealing-overlay">
+  @if (state() === 'shuffling') {
+    <div class="dealing-stage">
+      <div class="deck-stack">
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="deck-card shuffling" [style.animationDelay.px]="$index * 40"></div>
+        }
+      </div>
+      <p class="dealing-text">MEZCLANDO MAZOS...</p>
+    </div>
+  }
+
+  @if (state() === 'dealing') {
+    <div class="dealing-stage">
+      <div class="deck-stack deck-stack--dealing">
+        <div class="deck-card"></div>
+      </div>
+      @for (card of cards; track card.id) {
+        <div
+          class="flying-card"
+          [class.flying-card--myHand]="card.target === 'myHand'"
+          [class.flying-card--opponentHand]="card.target === 'opponentHand'"
+          [style.animationDelay.ms]="cardDelay(card)"
+          [style.--spread-x.px]="cardSpreadX(card)"
+          [style.--spread-y.px]="cardSpreadY(card)"
+        ></div>
+      }
+    </div>
+  }
+
+  @if (state() === 'done') {
+    <div class="dealing-done"></div>
+  }
+</div>

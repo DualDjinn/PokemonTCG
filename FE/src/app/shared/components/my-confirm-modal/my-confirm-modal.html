@@ -1,0 +1,32 @@
+<my-modal
+  [open]="open"
+  [title]="title"
+  variant="pixel"
+  [color]="resolvedConfirmColor"
+  [width]="width"
+  (close)="onCancel()"
+>
+  <div class="flex flex-col gap-4">
+    @if (message) {
+      <my-text [text]="message" tag="p" size="0.855rem"></my-text>
+    }
+    <ng-content />
+    <div class="flex gap-3 justify-end">
+      <my-button
+        [text]="cancelText"
+        variant="pixel"
+        size="small"
+        color="var(--text-secondary, rgba(255,255,255,0.3))"
+        (clicked)="onCancel()"
+      ></my-button>
+      <my-button
+        [text]="confirmText"
+        variant="pixel"
+        size="small"
+        [color]="resolvedConfirmColor"
+        [disabled]="loading"
+        (clicked)="onConfirm()"
+      ></my-button>
+    </div>
+  </div>
+</my-modal>

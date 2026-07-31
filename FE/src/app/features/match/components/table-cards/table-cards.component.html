@@ -1,0 +1,76 @@
+<div class="flex justify-start gap-1.5 p-2">
+  @for (card of cards(); track card.id) {
+    <div class="bench-slot">
+    @if (!showCardBacks() && hpMap().get(card.id) !== undefined) {
+      <div class="stat-line" (click)="$event.stopPropagation()">
+        <span class="stat-tag stat-tag--hp">HP</span>
+        <div class="stat-track">
+          <div
+            class="stat-fill"
+            [class.is-hp-high]="hpBarClass(card.id) === 'hp-high'"
+            [class.is-hp-medium]="hpBarClass(card.id) === 'hp-medium'"
+            [class.is-hp-low]="hpBarClass(card.id) === 'hp-low'"
+            [style.width.%]="hpBarPercent(card.id)"
+          ></div>
+        </div>
+        <span class="stat-amt">{{ hpMap().get(card.id) }}</span>
+        <span class="stat-dmg">{{ damageLabel(card.id) }}</span>
+      </div>
+    }
+    <div
+      class="table-cards-card relative w-[5rem] aspect-[2.5/3.5] overflow-hidden border-2 bg-white transition-all duration-200 flex flex-col flex-shrink-0"
+      [attr.data-card-id]="card.id"
+      [attr.data-card-instance-id]="card.instanceId"
+      [style.boxShadow]="highlightedCardIds().has(card.id) ? '0 0 0 2px #00aaff, 0 2px 6px rgba(0,0,0,0.25)' : '0 2px 6px rgba(0,0,0,0.25)'"
+      [style.borderColor]="'#cccce0'"
+      [style.borderTopColor]="'#a0a0b8'"
+      [style.borderLeftColor]="'#a0a0b8'"
+      [class.hover:-translate-y-3]="hoverEnabled() && !isCardDisabled(card) && !isOpponentZone()"
+      [class.hover:scale-105]="hoverEnabled() && !isCardDisabled(card) && !isOpponentZone()"
+      [class.hover:shadow-[0_8px_25px_rgba(0,170,255,0.35)]]="hoverEnabled() && !isCardDisabled(card) && !isOpponentZone()"
+      [class.hover:z-10]="!isCardDisabled(card) && !isOpponentZone()"
+      [class.opacity-45]="isCardDisabled(card)"
+      [class.grayscale-[0.7]]="isCardDisabled(card)"
+      [class.evolution-flash]="evolvingCardId() === card.id"
+      [class.cursor-not-allowed]="isCardDisabled(card)"
+      (click)="onCardClick(card)"
+      (contextmenu)="onCardContextMenu(card, $event)"
+      role="button"
+      [attr.aria-label]="card.name"
+      [attr.tabindex]="isCardDisabled(card) ? -1 : 0"
+      [class.ring-2]="highlightedCardIds().has(card.id) && !isOpponentZone()"
+      [class.ring-cyan-400]="highlightedCardIds().has(card.id) && !isOpponentZone()"
+      [class.scale-105]="hoverTargetIds().has(card.id) && !isOpponentZone()"
+    >
+      @if (showCardBacks()) {
+        @if (cardBackUrl()) {
+          <img [src]="cardBackUrl()" class="card-back-img w-full h-full" />
+        } @else {
+          <div class="card-back w-full h-full"></div>
+        }
+      } @else if (card.imageUrl) {
+        <img [src]="card.imageUrl" [alt]="card.name" loading="lazy" class="w-full h-full object-cover block" style="filter: brightness(1.15)" />
+      } @else {
+        <div class="flex-1 flex items-center justify-center text-[#8888aa] text-sm">
+          <span>?</span>
+        </div>
+      }
+      @if (!showCardBacks()) {
+        @let energies = energyMap().get(card.id);
+        @if (energies && energies.length > 0) {
+          <div class="absolute bottom-0 left-0 flex items-end gap-0.5 p-0.5">
+            @for (group of groupEnergies(energies); track group.type) {
+              <div class="relative flex items-end">
+                <img [src]="energyImage(group.type)" class="w-5 h-5 object-contain border border-cyan-300/50 rounded-full drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] shadow-[0_0_6px_rgba(0,220,255,0.35)] energy-appear" [style.animation-delay.ms]="$index * 80" [alt]="group.type" />
+                @if (group.count > 1) {
+                  <span class="text-[0.6rem] font-bold text-white leading-none ml-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.9)]">{{ group.count }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+    </div>
+  }
+</div>

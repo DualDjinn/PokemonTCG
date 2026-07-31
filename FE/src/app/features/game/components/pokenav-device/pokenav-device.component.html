@@ -1,0 +1,151 @@
+@if (isOpen()) {
+  <div class="pokenav-overlay">
+    <div class="flex justify-center items-center py-6" style="font-family: 'Exo 2', sans-serif;">
+
+      <!-- ── Carcasa principal ── -->
+      <div class="relative overflow-hidden device-shell">
+
+        <!-- Franjas de color -->
+        <div class="absolute top-0 left-0 right-0 device-red-top"></div>
+        <div class="absolute left-0 right-0 bottom-0 device-blue-body"></div>
+
+        <!-- ────────── PANTALLA ────────── -->
+        <div class="absolute overflow-hidden screen-bezel">
+
+          <div class="absolute inset-0 overflow-hidden" style="z-index:1;">
+            <div class="scanline-sweep"></div>
+
+            <!-- Contenido de la pantalla -->
+            <div class="absolute inset-0 flex flex-col pokenav-bg" style="padding:10px; gap:8px;">
+
+              @if (!showExitConfirm() && !showResetConfirm() && !showSurrenderConfirm()) {
+                <!-- Header -->
+                <div class="flex justify-between items-center shrink-0 pnav-header">
+                  <div class="flex items-center" style="gap:6px;">
+                    <span class="shrink-0 pnav-dot"></span>
+                    <span class="pnav-title">{{ 'GAME_MENU.HEADER' | translate }}</span>
+                  </div>
+                  <span class="pnav-time">{{ currentTime() }}</span>
+                </div>
+
+                <!-- Grid de items -->
+                <div
+                  class="grid flex-1"
+                  [class.grid-cols-2]="!compact() && !battleCompact()"
+                  [class.grid-cols-1]="compact() || battleCompact()"
+                  [class.pnav-grid--compact]="compact() || battleCompact()"
+                  style="gap:5px;"
+                >
+                  @for (item of displayedItems(); track item.id; let i = $index) {
+                    <div
+                      class="flex items-center rounded-md cursor-pointer outline-none pnav-item pnav-confirm-btn"
+                      [class.pnav-item--selected]="selectedIndex() === i"
+                      (click)="selectItem(i)"
+                      (keydown.enter)="selectItem(i)"
+                      (keydown.space)="selectItem(i)"
+                      [attr.aria-label]="item.titleKey | translate"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <div
+                        class="flex items-center justify-center shrink-0 rounded-md pnav-icon"
+                        [style.background]="item.iconBg"
+                      >{{ item.icon }}</div>
+
+                      <div class="flex-1 min-w-0" style="margin-left:7px;">
+                        <div class="pnav-item-title">{{ item.titleKey | translate }}</div>
+                        <div class="pnav-item-desc">{{ item.descKey | translate }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-between items-center shrink-0 pnav-footer">
+                  <span class="pnav-fstat">🕹 <strong>PokeNav v2.0</strong></span>
+                  <span class="pnav-fstat">⏱ <strong>{{ currentTime() }}</strong></span>
+                </div>
+              } @else if (showExitConfirm()) {
+                <!-- Confirmacion Salir -->
+                <div class="flex flex-col items-center justify-center flex-1" style="gap:16px;">
+                  <span class="pnav-confirm-text">{{ 'GAME_MENU.EXIT_CONFIRM' | translate }}</span>
+                  <div class="flex" style="gap:10px;">
+                    <button class="pnav-confirm-btn pnav-confirm-btn--danger" (click)="onConfirmExit()">{{ 'GAME_MENU.SAVE_AND_EXIT' | translate }}</button>
+                    <button class="pnav-confirm-btn" (click)="onCancelExit()">{{ 'GAME_MENU.CANCEL' | translate }}</button>
+                  </div>
+                </div>
+              } @else if (showResetConfirm()) {
+                <!-- Confirmacion Reset -->
+                <div class="flex flex-col items-center justify-center flex-1" style="gap:16px;">
+                  <span class="pnav-confirm-text">{{ 'GAME_MENU.RESET_CONFIRM' | translate }}<br>{{ 'GAME_MENU.RESET_WARNING' | translate }}</span>
+                  <div class="flex" style="gap:10px;">
+                    <button class="pnav-confirm-btn pnav-confirm-btn--danger" (click)="onResetYes()">{{ 'GAME_MENU.RESET_YES' | translate }}</button>
+                    <button class="pnav-confirm-btn" (click)="onResetNo()">{{ 'GAME_MENU.RESET_NO' | translate }}</button>
+                  </div>
+                </div>
+              } @else {
+                <!-- Confirmacion Rendirse -->
+                <div class="flex flex-col items-center justify-center flex-1" style="gap:16px;">
+                  <span class="pnav-confirm-text">{{ 'GAME_MENU.SURRENDER_CONFIRM' | translate }}<br>{{ 'GAME_MENU.SURRENDER_WARNING' | translate }}</span>
+                  <div class="flex" style="gap:10px;">
+                    <button class="pnav-confirm-btn pnav-confirm-btn--danger" (click)="onConfirmSurrender()">{{ 'GAME_MENU.SURRENDER_YES' | translate }}</button>
+                    <button class="pnav-confirm-btn" (click)="onCancelSurrender()">{{ 'GAME_MENU.SURRENDER_NO' | translate }}</button>
+                  </div>
+                </div>
+              }
+
+            </div>
+          </div>
+        </div>
+        <!-- ── Fin pantalla ── -->
+
+        <!-- ────────── CONTROLES IZQUIERDA ────────── -->
+
+        <!-- Joystick -->
+        <div class="joystick">
+          <div class="joystick-inner"></div>
+        </div>
+
+        <!-- D-Pad -->
+        <div class="dpad">
+          <div class="dpad-v"></div>
+          <div class="dpad-h"></div>
+          <div class="dpad-center"></div>
+          <span class="dpad-arrow" style="top:4px; left:31px;">▲</span>
+          <span class="dpad-arrow" style="top:58px; left:31px;">▼</span>
+          <span class="dpad-arrow" style="top:31px; left:4px;">◀</span>
+          <span class="dpad-arrow" style="top:31px; left:58px;">▶</span>
+        </div>
+
+        <!-- Altavoz -->
+        <div class="speaker">
+          @for (d of speakerDots; track $index) {
+            <div class="speaker-dot"></div>
+          }
+        </div>
+
+        <!-- ────────── CONTROLES DERECHA ────────── -->
+
+        <!-- PokeBall -->
+        <div class="pokeball-btn">
+          <div class="pokeball-top"></div>
+          <div class="pokeball-bot"></div>
+          <div class="pokeball-line"></div>
+          <div class="pokeball-center"></div>
+        </div>
+
+        <!-- Botones A / B -->
+        <div class="flex items-center justify-center btn-a">A</div>
+        <div class="flex items-center justify-center btn-b">B</div>
+
+        <!-- Select -->
+        <span class="select-label">SELECT</span>
+
+        <!-- ────────── BASE ────────── -->
+        <div class="bottom-notch"></div>
+        <span class="device-label">PokeNav</span>
+
+      </div>
+    </div>
+  </div>
+}

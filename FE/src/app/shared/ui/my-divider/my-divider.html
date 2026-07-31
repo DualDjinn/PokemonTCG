@@ -1,0 +1,17 @@
+@if (orientation === 'horizontal') {
+  <hr
+    class="block w-full opacity-80 border-none"
+    [style.borderTop]="thickness + ' dashed ' + color"
+    [style.height]="'0'"
+    [style.marginTop]="spacing"
+    [style.marginBottom]="spacing"
+  />
+} @else {
+  <span
+    class="inline-block opacity-80 self-stretch h-auto min-h-[1em]"
+    [style.borderLeft]="thickness + ' dashed ' + color"
+    [style.width]="'0'"
+    [style.marginLeft]="spacing"
+    [style.marginRight]="spacing"
+  ></span>
+}

@@ -1,0 +1,339 @@
+:host {
+  --px-bg: #1a0a00;
+  --px-bg2: #2a1200;
+  --px-border: #ff6a00;
+  --px-border2: #ff9a00;
+  --px-gold: #ffb300;
+  --px-gold2: #ffe066;
+  --px-dark: #0d0500;
+  --px-reel: #110800;
+  --px-win: #00ff88;
+  --px-win2: #00cc66;
+  --px-btn: #ff5500;
+  --px-btn2: #ff8800;
+  --px-shadow: #5a2000;
+}
+
+.px-wrap {
+  position: relative;
+  min-height: 100vh;
+  background: var(--px-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Press Start 2P', monospace;
+  image-rendering: pixelated;
+  overflow: hidden;
+  gap: 14px;
+}
+
+.px-wrap::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, rgba(255,106,0,0.04) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,106,0,0.04) 1px, transparent 1px);
+  background-size: 16px 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.px-wrap::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.18) 3px,
+    rgba(0,0,0,0.18) 4px
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+.px-title {
+  flex: 1;
+  font-size: 16px;
+  color: var(--px-gold);
+  text-shadow: 2px 2px 0 var(--px-shadow), -1px -1px 0 var(--px-border2);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+.px-subtitle {
+  font-size: 8px;
+  color: var(--px-border);
+  text-shadow: 1px 1px 0 var(--px-shadow);
+}
+
+.px-layout-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: fit-content;
+  max-width: calc(100% - 40px);
+}
+
+.px-top-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  z-index: 1;
+}
+
+.px-body {
+  background: var(--px-bg2);
+  border: 4px solid var(--px-border);
+  outline: 2px solid var(--px-shadow);
+  outline-offset: -6px;
+  clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
+  padding: 22px 22px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.px-lights {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.px-light {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--px-shadow);
+  animation: blink 1.2s step-end infinite;
+}
+
+.px-light-1 { background: var(--px-border); }
+.px-light-2 { background: var(--px-gold); }
+.px-light-3 { background: var(--px-border2); }
+
+@keyframes blink {
+  50% { opacity: 0.15; }
+}
+
+.px-reels-row {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.px-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.px-left-col > app-px-hud {
+  margin-top: auto;
+}
+
+.px-reels-frame {
+  min-width: 342px;
+}
+
+.px-reels-frame {
+  background: var(--px-dark);
+  border: 4px solid var(--px-shadow);
+  outline: 2px solid var(--px-border);
+  padding: 8px;
+  position: relative;
+}
+
+.px-reels {
+  display: flex;
+  gap: 4px;
+}
+
+.px-win-lines-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.px-win-halo {
+  stroke-width: 12;
+  opacity: 0.18;
+  stroke-linecap: square;
+  stroke-linejoin: square;
+}
+
+.px-win-line {
+  stroke-width: 4;
+  stroke-dasharray: 5 3;
+  stroke-linecap: square;
+  stroke-linejoin: square;
+  animation: dashAnim .35s steps(2,end) infinite;
+}
+
+.px-win-rect {
+  stroke: none;
+}
+
+@keyframes dashAnim {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -14; }
+}
+
+.px-msg {
+  font-size: 10px;
+  text-align: center;
+  min-height: 30px;
+  letter-spacing: 1px;
+}
+
+.px-msg.win {
+  color: var(--px-win);
+  animation: msgblink .25s step-end 6;
+}
+
+.px-msg.lose {
+  color: #664400;
+}
+
+.px-msg.jackpot {
+  color: var(--px-gold2);
+  animation: msgblink .15s step-end infinite;
+}
+
+@keyframes msgblink {
+  50% { opacity: 0; }
+}
+
+.px-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  overflow: hidden;
+}
+
+.px-spark {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  animation: pixSpark .8s steps(4,end) forwards;
+  pointer-events: none;
+}
+
+@keyframes pixSpark {
+  100% {
+    transform: translateY(-40px) scale(0);
+    opacity: 0;
+  }
+}
+
+.px-back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 122px;
+  height: 29px;
+  background: var(--px-btn);
+  clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+  border: none;
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  user-select: none;
+   z-index: 2;
+}
+
+.px-back-btn::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--px-btn2);
+  clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+}
+
+.px-back-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.px-back-btn:hover {
+  filter: brightness(1.15);
+  color: #fff;
+}
+
+.px-back-btn:active {
+  filter: brightness(0.9);
+}
+
+@media (max-width: 900px) {
+  .px-reels-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .px-reels-frame {
+    min-width: unset;
+    width: 100%;
+  }
+  .px-left-col {
+    width: 100%;
+  }
+  .px-left-col > app-px-hud {
+    margin-top: 0;
+  }
+  .px-body {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .px-title {
+    font-size: 14px;
+  }
+  .px-led {
+    min-width: 120px;
+  }
+  .px-led-value {
+    font-size: 14px;
+  }
+  .px-led-label {
+    font-size: 6px;
+  }
+  .px-pay-cell {
+    width: 28px;
+    height: 28px;
+  }
+  .px-pay-img {
+    width: 22px;
+    height: 22px;
+  }
+  .px-pay-name {
+    font-size: 6px;
+  }
+  .px-pay-mult {
+    font-size: 7px;
+  }
+}

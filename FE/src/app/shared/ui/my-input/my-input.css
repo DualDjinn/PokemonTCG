@@ -1,0 +1,29 @@
+:host { display: contents; }
+
+.pixel-input {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  border: 2px solid;
+  border-color: var(--pixel-border-top-left) var(--pixel-border-bottom-right) var(--pixel-border-bottom-right) var(--pixel-border-top-left);
+  border-radius: 0;
+  padding: 0.6rem 0.75rem;
+  outline: none;
+  width: 100%;
+  background: var(--pixel-input-bg);
+  color: var(--text-primary);
+}
+
+.pixel-input::placeholder {
+  opacity: 0.5;
+  color: var(--neon-cyan);
+}
+
+.pixel-input:focus {
+  background: var(--pixel-focus-bg);
+  border-color: var(--pixel-border-hover-top-left) var(--pixel-border-hover-bottom-right) var(--pixel-border-hover-bottom-right) var(--pixel-border-hover-top-left);
+}
+
+.pixel-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

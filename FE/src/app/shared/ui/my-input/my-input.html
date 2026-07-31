@@ -1,0 +1,30 @@
+@if (variant === 'pixel') {
+  <input
+    class="pixel-input"
+    [type]="type"
+    [value]="value"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [style.color]="textColor"
+    [style.--my-input-placeholder-color]="color"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+    (keydown)="keydownEvent.emit($event)"
+  />
+} @else {
+  <input
+    class="text-xs font-pixel border-[3px] border-dashed px-[0.85rem] py-[0.65rem] outline-none w-full focus:brightness-110 placeholder:opacity-60 placeholder:text-[var(--my-input-placeholder-color)] disabled:opacity-50 disabled:cursor-not-allowed"
+    [type]="type"
+    [value]="value"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [style.color]="textColor"
+    [style.background]="background"
+    [style.borderColor]="color"
+    [style.--my-input-placeholder-color]="color"
+    [style.boxShadow]="'4px 4px 0px ' + color"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+    (keydown)="keydownEvent.emit($event)"
+  />
+}

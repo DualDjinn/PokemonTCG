@@ -1,0 +1,11 @@
+<video
+  class="bg-video"
+  [src]="videoSrc"
+  [attr.poster]="poster || null"
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="auto"
+></video>
+<div class="bg-overlay" [style.background]="'rgba(5, 5, 8, ' + overlayOpacity + ')'"></div>

@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+
+.title-pokeball {
+  width: 22px;
+  height: 22px;
+}

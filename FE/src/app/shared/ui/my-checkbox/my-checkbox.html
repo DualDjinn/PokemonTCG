@@ -1,0 +1,38 @@
+@if (variant === 'pixel') {
+  <label class="inline-flex items-center gap-3 cursor-pointer select-none font-pixel" [class.opacity-50]="disabled" [class.cursor-not-allowed]="disabled" (blur)="markTouched()">
+    <span
+      class="inline-flex items-center justify-center border-2 w-[1.25rem] h-[1.25rem]"
+      [class.is-checked]="checked"
+      [style.borderColor]="checked ? 'var(--pixel-border-bottom-right)' : 'var(--pixel-border-top-left)'"
+      [style.borderTopColor]="checked ? 'var(--pixel-border-hover-top-left)' : 'var(--pixel-border-top-left)'"
+      [style.borderLeftColor]="checked ? 'var(--pixel-border-hover-top-left)' : 'var(--pixel-border-top-left)'"
+      [style.background]="checked ? 'var(--pixel-card-bg)' : 'var(--pixel-input-bg)'"
+      (click)="toggle()"
+    >
+      @if (checked) {
+        <span class="text-[var(--neon-cyan)] text-[0.63rem] leading-none font-bold">X</span>
+      }
+    </span>
+    @if (label) {
+      <my-text [text]="label" [color]="textColor" />
+    }
+  </label>
+} @else {
+  <label class="inline-flex items-center gap-3 cursor-pointer select-none font-pixel" [class.opacity-50]="disabled" [class.cursor-not-allowed]="disabled" (blur)="markTouched()">
+    <span
+      class="inline-flex items-center justify-center border-[3px] border-dashed w-[1.25rem] h-[1.25rem] hover:brightness-[1.2]"
+      [class.is-checked]="checked"
+      [style.borderColor]="color"
+      [style.background]="checked ? color : 'transparent'"
+      [style.boxShadow]="'2px 2px 0px ' + color"
+      (click)="toggle()"
+    >
+      @if (checked) {
+        <span class="text-bg-dark text-[0.63rem] leading-none font-bold">X</span>
+      }
+    </span>
+    @if (label) {
+      <my-text [text]="label" [color]="textColor" />
+    }
+  </label>
+}

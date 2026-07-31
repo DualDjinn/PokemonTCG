@@ -1,0 +1,104 @@
+@if (state() === 'choosing') {
+  <div class="coin-overlay">
+    <div class="coin-modal">
+      <h2 class="coin-modal__title">{{ 'MATCH.COIN_TITLE' | translate }}</h2>
+      <p class="coin-modal__text">{{ 'MATCH.COIN_CHOOSE' | translate }}</p>
+      <div class="coin-modal__buttons">
+        <button class="coin-btn coin-btn--heads" (click)="choose('heads')">
+          <div class="coin-btn__preview">
+            <img src="/assets/img/coin/heads.png" alt="Pikachu" />
+          </div>
+          <span class="coin-btn__label">{{ 'MATCH.COIN_HEADS' | translate }}</span>
+        </button>
+        <button class="coin-btn coin-btn--tails" (click)="choose('tails')">
+          <div class="coin-btn__preview">
+            <img src="/assets/img/coin/tails.png" alt="Pokéball" />
+          </div>
+          <span class="coin-btn__label">{{ 'MATCH.COIN_TAILS' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (state() === 'waiting') {
+  <div class="coin-overlay">
+    <div class="coin-modal">
+      <h2 class="coin-modal__title">{{ 'MATCH.COIN_TITLE' | translate }}</h2>
+      @if (hadChanceToChoose && openingCoinResult) {
+        <p class="coin-modal__text">{{ 'MATCH.COIN_WAIT_OTHER_DECIDES' | translate }}</p>
+      } @else if (openingState === 'COIN_RESULT') {
+        <p class="coin-modal__text">{{ 'MATCH.COIN_WAIT_OTHER_CHOOSING' | translate }}</p>
+      } @else {
+        <p class="coin-modal__text">{{ 'MATCH.COIN_WAIT_OTHER_SIDE' | translate }}</p>
+      }
+      <div class="coin-modal__spinner"></div>
+    </div>
+  </div>
+}
+
+@if (state() === 'flipping' || state() === 'result') {
+  <div class="coin-overlay coin-overlay--dark">
+    <div class="coin-scene">
+      <div class="coin-shadow" #shadow></div>
+      <div class="coin" #coin>
+        <div class="coin-face coin-face--heads">
+          <img src="/assets/img/coin/heads.png" alt="Pikachu" />
+        </div>
+        <div class="coin-face coin-face--tails">
+          <img src="/assets/img/coin/tails.png" alt="TCG" />
+        </div>
+      </div>
+    </div>
+    @if (state() === 'result' && result) {
+      <div class="history">
+        @for (r of history; track $index) {
+          <span [class]="r === 'heads' ? 'chip-p' : 'chip-t'">
+            {{ r === 'heads' ? 'P' : 'T' }}
+          </span>
+        }
+      </div>
+      <div class="coin-result">
+        <p class="coin-result__text" [class.text-heads]="result === 'heads'" [class.text-tails]="result === 'tails'">
+          {{ (result === 'heads' ? 'MATCH.COIN_PIKACHU' : 'MATCH.COIN_POKEBALL') | translate }}
+        </p>
+        @if (wasCoinChooser) {
+          @if (correctGuess) {
+            <p class="coin-result__sub">{{ 'MATCH.COIN_GUESS_RIGHT' | translate }}</p>
+          } @else {
+            <p class="coin-result__sub coin-result__sub--wrong">{{ 'MATCH.COIN_GUESS_WRONG' | translate }}</p>
+          }
+        } @else {
+          @if (correctGuess) {
+            <p class="coin-result__sub coin-result__sub--waiting">{{ 'MATCH.COIN_OTHER_RIGHT' | translate }}</p>
+          } @else {
+            <p class="coin-result__sub coin-result__sub--wrong">{{ 'MATCH.COIN_OTHER_WRONG' | translate }}</p>
+          }
+        }
+      </div>
+    }
+  </div>
+}
+
+@if (state() === 'chooseTurn') {
+  <div class="coin-overlay">
+    <div class="coin-modal">
+      <h2 class="coin-modal__title">{{ 'MATCH.GAME_STARTS' | translate }}</h2>
+      <p class="coin-modal__text">
+        @if (playerRole === 'chooser' && correctGuess) {
+          {{ 'MATCH.CHOOSE_TURN_WON' | translate }}
+        } @else {
+          {{ 'MATCH.CHOOSE_TURN_OTHER_FAILED' | translate }}
+        }
+      </p>
+      <div class="coin-modal__buttons">
+        <button class="coin-btn coin-btn--heads" (click)="chooseTurn('me')">
+          <span class="coin-btn__label">{{ 'MATCH.CHOOSE_ME' | translate }}</span>
+        </button>
+        <button class="coin-btn coin-btn--tails" (click)="chooseTurn('opponent')">
+          <span class="coin-btn__label">{{ 'MATCH.CHOOSE_OPPONENT' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}

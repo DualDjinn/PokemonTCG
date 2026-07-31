@@ -1,0 +1,159 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1a237e 100%);
+  border: 1px solid #5c6bc0;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 55%;
+  height: 65%;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.12);
+}
+
+.card-back::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 25%;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+}
+
+/* ===== Damage badge ===== */
+
+.damage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #ef4444;
+  color: black;
+  font-weight: 900;
+  font-size: 0.45rem;
+  line-height: 1;
+  border: 1.5px solid #7f1d1d;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+/* ===== Evolution flash ===== */
+
+@keyframes evolution-flash {
+  0% { filter: brightness(1); box-shadow: 0 0 0 transparent; }
+  30% { filter: brightness(2.5); box-shadow: 0 0 40px rgba(255,255,255,0.9), 0 0 80px rgba(0,170,255,0.5); }
+  70% { filter: brightness(1.8); box-shadow: 0 0 25px rgba(255,255,255,0.5), 0 0 50px rgba(0,170,255,0.3); }
+  100% { filter: brightness(1); box-shadow: none; }
+}
+
+.evolution-flash {
+  animation: evolution-flash 0.8s ease-out forwards;
+}
+
+/* ===== Energy appear animation ===== */
+
+@keyframes energy-appear {
+  from { opacity: 0; transform: scale(0) rotate(-90deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.energy-appear {
+  animation: energy-appear 0.3s ease-out both;
+}
+
+/* ===== Barra de vida ===== */
+
+.bench-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.stat-line {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 5rem;
+  flex-shrink: 0;
+  /* Captura el click para que no pase a la zona y evita selección/caret. */
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+.stat-tag {
+  flex-shrink: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.45rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.stat-tag--hp { color: #86efac; }
+
+.stat-track {
+  flex: 1;
+  min-width: 0;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  border-radius: 2px;
+  /* La transición anima el drenaje cuando baja el HP al recibir daño. */
+  transition: width 0.5s ease, background-color 0.3s ease;
+}
+.stat-fill.is-hp-high { background: #22c55e; }
+.stat-fill.is-hp-medium { background: #eab308; }
+.stat-fill.is-hp-low { background: #ef4444; }
+
+.stat-amt {
+  flex-shrink: 0;
+  min-width: 0.9rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.5rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+}
+
+.stat-dmg {
+  flex-shrink: 0;
+  min-width: 1.1rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.48rem;
+  font-weight: 800;
+  color: #ff4d4d;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+}

@@ -1,0 +1,20 @@
+<div class="flex gap-1.5 flex-nowrap" role="tablist" [style.--filter-color]="color">
+  @for (opt of options; track opt.value) {
+    <button
+      type="button"
+      [class]="btnClass(opt.value)"
+      [style.borderColor]="color"
+      [style.--filter-color]="color"
+      [style.background]="selected === opt.value ? color : 'transparent'"
+      [style.color]="selected === opt.value ? '#050508' : 'inherit'"
+      [style.boxShadow]="selected === opt.value ? '0 0 10px ' + color : 'none'"
+      (click)="select(opt.value)"
+    >
+      @if (translate) {
+        {{ opt.label | translate }}
+      } @else {
+        {{ opt.label }}
+      }
+    </button>
+  }
+</div>

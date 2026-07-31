@@ -1,0 +1,242 @@
+{
+  "official": [
+    {
+      "skinId": "skin-xy1-141",
+      "name": "Venusaur-EX Full Art",
+      "baseCardId": "xy1-1",
+      "imageUrl": "https://images.pokemontcg.io/xy1/141.png",
+      "imageUrlLarge": "https://images.pokemontcg.io/xy1/141_hires.png",
+      "setCode": "xy1",
+      "tag": "full-art"
+    },
+    {
+      "skinId": "skin-xy1-142",
+      "name": "Blastoise-EX Full Art",
+      "baseCardId": "xy1-29",
+      "imageUrl": "https://images.pokemontcg.io/xy1/142.png",
+      "imageUrlLarge": "https://images.pokemontcg.io/xy1/142_hires.png",
+      "setCode": "xy1",
+      "tag": "full-art"
+    },
+    {
+      "skinId": "skin-xy1-143",
+      "name": "Emolga-EX Full Art",
+      "baseCardId": "xy1-46",
+      "imageUrl": "https://images.pokemontcg.io/xy1/143.png",
+      "imageUrlLarge": "https://images.pokemontcg.io/xy1/143_hires.png",
+      "setCode": "xy1",
+      "tag": "full-art"
+    },
+    {
+      "skinId": "skin-xy1-144",
+      "name": "Yveltal-EX Full Art",
+      "baseCardId": "xy1-79",
+      "imageUrl": "https://images.pokemontcg.io/xy1/144.png",
+      "imageUrlLarge": "https://images.pokemontcg.io/xy1/144_hires.png",
+      "setCode": "xy1",
+      "tag": "full-art"
+    },
+    {
+      "skinId": "skin-xy1-145",
+      "name": "Skarmory-EX Full Art",
+      "baseCardId": "xy1-80",
+      "imageUrl": "https://images.pokemontcg.io/xy1/145.png",
+      "imageUrlLarge": "https://images.pokemontcg.io/xy1/145_hires.png",
+      "setCode": "xy1",
+      "tag": "full-art"
+    },
+    {
+      "skinId": "skin-xy1-146",
+      "name": "Xerneas-EX Full Art",
+      "baseCardId": "xy1-97",
+      "imageUrl": "https://images.pokemontcg.io/xy1/146.png",
+      "imageUrlLarge": "https://images.pokemontcg.io/xy1/146_hires.png",
+      "setCode": "xy1",
+      "tag": "full-art"
+    }
+  ],
+  "alternative": [
+    {
+      "skinId": "skin-alt-147-venusaur",
+      "name": "Venusaur Alt Art 1",
+      "filename": "147-146-venusaur.png",
+      "baseCardId": "xy1-1",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-148-venusaur",
+      "name": "Venusaur Alt Art 2",
+      "filename": "148-146-venusaur.png",
+      "baseCardId": "xy1-1",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-149-blastoise",
+      "name": "Blastoise Alt Art 1",
+      "filename": "149-146-blastoise.png",
+      "baseCardId": "xy1-29",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-150-blastoise",
+      "name": "Blastoise Alt Art 2",
+      "filename": "150-146-blastoise.png",
+      "baseCardId": "xy1-29",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-151-emolga",
+      "name": "Emolga Alt Art",
+      "filename": "151-146-emolga.png",
+      "baseCardId": "xy1-46",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-152-yveltal",
+      "name": "Yveltal Alt Art",
+      "filename": "152-146-yveltal.png",
+      "baseCardId": "xy1-79",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-153-skarmory",
+      "name": "Skarmory Alt Art",
+      "filename": "153-146-skarmory.png",
+      "baseCardId": "xy1-80",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-alt-154-xerneas",
+      "name": "Xerneas Alt Art",
+      "filename": "154-146-xerneas.png",
+      "baseCardId": "xy1-97",
+      "tag": "alt-art"
+    },
+    {
+      "skinId": "skin-bio-grass",
+      "name": "Grass Energy Bio",
+      "filename": "energies/bio/--grassBio-energy.png",
+      "baseCardId": "xy1-132",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-fire",
+      "name": "Fire Energy Bio",
+      "filename": "energies/bio/--fireBio-energy.png",
+      "baseCardId": "xy1-133",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-water",
+      "name": "Water Energy Bio",
+      "filename": "energies/bio/--waterBio-energy.png",
+      "baseCardId": "xy1-134",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-lightning",
+      "name": "Lightning Energy Bio",
+      "filename": "energies/bio/--lightningBio-energy.png",
+      "baseCardId": "xy1-135",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-psychic",
+      "name": "Psychic Energy Bio",
+      "filename": "energies/bio/--psychicBio-energy.png",
+      "baseCardId": "xy1-136",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-fighting",
+      "name": "Fighting Energy Bio",
+      "filename": "energies/bio/--fightingBio-energy.png",
+      "baseCardId": "xy1-137",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-darkness",
+      "name": "Darkness Energy Bio",
+      "filename": "energies/bio/--darknessBio-energy.png",
+      "baseCardId": "xy1-138",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-metal",
+      "name": "Metal Energy Bio",
+      "filename": "energies/bio/--metalBio-energy.png",
+      "baseCardId": "xy1-139",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-bio-fairy",
+      "name": "Fairy Energy Bio",
+      "filename": "energies/bio/--fairyBio-energy.png",
+      "baseCardId": "xy1-140",
+      "tag": "bio"
+    },
+    {
+      "skinId": "skin-pixel-grass",
+      "name": "Grass Energy Pixel",
+      "filename": "energies/pixel/--grassPixel-energy.png",
+      "baseCardId": "xy1-132",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-fire",
+      "name": "Fire Energy Pixel",
+      "filename": "energies/pixel/--firePixel-energy.png",
+      "baseCardId": "xy1-133",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-water",
+      "name": "Water Energy Pixel",
+      "filename": "energies/pixel/--waterPixel-energy.png",
+      "baseCardId": "xy1-134",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-lightning",
+      "name": "Lightning Energy Pixel",
+      "filename": "energies/pixel/--lightningPixel-energy.png",
+      "baseCardId": "xy1-135",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-psychic",
+      "name": "Psychic Energy Pixel",
+      "filename": "energies/pixel/--psychicPixel-energy.png",
+      "baseCardId": "xy1-136",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-fighting",
+      "name": "Fighting Energy Pixel",
+      "filename": "energies/pixel/--fightingPixel-energy.png",
+      "baseCardId": "xy1-137",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-darkness",
+      "name": "Darkness Energy Pixel",
+      "filename": "energies/pixel/--darknessPixel-energy.png",
+      "baseCardId": "xy1-138",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-metal",
+      "name": "Metal Energy Pixel",
+      "filename": "energies/pixel/--metalPixel-energy.png",
+      "baseCardId": "xy1-139",
+      "tag": "pixel"
+    },
+    {
+      "skinId": "skin-pixel-fairy",
+      "name": "Fairy Energy Pixel",
+      "filename": "energies/pixel/--fairyPixel-energy.png",
+      "baseCardId": "xy1-140",
+      "tag": "pixel"
+    }
+  ]
+}

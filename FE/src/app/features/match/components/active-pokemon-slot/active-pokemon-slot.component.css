@@ -1,0 +1,279 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* ===== Setup glow animation ===== */
+
+@keyframes setup-glow-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 30px 8px rgba(0, 200, 255, 0.35), 0 0 24px 6px rgba(0, 200, 255, 0.4);
+    background-color: rgba(0, 200, 255, 0.1);
+  }
+  50% {
+    box-shadow: inset 0 0 50px 14px rgba(0, 220, 255, 0.55), 0 0 40px 12px rgba(0, 220, 255, 0.6);
+    background-color: rgba(0, 220, 255, 0.2);
+  }
+}
+
+.setup-glow {
+  animation: setup-glow-pulse 1.4s ease-in-out infinite;
+  border-radius: 8px;
+  border: 2px solid var(--neon-cyan, #00aaff) !important;
+}
+
+/* ===== Setup glow animation ===== */
+
+@keyframes setup-glow-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 30px 8px rgba(0, 200, 255, 0.35), 0 0 24px 6px rgba(0, 200, 255, 0.4);
+    background-color: rgba(0, 200, 255, 0.1);
+  }
+  50% {
+    box-shadow: inset 0 0 50px 14px rgba(0, 220, 255, 0.55), 0 0 40px 12px rgba(0, 220, 255, 0.6);
+    background-color: rgba(0, 220, 255, 0.2);
+  }
+}
+
+.setup-glow {
+  animation: setup-glow-pulse 1.4s ease-in-out infinite;
+  border-radius: 8px;
+  border: 2px solid var(--neon-cyan, #00aaff);
+}
+
+/* ===== Card entry animation (when placed from hand to slot) ===== */
+
+@keyframes card-entry {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.6) rotateZ(-5deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(5px) scale(1.05) rotateZ(1deg);
+  }
+  80% {
+    transform: translateY(-2px) scale(0.98) rotateZ(-0.5deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotateZ(0deg);
+  }
+}
+
+.slot-card.animate-entry {
+  animation: card-entry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ===== Own slot hover (player's active Pokémon) ===== */
+
+.own-slot {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.own-slot:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 12px 2px rgba(0, 180, 255, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* ===== Card back pattern (for opponent view during setup) ===== */
+
+.card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1a237e 100%);
+  border: 1px solid #5c6bc0;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 55%;
+  height: 65%;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.12);
+}
+
+.card-back::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 25%;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+/* ===== Damage badge ===== */
+
+.damage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #ef4444;
+  color: black;
+  font-weight: 900;
+  font-size: 0.45rem;
+  line-height: 1;
+  border: 1.5px solid #7f1d1d;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+/* ===== Energy appear animation ===== */
+
+@keyframes energy-appear {
+  from { opacity: 0; transform: scale(0) rotate(-90deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.energy-appear {
+  animation: energy-appear 0.3s ease-out both;
+}
+
+/* ===== Barra de estado (HP + daño) ===== */
+
+.stat-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 6rem;
+  flex-shrink: 0;
+  /* Captura el click para que no pase a la zona (no abre la barra de ataque)
+     y evita la selección de texto / cursor de escritura sobre los números. */
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+.stat-tag {
+  flex-shrink: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.5rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.stat-tag--hp { color: #86efac; }
+
+.stat-track {
+  flex: 1;
+  min-width: 0;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  border-radius: 2px;
+  /* La transición anima el drenaje cuando baja el HP al recibir daño. */
+  transition: width 0.5s ease, background-color 0.3s ease;
+}
+.stat-fill.is-hp-high { background: #22c55e; }
+.stat-fill.is-hp-medium { background: #eab308; }
+.stat-fill.is-hp-low { background: #ef4444; }
+
+.stat-amt {
+  flex-shrink: 0;
+  min-width: 0.95rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+}
+
+.stat-dmg {
+  flex-shrink: 0;
+  min-width: 1.2rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #ff4d4d;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+}
+
+/* ===== Tool card peeking beneath Pokemon ===== */
+
+.tool-card-peek {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(180, 130, 255, 0.5);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 0 6px rgba(180, 130, 255, 0.3);
+  z-index: 5;
+}
+
+.tool-card-peek img {
+  object-position: bottom;
+}
+
+/* ===== Pokémon aura (RPG ground circle) ===== */
+
+@keyframes aura-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scaleX(1) scaleY(1);
+    opacity: 0.85;
+    filter: blur(2px) brightness(1.5);
+  }
+  50% {
+    transform: translate(-50%, -50%) scaleX(1.2) scaleY(1.15);
+    opacity: 1;
+    filter: blur(3px) brightness(2);
+  }
+}
+
+.pokemon-aura {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 80%;
+  height: 22%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: aura-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 19;
+}
+
+/* ===== Pokémon GIF overlay sobre la carta ===== */
+
+.pokemon-gif-overlay {
+  position: absolute;
+  top: 3%;
+  left: 8%;
+  width: 84%;
+  height: 42%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 20;
+}

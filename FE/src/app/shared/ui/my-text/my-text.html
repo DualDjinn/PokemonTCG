@@ -1,0 +1,15 @@
+@if (tag === 'h1') {
+  <h1 class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</h1>
+} @else if (tag === 'h2') {
+  <h2 class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</h2>
+} @else if (tag === 'h3') {
+  <h3 class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</h3>
+} @else if (tag === 'h4') {
+  <h4 class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</h4>
+} @else if (tag === 'p') {
+  <p class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</p>
+} @else if (tag === 'label') {
+  <label class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</label>
+} @else {
+  <span class="m-0 p-0 leading-[1.4]" [style.color]="color" [style.fontSize]="size" [style.fontWeight]="weight" [style.textAlign]="align">{{ text }}</span>
+}

@@ -1,0 +1,43 @@
+<button
+  type="button"
+  class="card-thumb flex flex-col gap-1 p-1.5 border-[3px] bg-black/35 cursor-pointer font-inherit text-inherit text-left transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_0_10px_rgba(0,170,255,0.2)]"
+  [style.borderColor]="'var(--pixel-border-bottom-right)'"
+  [style.borderTopColor]="'var(--pixel-border-top-left)'"
+  [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+  [title]="name"
+  (click)="onClick($event)"
+>
+  <div
+    class="card-img-wrapper relative w-full aspect-[2.5/3.5] overflow-hidden bg-black/30 flex items-center justify-center"
+    [class.card-holo]="isHolo"
+  >
+    @if (imageUrl) {
+      <img
+        [src]="imageUrl"
+        [alt]="name"
+        loading="lazy"
+        class="w-full h-full object-contain block"
+        (error)="onImgError($event)"
+      />
+    } @else {
+      <div class="w-full h-full flex items-center justify-center text-2xl" [style.color]="color">?</div>
+    }
+    @if (hoverOverlay && showName) {
+      <div class="card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 transition-opacity duration-200 flex items-end p-1.5">
+        <my-text [text]="name" tag="span" size="0.6rem" color="var(--text-primary)" weight="bold"></my-text>
+      </div>
+    }
+  </div>
+  <div class="flex flex-col items-center gap-0.5">
+    @if (showName) {
+      <my-text [text]="name" tag="span" size="0.675rem" align="center"></my-text>
+    }
+    @if (showCount && count >= 1) {
+      <span
+        class="inline-block text-xs font-bold px-1.5 py-0.5 rounded-full leading-tight"
+        [style.background]="color"
+        style="color: #050508;"
+      >{{ count }}</span>
+    }
+  </div>
+</button>

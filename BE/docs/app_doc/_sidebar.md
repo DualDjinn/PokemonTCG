@@ -1,0 +1,5 @@
+- **Introduction**
+- [**Class Diagrams**](/diagrams/class_diagram.md)
+- [**Components Diagrams**](/diagrams/components_diagram.md)
+- [**Sequences Diagrams**](/diagrams/sequences_diagram.md)
+- [**Patrones de diseño**](/patrones.md)

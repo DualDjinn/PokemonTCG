@@ -1,0 +1,300 @@
+.dealing-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deal-stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.flying-card {
+  position: fixed;
+  width: 5rem;
+  aspect-ratio: 2.5 / 3.5;
+  left: var(--start-x);
+  top: var(--start-y);
+  transform: translate(-50%, -50%);
+  animation: deal-card-opponent 600ms ease-in-out forwards;
+  will-change: transform, opacity;
+  transition: opacity 0.3s ease;
+}
+
+.flying-card--fading {
+  opacity: 0;
+}
+
+.flying-card--player {
+  animation-name: deal-card-player;
+}
+
+.flying-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 4px;
+}
+
+.flying-card__back {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1a237e 100%);
+  border: 1px solid #5c6bc0;
+  position: relative;
+  overflow: hidden;
+}
+
+.flying-card__back::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 55%;
+  height: 65%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.flying-card__back::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 25%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+@keyframes deal-card-opponent {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% - 15px)) scale(0.7);
+  }
+  50% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x)) * 0.4),
+      calc(-50% + (var(--end-y) - var(--start-y)) * 0.5 - 20px)
+    ) scale(0.9);
+  }
+  100% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x))),
+      calc(-50% + (var(--end-y) - var(--start-y)))
+    ) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Shuffle stage ===== */
+
+.shuffle-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.shuffle-deck {
+  position: relative;
+  width: 80px;
+  height: 112px;
+}
+
+.shuffle-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 112px;
+  border-radius: 4px;
+  overflow: hidden;
+  animation: shuffle-card 0.6s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+
+.shuffle-card .card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1a237e 100%);
+  border: 1px solid #5c6bc0;
+  position: relative;
+  overflow: hidden;
+}
+
+.shuffle-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 3px;
+}
+
+.shuffle-card .card-back::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 55%;
+  height: 65%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.shuffle-card .card-back::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 25%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.shuffle-card:nth-child(1) { animation-delay: 0ms; }
+.shuffle-card:nth-child(2) { animation-delay: 70ms; }
+.shuffle-card:nth-child(3) { animation-delay: 140ms; }
+.shuffle-card:nth-child(4) { animation-delay: 210ms; }
+.shuffle-card:nth-child(5) { animation-delay: 280ms; }
+
+@keyframes shuffle-card {
+  0% {
+    transform: translateX(-8px) rotate(-4deg) translateY(-2px);
+  }
+  25% {
+    transform: translateX(10px) rotate(3deg) translateY(0px);
+  }
+  50% {
+    transform: translateX(-6px) rotate(-2deg) translateY(-3px);
+  }
+  75% {
+    transform: translateX(12px) rotate(4deg) translateY(1px);
+  }
+  100% {
+    transform: translateX(-8px) rotate(-3deg) translateY(-1px);
+  }
+}
+
+.dealing-text {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  color: var(--neon-cyan, #00aaff);
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+  animation: pulse-text 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* ===== Return animation (cards fly back to deck) ===== */
+
+.flying-card--return {
+  animation: return-card 500ms ease-in-out forwards;
+}
+
+@keyframes return-card {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x)) * 0.6),
+      calc(-50% + (var(--end-y) - var(--start-y)) * 0.6 - 20px)
+    ) scale(0.9) rotateY(90deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x))),
+      calc(-50% + (var(--end-y) - var(--start-y)))
+    ) scale(0.5) rotateY(180deg);
+    opacity: 0;
+  }
+}
+
+/* ===== Mulligan badge ===== */
+
+.mulligan-badge {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.8rem;
+  color: #ff4444;
+  text-shadow:
+    0 0 20px rgba(255, 68, 68, 0.6),
+    0 0 40px rgba(255, 68, 68, 0.3);
+  animation: mulligan-flash 0.6s ease-out forwards;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+@keyframes mulligan-flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1) translateY(-20px);
+  }
+}
+
+@keyframes deal-card-player {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5) rotateY(180deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% - 15px)) scale(0.7) rotateY(180deg);
+  }
+  40% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x)) * 0.35),
+      calc(-50% + (var(--end-y) - var(--start-y)) * 0.45 - 25px)
+    ) scale(0.95) rotateY(170deg);
+  }
+  55% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x)) * 0.5),
+      calc(-50% + (var(--end-y) - var(--start-y)) * 0.55 - 10px)
+    ) scale(1) rotateY(10deg);
+  }
+  100% {
+    transform: translate(
+      calc(-50% + (var(--end-x) - var(--start-x))),
+      calc(-50% + (var(--end-y) - var(--start-y)))
+    ) scale(1) rotateY(0deg);
+    opacity: 1;
+  }
+}

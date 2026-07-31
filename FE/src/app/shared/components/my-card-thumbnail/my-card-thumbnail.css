@@ -1,0 +1,27 @@
+:host { display: contents; }
+
+.card-thumb:hover {
+  border-color: var(--neon-cyan, #00ccaa) !important;
+}
+
+.card-thumb:hover .card-overlay {
+  opacity: 1;
+}
+
+.card-holo {
+  background: linear-gradient(135deg, rgba(0, 204, 170, 0.08), rgba(168, 85, 247, 0.08));
+}
+
+.card-holo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 20%,
+    rgba(0, 204, 170, 0.12) 40%,
+    rgba(168, 85, 247, 0.12) 60%,
+    transparent 80%
+  );
+  pointer-events: none;
+}

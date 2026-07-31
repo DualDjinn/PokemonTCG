@@ -1,0 +1,13 @@
+<div class="flex flex-col gap-2">
+  @if (title) {
+    <my-text [text]="title" tag="p" size="0.855rem" weight="bold" color="var(--text-secondary)"></my-text>
+  }
+  <div class="flex flex-col gap-1">
+    @for (check of checks; track check.label) {
+      <div class="flex items-center gap-2" [class.opacity-100]="check.passed" [class.opacity-60]="!check.passed">
+        <span class="text-sm leading-none">{{ check.passed ? '✅' : '❌' }}</span>
+        <my-text [text]="check.label" tag="span" size="0.855rem"></my-text>
+      </div>
+    }
+  </div>
+</div>

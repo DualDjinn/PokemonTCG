@@ -1,0 +1,83 @@
+[
+  {
+    "name": "Chespin Deck",
+    "cards": [
+      { "name": "Chespin", "count": 4 },
+      { "name": "Quilladin", "count": 3 },
+      { "name": "Chesnaught", "count": 2 },
+      { "name": "Weedle", "count": 2 },
+      { "name": "Kakuna", "count": 1 },
+      { "name": "Beedrill", "count": 1 },
+      { "name": "Pansage", "count": 2 },
+      { "name": "Simisage", "count": 1 },
+      { "name": "Skiddo", "count": 2 },
+      { "name": "Gogoat", "count": 1 },
+      { "name": "Volbeat", "count": 1 },
+      { "name": "Illumise", "count": 1 },
+      { "name": "Scatterbug", "count": 1 },
+      { "name": "Great Ball", "count": 4 },
+      { "name": "Professor Sycamore", "count": 2 },
+      { "name": "Shauna", "count": 2 },
+      { "name": "Super Potion", "count": 2 },
+      { "name": "Evosoda", "count": 2 },
+      { "name": "Professor's Letter", "count": 2 },
+      { "name": "Hard Charm", "count": 2 },
+      { "name": "Roller Skates", "count": 2 },
+      { "name": "Grass Energy", "count": 20 }
+    ]
+  },
+  {
+    "name": "Fennekin Deck",
+    "cards": [
+      { "name": "Fennekin", "count": 4 },
+      { "name": "Braixen", "count": 3 },
+      { "name": "Delphox", "count": 2 },
+      { "name": "Slugma", "count": 2 },
+      { "name": "Magcargo", "count": 1 },
+      { "name": "Pansear", "count": 2 },
+      { "name": "Simisear", "count": 1 },
+      { "name": "Fletchling", "count": 2 },
+      { "name": "Fletchinder", "count": 1 },
+      { "name": "Talonflame", "count": 1 },
+      { "name": "Tauros", "count": 1 },
+      { "name": "Lillipup", "count": 1 },
+      { "name": "Herdier", "count": 1 },
+      { "name": "Great Ball", "count": 4 },
+      { "name": "Professor Sycamore", "count": 2 },
+      { "name": "Shauna", "count": 2 },
+      { "name": "Super Potion", "count": 2 },
+      { "name": "Evosoda", "count": 2 },
+      { "name": "Professor's Letter", "count": 2 },
+      { "name": "Muscle Band", "count": 2 },
+      { "name": "Roller Skates", "count": 2 },
+      { "name": "Fire Energy", "count": 20 }
+    ]
+  },
+  {
+    "name": "Froakie Deck",
+    "cards": [
+      { "name": "Froakie", "count": 4 },
+      { "name": "Frogadier", "count": 3 },
+      { "name": "Greninja", "count": 2 },
+      { "name": "Panpour", "count": 2 },
+      { "name": "Simipour", "count": 1 },
+      { "name": "Shellder", "count": 2 },
+      { "name": "Cloyster", "count": 1 },
+      { "name": "Staryu", "count": 2 },
+      { "name": "Starmie", "count": 1 },
+      { "name": "Lapras", "count": 1 },
+      { "name": "Corsola", "count": 1 },
+      { "name": "Bidoof", "count": 1 },
+      { "name": "Bibarel", "count": 1 },
+      { "name": "Great Ball", "count": 4 },
+      { "name": "Professor Sycamore", "count": 2 },
+      { "name": "Shauna", "count": 2 },
+      { "name": "Super Potion", "count": 2 },
+      { "name": "Evosoda", "count": 2 },
+      { "name": "Professor's Letter", "count": 2 },
+      { "name": "Hard Charm", "count": 2 },
+      { "name": "Roller Skates", "count": 2 },
+      { "name": "Water Energy", "count": 20 }
+    ]
+  }
+]

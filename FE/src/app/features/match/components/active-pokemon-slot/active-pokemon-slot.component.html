@@ -1,0 +1,75 @@
+@let mon = pokemon();
+
+<div class="flex items-center justify-center w-full h-full">
+  <div class="flex flex-col items-center gap-1">
+    @if (!showCardBack() && mon.maxHp > 0) {
+      <div class="stat-line" (click)="$event.stopPropagation()">
+        <span class="stat-tag stat-tag--hp">HP</span>
+        <div class="stat-track">
+          <div
+            class="stat-fill"
+            [class.is-hp-high]="hpClass() === 'hp-high'"
+            [class.is-hp-medium]="hpClass() === 'hp-medium'"
+            [class.is-hp-low]="hpClass() === 'hp-low'"
+            [style.width.%]="hpPct()"
+          ></div>
+        </div>
+        <span class="stat-amt">{{ mon.currentHp }}</span>
+        <span class="stat-dmg">{{ damageTaken() > 0 ? '-' + damageTaken() : '' }}</span>
+      </div>
+    }
+    <div class="relative">
+      <div class="relative w-24 aspect-[2.5/3.5] overflow-hidden border border-[rgba(201,165,48,0.5)] bg-white flex items-center justify-center slot-card z-10"
+           [class.setup-glow]="highlight()"
+           [class.animate-entry]="animateEntry()"
+           [class.own-slot]="isOwn()">
+        @if (showCardBack()) {
+          @if (cardBackUrl()) {
+            <img [src]="cardBackUrl()" class="card-back-img" />
+          } @else {
+            <div class="card-back"></div>
+          }
+        } @else if (mon.imageUrl) {
+          <img [src]="mon.imageUrl" [alt]="mon.name" loading="lazy" class="w-full h-full object-cover block" />
+          @if (gifPath()) {
+            <div class="pokemon-aura"
+                 [style.background]="'radial-gradient(ellipse at center, ' + auraColor() + ' 0%, ' + auraColor() + '99 40%, transparent 75%)'"
+                 [style.box-shadow]="'0 0 14px 6px ' + auraColor() + ', 0 0 24px 10px ' + auraColor() + '88'"></div>
+            <img [src]="gifPath()!" [alt]="mon.name" class="pokemon-gif-overlay" />
+          }
+        } @else {
+          <span class="text-xl text-[#8888aa] leading-none">?</span>
+        }
+        @if (mon.statusConditions.length) {
+          <div class="absolute top-6 right-0.5 flex flex-col gap-0.5 pointer-events-none">
+            @for (status of mon.statusConditions; track $index) {
+              <span
+                class="flex items-center justify-center w-4 h-4 text-[0.6rem] leading-none bg-black/60 rounded-full backdrop-blur-sm"
+                [title]="status"
+              >{{ statusIcon(status) }}</span>
+            }
+          </div>
+        }
+        @if (!showCardBack() && groupedEnergies().length > 0) {
+          <div class="absolute bottom-0 left-0 flex items-end gap-0.5 p-0.5">
+            @for (group of groupedEnergies(); track group.type) {
+              <div class="relative flex items-end">
+                <img [src]="energyImage(group.type)" class="w-5 h-5 object-contain border border-cyan-300/50 rounded-full drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] shadow-[0_0_6px_rgba(0,220,255,0.35)] energy-appear" [style.animation-delay.ms]="$index * 80" [alt]="group.type" />
+                @if (group.count > 1) {
+                  <span class="text-[0.6rem] font-bold text-white leading-none ml-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,0.9)]">{{ group.count }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      @if (!showCardBack() && hasTool()) {
+        <div style="position:absolute;right:-8%;top:5%;width:65%;height:85%;z-index:1;transform:rotate(14deg);transform-origin:bottom right;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.6))" [title]="mon.toolCardName"
+          (contextmenu)="onToolRightClick($event, mon.toolCardName!, mon.toolCardImageUrl ?? '', mon.toolCardRules)">
+          <img [src]="mon.toolCardImageUrl" [alt]="mon.toolCardName" style="width:100%;height:100%;object-fit:contain;display:block;border-radius:4px" />
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

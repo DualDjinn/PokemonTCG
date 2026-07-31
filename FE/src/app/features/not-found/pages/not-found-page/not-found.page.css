@@ -1,0 +1,102 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.nf-container {
+  width: 100%;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(5, 8, 18, 0.35), rgba(5, 8, 18, 0.55)),
+    url('/assets/img/fondo404hd.png') center / cover no-repeat fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Panel translúcido tipo vidrio esmerilado — el bosque se ve a través */
+.nf-card {
+  background: rgba(10, 14, 28, 0.45) !important;
+  background-image: none !important;
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  text-align: center;
+}
+
+/* ============== Pokéball decorativa con glow neón ============== */
+.nf-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(0, 170, 255, 0.55));
+  animation: nf-float 3s ease-in-out infinite;
+}
+
+@keyframes nf-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ============== "4 0 4" ============== */
+.nf-404 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  line-height: 1;
+}
+
+.nf-digit {
+  font-size: 8rem;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: -0.04em;
+  text-shadow:
+    0 0 12px rgba(0, 170, 255, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.nf-zero {
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  border: 6px solid var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 14, 28, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 12px rgba(0, 170, 255, 0.3),
+    0 0 18px rgba(0, 170, 255, 0.45);
+}
+
+.nf-snorlax {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* ============== Responsive ============== */
+@media (max-width: 640px) {
+  .nf-digit {
+    font-size: 5rem;
+  }
+  .nf-zero {
+    width: 4.5rem;
+    height: 4.5rem;
+    border-width: 4px;
+  }
+  .nf-logo {
+    width: 42px;
+    height: 42px;
+  }
+}

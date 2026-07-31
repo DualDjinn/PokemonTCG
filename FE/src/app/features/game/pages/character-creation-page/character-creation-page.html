@@ -1,0 +1,62 @@
+<div class="fixed inset-0 z-0 bg-[#0a0a1a]">
+  <div class="absolute inset-0" style="background: rgba(5,5,15,0.7)"></div>
+</div>
+
+<div class="fixed top-1/2 left-1/2 z-[100] bg-bg-secondary/95 border-2 border-neon-cyan rounded-lg shadow-[0_0_30px_rgba(0,170,255,0.3)] w-[min(90vw,420px)] max-h-[92vh] overflow-y-auto p-8" style="transform: translate(-50%, -50%)">
+  <div class="logo">
+    <!-- Título y subtítulo traducidos -->
+    <h1 class="font-orbitron text-2xl text-center text-text-primary tracking-[4px] mb-4">{{ 'CHARACTER_CREATION.TITLE' | translate }}</h1>
+  </div>
+  <p class="text-center text-text-secondary text-sm mb-5 tracking-[1px] font-share-tech">{{ 'CHARACTER_CREATION.CHOOSE' | translate }}</p>
+
+  <div class="grid grid-cols-3 gap-2 justify-items-center mb-4">
+    @for (char of characters; track char.id) {
+    <div class="flex flex-col items-center gap-1 p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 bg-black/30 w-full max-w-[120px] hover:border-neon-cyan hover:shadow-[0_0_15px_rgba(0,170,255,0.3)]"
+         [ngClass]="selectedCharacter === char.id
+            ? 'border-neon-cyan shadow-[0_0_20px_rgba(0,170,255,0.5)]'
+            : 'border-text-secondary'"
+         (click)="selectCharacter(char.id)">
+      <img [src]="char.portrait" [alt]="char.name" class="w-[72px] h-auto rounded">
+    </div>
+    }
+  </div>
+
+  @if (showColorSelector) {
+  <div class="flex gap-6 justify-center mb-4 min-h-[36px]" id="color-selector">
+    <div class="w-8 h-8 rounded-full border-2 border-text-secondary cursor-pointer transition-all duration-300 hover:scale-110 relative"
+         [class.border-neon-cyan]="selectedColor === 'rojo'"
+         [class.shadow-[0_0_12px_#00aaff]]="selectedColor === 'rojo'"
+         [class.scale-110]="selectedColor === 'rojo'"
+         style="background: #e03131"
+         (click)="selectColor('rojo')">
+      <!-- Etiquetas de colores traducidas -->
+      <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-text-secondary font-orbitron whitespace-nowrap tracking-[1px] -translate-x-1/2" [class.text-neon-cyan]="selectedColor === 'rojo'">{{ 'CHARACTER_CREATION.COLOR_RED' | translate }}</span>
+    </div>
+    <div class="w-8 h-8 rounded-full border-2 border-text-secondary cursor-pointer transition-all duration-300 hover:scale-110 relative"
+         [class.border-neon-cyan]="selectedColor === 'verde'"
+         [class.shadow-[0_0_12px_#00aaff]]="selectedColor === 'verde'"
+         [class.scale-110]="selectedColor === 'verde'"
+         style="background: #2f9e44"
+         (click)="selectColor('verde')">
+      <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-text-secondary font-orbitron whitespace-nowrap tracking-[1px] -translate-x-1/2" [class.text-neon-cyan]="selectedColor === 'verde'">{{ 'CHARACTER_CREATION.COLOR_GREEN' | translate }}</span>
+    </div>
+    <div class="w-8 h-8 rounded-full border-2 border-text-secondary cursor-pointer transition-all duration-300 hover:scale-110 relative"
+         [class.border-neon-cyan]="selectedColor === 'violeta'"
+         [class.shadow-[0_0_12px_#00aaff]]="selectedColor === 'violeta'"
+         [class.scale-110]="selectedColor === 'violeta'"
+         style="background: #845ef7"
+         (click)="selectColor('violeta')">
+      <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-text-secondary font-orbitron whitespace-nowrap tracking-[1px] -translate-x-1/2" [class.text-neon-cyan]="selectedColor === 'violeta'">{{ 'CHARACTER_CREATION.COLOR_PURPLE' | translate }}</span>
+    </div>
+  </div>
+  }
+
+  <form (ngSubmit)="onSubmit()" #charForm="ngForm">
+    <div class="mb-5">
+      <!-- Input con placeholder traducido -->
+      <input type="text" [(ngModel)]="characterName" name="charName" [placeholder]="'CHARACTER_CREATION.NAME_PLACEHOLDER' | translate" maxlength="15" required class="w-full p-3 bg-black/40 border border-white/10 rounded text-text-primary font-share-tech text-sm transition-all duration-300 box-border focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_10px_rgba(0,170,255,0.2)]">
+      <div class="text-right text-text-secondary text-xs mt-1 tracking-[1px]" [class.text-neon-magenta]="nameLength >= 15">{{ nameLength }} / 15</div>
+    </div>
+    <button type="submit" class="w-full p-4 border-0 rounded text-white font-orbitron text-sm tracking-[3px] cursor-pointer transition-all duration-300 uppercase hover:-translate-y-0.5 hover:shadow-[0_5px_20px_rgba(0,170,255,0.4)]" style="background: linear-gradient(135deg, #00aaff, #ff3333)">{{ 'CHARACTER_CREATION.CREATE' | translate }}</button>
+  </form>
+</div>

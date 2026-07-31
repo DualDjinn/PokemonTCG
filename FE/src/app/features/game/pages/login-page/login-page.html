@@ -1,0 +1,160 @@
+<div id="transition-overlay" class="fixed inset-0 bg-[#0a0a1a] z-[1000] opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+<div class="fixed inset-0 z-0">
+  <video id="main-video" src="assets/video/intro.webm" [muted]="isMuted" loop playsinline preload="metadata" class="w-full h-full object-cover"></video>
+  <div class="absolute inset-0" style="background: rgba(5,5,15,0.7)"></div>
+</div>
+
+<button id="mute-btn" class="fixed top-5 right-5 z-[100] w-11 h-11 flex items-center justify-center cursor-pointer text-white transition-all duration-300 hover:bg-white/20 hover:border-neon-cyan rounded-full" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);" (click)="toggleMute()" [attr.aria-label]="(isMuted ? 'LOGIN.UNMUTE_AUDIO' : 'LOGIN.MUTE_AUDIO') | translate" [attr.title]="(isMuted ? 'LOGIN.UNMUTE_AUDIO' : 'LOGIN.MUTE_AUDIO') | translate">
+  <svg id="sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [style.display]="isMuted ? 'block' : 'none'" class="w-[22px] h-[22px]">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+    <line x1="23" y1="9" x2="17" y2="15"/>
+    <line x1="17" y1="9" x2="23" y2="15"/>
+  </svg>
+  <svg id="sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [style.display]="!isMuted ? 'block' : 'none'" class="w-[22px] h-[22px]">
+    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+  </svg>
+</button>
+
+<div id="index-page" class="fixed inset-0 z-10 flex flex-col items-center justify-center"
+     [class.opacity-100]="currentPage === 'intro'"
+     [class.pointer-events-auto]="currentPage === 'intro'"
+     [class.opacity-0]="currentPage !== 'intro'"
+     [class.pointer-events-none]="currentPage !== 'intro'"
+     style="transition: opacity 0.6s;"
+     (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)" (keydown)="onSpaceDown($event)" (keyup)="onSpaceUp($event)" tabindex="0">
+  <div class="font-orbitron text-sm text-text-secondary tracking-[3px] uppercase mb-8"
+        [class.animate-pulse]="showIntroHint"
+        [style.opacity]="showIntroHint ? '1' : '0'"
+        [style.visibility]="showIntroHint ? 'visible' : 'hidden'"
+        style="transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; text-shadow: 0 0 20px rgba(0,170,255,0.5);">{{ 'LOGIN.HOLD_SPACE' | translate }}</div>
+  <div class="mt-4" id="progress-ring"
+       [style.opacity]="showIntroHint ? '1' : '0'"
+       style="transition: opacity 0.4s ease-in-out;">
+    <svg viewBox="0 0 100 100" class="w-[100px] h-[100px] -rotate-90">
+      <circle class="fill-none stroke-white/10 stroke-[6]" cx="50" cy="50" r="45"/>
+      <circle class="fill-none stroke-neon-cyan stroke-[6] stroke-linecap-round" cx="50" cy="50" r="45" id="ring-progress" style="stroke-dasharray: 283; stroke-dashoffset: 283; transition: stroke-dashoffset 0.05s linear, stroke 0.05s linear;"/>
+    </svg>
+  </div>
+</div>
+
+<div id="login-page" class="fixed inset-0 z-10 flex flex-col items-center justify-center"
+     [class.visible]="currentPage === 'login'"
+     [class.opacity-100]="currentPage === 'login'"
+     [class.pointer-events-auto]="currentPage === 'login'"
+     [class.invisible]="currentPage !== 'login'"
+     [class.opacity-0]="currentPage !== 'login'"
+     [class.pointer-events-none]="currentPage !== 'login'"
+     style="transition: opacity 0.6s;">
+  <div class="login-wrapper relative inline-flex" [class.auth-transitioning]="isAuthTransitioning">
+    <div class="login-card bg-bg-secondary/80 backdrop-blur-[12px] border-2 border-neon-cyan rounded-full"
+         [class.glow-right]="slideLeft"
+         [class.glow-left]="!slideLeft"
+         [class.glow-active]="isRotating">
+      <div class="py-10"
+           [style.width]="'66rem'"
+           [style.paddingLeft]="activeTab === 'register' ? '26rem' : '5rem'"
+           [style.paddingRight]="activeTab === 'register' ? '5rem' : '26rem'">
+        <div class="logo">
+          <h1 class="font-orbitron text-2xl text-center text-text-primary tracking-[4px] mb-6"
+              style="transition: opacity 0.25s ease-in-out;"
+              [style.opacity]="isRotating ? '0' : '1'">{{ activeTab === 'login' ? 'LOGIN' : 'REGISTER' }}</h1>
+        </div>
+        <div class="form-stack">
+          <form class="form-layer flex-col items-center gap-[1.2em]"
+                style="transition: opacity 0.25s ease-in-out;"
+                [style.opacity]="activeTab === 'login' && !isRotating ? '1' : '0'"
+                [class.pointer-events-auto]="activeTab === 'login' && !isRotating"
+                [class.pointer-events-none]="activeTab !== 'login' || isRotating"
+                (ngSubmit)="onLogin()" #loginForm="ngForm">
+            <div class="flex flex-col items-center gap-[1.2em]">
+              <div class="input-group">
+                 <input type="text" [(ngModel)]="loginUser" name="loginUser" [placeholder]="'LOGIN.USERNAME' | translate" autocomplete="off" required class="w-[280px] p-4 bg-black/40 border border-white/10 rounded text-text-primary font-share-tech text-sm transition-all duration-300 box-border focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_10px_rgba(0,170,255,0.2)]">
+              </div>
+              <div class="input-group">
+                 <input type="password" [(ngModel)]="loginPass" name="loginPass" [placeholder]="'LOGIN.PASSWORD' | translate" autocomplete="new-password" required class="w-[280px] p-4 bg-black/40 border border-white/10 rounded text-text-primary font-share-tech text-sm transition-all duration-300 box-border focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_10px_rgba(0,170,255,0.2)]">
+              </div>
+              <label class="flex items-center gap-2 cursor-pointer select-none w-[280px]">
+                <input type="checkbox" [(ngModel)]="keepSession" name="keepSession"
+                       class="w-4 h-4 rounded border border-white/10 bg-black/40
+                              accent-neon-cyan focus:ring-neon-cyan cursor-pointer">
+                <!-- Texto "Mantener sesión" traducido -->
+                <span class="text-text-secondary font-share-tech text-xs tracking-[1px]">{{ 'LOGIN.KEEP_SESSION' | translate }}</span>
+              </label>
+              <button type="submit" class="btn-submit w-[280px] p-4 border-0 rounded text-white font-orbitron text-sm tracking-[3px] cursor-pointer transition-all duration-300 uppercase hover:-translate-y-0.5 hover:shadow-[0_5px_20px_rgba(0,170,255,0.4)]" style="background: linear-gradient(135deg, #00aaff, #ff3333)">{{ 'LOGIN.ENTER' | translate }}</button>
+            </div>
+          </form>
+          <form class="form-layer flex-col items-center gap-[1.2em]"
+                style="transition: opacity 0.25s ease-in-out;"
+                [style.opacity]="activeTab === 'register' && !isRotating ? '1' : '0'"
+                [class.pointer-events-auto]="activeTab === 'register' && !isRotating"
+                [class.pointer-events-none]="activeTab !== 'register' || isRotating"
+                (ngSubmit)="onRegister()" #registerForm="ngForm">
+            <div class="flex flex-col items-center gap-[1.2em]">
+              <div class="input-group">
+                <input type="text" [(ngModel)]="regUser" name="regUser" [placeholder]="'LOGIN.USERNAME' | translate" autocomplete="off" required class="w-[280px] p-4 bg-black/40 border border-white/10 rounded text-text-primary font-share-tech text-sm transition-all duration-300 box-border focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_10px_rgba(0,170,255,0.2)]">
+              </div>
+              <div class="input-group">
+                <input type="email" [(ngModel)]="regEmail" name="regEmail" [placeholder]="'LOGIN.EMAIL' | translate" autocomplete="off" required class="w-[280px] p-4 bg-black/40 border border-white/10 rounded text-text-primary font-share-tech text-sm transition-all duration-300 box-border focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_10px_rgba(0,170,255,0.2)]">
+              </div>
+              <div class="input-group" style="position: relative">
+                <input [type]="regPassVisible ? 'text' : 'password'" [(ngModel)]="regPass" name="regPass" [placeholder]="'LOGIN.PASSWORD' | translate" autocomplete="new-password" required class="w-[280px] p-4 bg-black/40 border border-white/10 rounded text-text-primary font-share-tech text-sm transition-all duration-300 box-border focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_10px_rgba(0,170,255,0.2)]">
+                <button type="button" (click)="regPassVisible = !regPassVisible" class="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer text-white/50 hover:text-white p-0 flex items-center justify-center w-5 h-5" tabindex="-1" attr.aria-label="{{ (regPassVisible ? 'LOGIN.HIDE_PASSWORD' : 'LOGIN.SHOW_PASSWORD') | translate }}">
+                  @if (regPassVisible) {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+              <button type="submit" class="btn-submit w-[280px] p-4 border-0 rounded text-white font-orbitron text-sm tracking-[3px] cursor-pointer transition-all duration-300 uppercase hover:-translate-y-0.5 hover:shadow-[0_5px_20px_rgba(0,170,255,0.4)]" style="background: linear-gradient(135deg, #00aaff, #ff3333)">{{ 'LOGIN.REGISTER' | translate }}</button>
+            </div>
+          </form>
+          <div class="flex items-center gap-3 w-[280px]" style="grid-area: 2 / 1; justify-self: center; transition: opacity 0.25s ease-in-out;" [style.opacity]="isRotating ? '0' : '1'">
+            <span class="flex-1 h-px bg-white/10"></span>
+            <span class="text-text-secondary font-share-tech text-[0.54rem] tracking-[2px]">O</span>
+            <span class="flex-1 h-px bg-white/10"></span>
+          </div>
+          <div id="google-signin-btn" class="w-[280px] flex justify-center" style="grid-area: 3 / 1; justify-self: center; z-index: 5; transition: opacity 0.25s ease-in-out;" [style.opacity]="isRotating ? '0' : '1'"></div>
+          <div class="flex flex-col items-center" style="grid-area: 4 / 1; justify-self: center; margin-top: 0.75rem; transition: opacity 0.25s ease-in-out;" [style.opacity]="isRotating ? '0' : '1'">
+            <!-- Enlace de "olvidé mi contraseña" y toggle de formulario traducidos -->
+            <button type="button" (click)="onForgotPassword()" class="text-text-secondary font-share-tech text-xs tracking-[1px] bg-transparent border-0 cursor-pointer hover:text-neon-cyan transition-colors duration-200"
+                    [style.display]="activeTab === 'login' ? 'block' : 'none'">{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</button>
+            <span class="font-share-tech text-xs text-text-secondary tracking-[1px] mt-1 cursor-pointer transition-colors duration-200 hover:text-neon-cyan" (click)="toggleForm()"
+                  [style.display]="activeTab === 'login' ? 'inline' : 'none'">
+              {{ 'LOGIN.NO_ACCOUNT' | translate }} <span class="text-neon-cyan">{{ 'LOGIN.SIGN_UP' | translate }}</span>
+            </span>
+            <span class="font-share-tech text-xs text-text-secondary tracking-[1px] mt-1 cursor-pointer transition-colors duration-200 hover:text-neon-cyan" (click)="toggleForm()"
+                  [style.display]="activeTab === 'register' ? 'inline' : 'none'">
+              {{ 'LOGIN.HAS_ACCOUNT' | translate }} <span class="text-neon-cyan">{{ 'LOGIN.SIGN_IN' | translate }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pokeball-dock absolute top-0 h-full aspect-square cursor-pointer z-10 transition-[left,transform] duration-500 ease-in-out"
+         [class.dock-left]="slideLeft"
+         [class.is-rotating]="isRotating"
+         [class.pokeball-pulse]="showPokeballPulse"
+         (click)="toggleForm()">
+      <img src="assets/img/login/pokeball.svg"
+           [class.rotating-left]="isRotating && slideLeft"
+           [class.rotating-right]="isRotating && !slideLeft"
+           class="w-full h-full object-contain"
+           [alt]="'LOGIN.CHANGE_FORM' | translate" />
+      <!-- Tooltip de la pokeball con texto traducido -->
+      <span class="pokeball-tooltip font-share-tech">
+        {{ (activeTab === 'login' ? 'LOGIN.POKEBALL_TOOLTIP_REGISTER' : 'LOGIN.POKEBALL_TOOLTIP_LOGIN') | translate }}
+      </span>
+    </div>
+  </div>
+</div>

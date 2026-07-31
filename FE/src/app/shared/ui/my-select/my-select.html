@@ -1,0 +1,36 @@
+@if (variant === 'pixel') {
+  <select
+    class="pixel-select"
+    [value]="value"
+    [disabled]="disabled"
+    [style.color]="textColor"
+    (change)="onSelect($event)"
+    (blur)="onBlur()"
+  >
+    @if (placeholder) {
+      <option value="" disabled hidden>{{ placeholder }}</option>
+    }
+    @for (option of options; track option.value) {
+      <option [value]="option.value">{{ option.label }}</option>
+    }
+  </select>
+} @else {
+  <select
+    class="text-xs font-pixel border-[3px] border-dashed px-[0.85rem] py-[0.65rem] outline-none cursor-pointer w-full appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+    [value]="value"
+    [disabled]="disabled"
+    [style.color]="textColor"
+    [style.background]="background"
+    [style.borderColor]="color"
+    [style.boxShadow]="'4px 4px 0px ' + color"
+    (change)="onSelect($event)"
+    (blur)="onBlur()"
+  >
+    @if (placeholder) {
+      <option value="" disabled hidden>{{ placeholder }}</option>
+    }
+    @for (option of options; track option.value) {
+      <option [value]="option.value">{{ option.label }}</option>
+    }
+  </select>
+}

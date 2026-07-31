@@ -1,0 +1,10 @@
+<div
+  class="border-dotted block box-border"
+  [style.background]="color"
+  [style.borderColor]="borderColor"
+  [style.padding]="padding"
+  [style.borderWidth]="borderWidth"
+  [style.boxShadow]="shadow ? '6px 6px 0px ' + borderColor : 'none'"
+>
+  <ng-content />
+</div>

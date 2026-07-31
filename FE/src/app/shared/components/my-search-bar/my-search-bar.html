@@ -1,0 +1,23 @@
+<div class="flex items-center gap-2 w-full">
+  <span class="text-sm leading-none" [style.color]="color">🔍</span>
+  <my-input
+    [value]="value"
+    [placeholder]="placeholder"
+    type="search"
+    [variant]="variant"
+    [color]="color"
+    [textColor]="textColor"
+    [background]="background"
+    (valueChange)="onValueChange($event)"
+  ></my-input>
+  @if (showClear && value) {
+    <my-icon-button
+      icon="✕"
+      [color]="color"
+      [variant]="variant"
+      size="small"
+      ariaLabel="Clear search"
+      (clicked)="clear()"
+    ></my-icon-button>
+  }
+</div>

@@ -1,0 +1,269 @@
+<div
+  class="fixed inset-0 z-[1000] bg-black/75 flex items-center justify-center"
+  (click)="onOverlayClick($event)"
+>
+    <div class="waiting-room-glow">
+      <div
+        class="flex border-3 overflow-hidden transition-all duration-300 ease-out h-[520px]"
+        [style.background]="'var(--pixel-panel-bg)'"
+        [style.backgroundImage]="'linear-gradient(45deg, rgba(0,170,255,0.04) 25%, transparent 25%), linear-gradient(-45deg, rgba(0,170,255,0.04) 25%, transparent 25%)'"
+        [style.backgroundSize]="'4px 4px'"
+        [style.borderColor]="'var(--pixel-border-bottom-right)'"
+        [style.borderTopColor]="'var(--pixel-border-top-left)'"
+        [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+        [class.max-w-[46rem]]="!chatOpen()"
+        [class.max-w-[58rem]]="chatOpen()"
+      >
+    <!-- Main content -->
+    <div class="flex flex-col gap-6 p-8 min-w-[30rem] max-w-[46rem] justify-center">
+      <div class="flex justify-between items-center">
+        <span class="font-orbitron text-lg text-neon-cyan">{{ roomName }}</span>
+        <div class="flex items-center gap-3 border-2 px-3 py-1.5"
+             [style.borderColor]="'var(--pixel-border-bottom-right)'"
+             [style.borderTopColor]="'var(--pixel-border-top-left)'"
+             [style.borderLeftColor]="'var(--pixel-border-top-left)'">
+          <span class="text-[0.495rem] font-orbitron text-text-secondary tracking-[2px] uppercase">{{ 'WAITING_ROOM.CODE_LABEL' | translate }}</span>
+          <span class="font-orbitron text-sm text-neon-cyan font-bold tracking-[4px]">{{ joinCode }}</span>
+          <button
+            (click)="onCopyCode()"
+            class="flex items-center justify-center w-7 h-7 border-2 transition-colors"
+            [style.borderColor]="'var(--pixel-border-bottom-right)'"
+            [style.borderTopColor]="'var(--pixel-border-top-left)'"
+            [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+            [title]="'WAITING_ROOM.COPY_CODE' | translate"
+          >
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center gap-8">
+        <!-- HOST (siempre visible) -->
+        <div class="flex flex-col items-center gap-2 min-w-[180px]">
+          <div class="w-[120px] h-[120px] border-2 overflow-hidden flex items-center justify-center bg-[var(--bg-primary)]"
+               [style.borderColor]="'var(--pixel-border-bottom-right)'"
+               [style.borderTopColor]="'var(--pixel-border-top-left)'"
+               [style.borderLeftColor]="'var(--pixel-border-top-left)'">
+            <img [src]="portraitUrl(hostCharacter)" [alt]="hostTrainerName" class="w-full h-full object-cover" />
+          </div>
+          <span class="font-orbitron text-xs text-text-primary text-center">{{ hostTrainerName }}</span>
+          <div class="lobby-status-badge" [class.text-neon-green]="_hostReady()" [class.border-neon-green]="_hostReady()">
+            {{ _hostReady() ? ('WAITING_ROOM.READY' | translate) : ('WAITING_ROOM.WAITING' | translate) }}
+          </div>
+        </div>
+
+        <span class="font-orbitron text-2xl text-neon-magenta">VS</span>
+
+        <!-- GUEST (condicional) -->
+        <div class="flex flex-col items-center gap-2 min-w-[180px]" [class.opacity-50]="!_guestTrainerName()">
+          @if (_guestTrainerName()) {
+            <div class="w-[120px] h-[120px] border-2 overflow-hidden flex items-center justify-center bg-[var(--bg-primary)]"
+                 [style.borderColor]="'var(--pixel-border-bottom-right)'"
+                 [style.borderTopColor]="'var(--pixel-border-top-left)'"
+                 [style.borderLeftColor]="'var(--pixel-border-top-left)'">
+              <img [src]="portraitUrl(_guestCharacter() ?? 'red')" [alt]="_guestTrainerName()" class="w-full h-full object-cover" />
+            </div>
+            <span class="font-orbitron text-xs text-text-primary text-center">{{ _guestTrainerName() }}</span>
+            <div class="lobby-status-badge" [class.text-neon-green]="_guestReady()" [class.border-neon-green]="_guestReady()">
+              {{ _guestReady() ? ('WAITING_ROOM.READY' | translate) : ('WAITING_ROOM.WAITING' | translate) }}
+            </div>
+          } @else {
+            <div class="w-[120px] h-[120px] border-2 overflow-hidden flex items-center justify-center bg-[var(--bg-primary)]"
+                 [style.borderColor]="'var(--pixel-card-bg)'"
+                 [style.borderTopColor]="'var(--pixel-border-top-left)'"
+                 [style.borderLeftColor]="'var(--pixel-border-top-left)'">
+              <span class="font-orbitron text-3xl text-[var(--text-disabled)]">?</span>
+            </div>
+            <span class="font-orbitron text-xs text-text-primary text-center">{{ 'WAITING_ROOM.WAITING_OPPONENT' | translate }}</span>
+            <div class="lobby-status-badge">---</div>
+          }
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="font-orbitron text-xs text-neon-magenta text-center">{{ error() }}</div>
+      }
+
+      <div class="flex items-center gap-3">
+        @if (countdownPhase() === 'idle') {
+          <button
+            (click)="toggleChat()"
+            class="relative flex items-center justify-center w-9 h-9 border-2 transition-colors"
+            [style.borderColor]="'var(--pixel-border-bottom-right)'"
+            [style.borderTopColor]="'var(--pixel-border-top-left)'"
+            [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+            [title]="'WAITING_ROOM.CHAT_TITLE' | translate"
+          >
+            <svg viewBox="0 0 24 24" class="w-5 h-5 text-neon-cyan" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            @if (unreadCount() > 0 && !chatOpen()) {
+              <span
+                class="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[1.2rem] h-[1.2rem] px-1 rounded-full bg-neon-magenta text-[0.54rem] font-orbitron text-white font-bold"
+              >
+                {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+              </span>
+            }
+          </button>
+
+          <div class="flex-1"></div>
+
+          @if (isHost) {
+            <my-button
+              [text]="'WAITING_ROOM.CANCEL_MATCH' | translate"
+              variant="pixel"
+              size="small"
+              (clicked)="onCancel()"
+              [disabled]="loading()"
+            ></my-button>
+            <my-button
+              [text]="_hostReady() ? ('WAITING_ROOM.READY_CHECK' | translate) : ('WAITING_ROOM.I_AM_READY' | translate)"
+              variant="pixel"
+              size="small"
+              (clicked)="onToggleReady()"
+              [disabled]="loading() || (isHost && !_guestTrainerName())"
+            ></my-button>
+            <my-button
+              [text]="'WAITING_ROOM.START' | translate"
+              variant="pixel"
+              size="small"
+              (clicked)="onStart()"
+              [disabled]="loading() || !_hostReady() || !_guestReady()"
+            ></my-button>
+          } @else {
+            <my-button
+              [text]="'WAITING_ROOM.LEAVE' | translate"
+              variant="pixel"
+              size="small"
+              (clicked)="onCancel()"
+              [disabled]="loading()"
+            ></my-button>
+            <my-button
+              [text]="_guestReady() ? ('WAITING_ROOM.READY_CHECK' | translate) : ('WAITING_ROOM.I_AM_READY' | translate)"
+              variant="pixel"
+              size="small"
+              (clicked)="onToggleReady()"
+              [disabled]="loading()"
+            ></my-button>
+          }
+        } @else {
+          <div class="flex-1"></div>
+
+          <span class="font-orbitron text-sm text-neon-cyan">
+            {{ (countdownPhase() === 'cancelable' ? 'WAITING_ROOM.STARTING_IN' : 'WAITING_ROOM.PREPARING_IN') | translate }}
+            {{ countdownSeconds() }}s
+          </span>
+          @if (countdownPhase() === 'cancelable' && isHost) {
+            <my-button
+              [text]="'LOBBY.CANCEL' | translate"
+              variant="pixel"
+              size="small"
+              (clicked)="onCancelCountdown()"
+            ></my-button>
+          }
+
+          <div class="flex-1"></div>
+        }
+      </div>
+    </div>
+
+    <!-- Chat panel -->
+    @if (chatOpen()) {
+      <div class="chat-panel">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-neon-cyan/20">
+          <span class="font-orbitron text-xs text-neon-cyan tracking-[1px] truncate">
+            {{ 'WAITING_ROOM.CHAT_HEADER' | translate:{name: opponentName()} }}
+          </span>
+          <button
+            (click)="toggleChat()"
+            class="flex items-center justify-center w-6 h-6 hover:bg-white/10 transition-colors text-text-secondary hover:text-text-primary"
+          >
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="chat-messages" #messagesContainer>
+          @for (msg of chatMessages(); track msg.timestamp) {
+            @if (msg.senderId === 'system') {
+              <div class="chat-bubble--system">
+                <span class="chat-bubble--system__text">{{ msg.content }}</span>
+                <span class="chat-bubble--system__time">{{ msg.timestamp | date:'HH:mm' }}</span>
+              </div>
+            } @else {
+              <div
+                class="chat-bubble"
+                [class.chat-bubble--own]="msg.senderId === currentUserId"
+              >
+                <div class="chat-bubble__sender">
+                  {{ msg.senderName || msg.senderId }}
+                  @if (msg.senderName === hostTrainerName) {
+                    <span class="chat-bubble__host-tag">(Host)</span>
+                  }
+                </div>
+                <div class="chat-bubble__text">{{ msg.content }}</div>
+                <div class="chat-bubble__time">{{ msg.timestamp | date:'HH:mm' }}</div>
+              </div>
+            }
+          } @empty {
+            <div class="flex items-center justify-center h-full text-text-secondary font-share-tech text-xs">
+              {{ 'WAITING_ROOM.NO_MESSAGES' | translate }}
+            </div>
+          }
+        </div>
+
+        <div class="chat-input-area">
+          @if (showEmojiPicker()) {
+            <div class="emoji-picker-wrapper">
+              <emoji-picker
+                (emoji-click)="onEmojiClick($event)"
+                class="emoji-picker-element"
+              ></emoji-picker>
+            </div>
+          }
+          <div class="flex items-center gap-2">
+            <button
+              (click)="toggleEmojiPicker()"
+              class="flex items-center justify-center w-8 h-8 border-2 transition-colors text-lg"
+              [style.borderColor]="'var(--pixel-border-bottom-right)'"
+              [style.borderTopColor]="'var(--pixel-border-top-left)'"
+              [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+              [title]="'WAITING_ROOM.EMOJIS' | translate"
+            >
+              😊
+            </button>
+            <input
+              [value]="chatInput()"
+              (input)="onChatInput($event)"
+              (keydown)="onChatInputKeydown($event)"
+              [placeholder]="'WAITING_ROOM.CHAT_PLACEHOLDER' | translate"
+              class="flex-1 bg-[var(--bg-primary)] border-2 px-3 py-2 text-xs font-share-tech text-text-primary outline-none transition-colors"
+              [style.borderColor]="'var(--pixel-border-bottom-right)'"
+              [style.borderTopColor]="'var(--pixel-border-top-left)'"
+              [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+            />
+            <button
+              (click)="sendChatMessage()"
+              [disabled]="!chatInput().trim()"
+              class="flex items-center justify-center w-8 h-8 border-2 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              [style.borderColor]="'var(--pixel-border-bottom-right)'"
+              [style.borderTopColor]="'var(--pixel-border-top-left)'"
+              [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+              [title]="'WAITING_ROOM.SEND' | translate"
+            >
+              <svg viewBox="0 0 24 24" class="w-4 h-4 text-neon-cyan" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+</div>
