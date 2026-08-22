@@ -10,7 +10,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
  * or template-driven forms ([(ngModel)] / formControlName).
  */
 export type MyInputType = 'text' | 'password' | 'email' | 'number' | 'search';
-export type MyInputVariant = 'solid' | 'pixel';
+export type MyInputVariant = 'solid' | 'pixel' | 'modern';
 
 @Component({
   selector: 'my-input',

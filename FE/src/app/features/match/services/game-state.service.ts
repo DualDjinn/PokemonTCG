@@ -131,6 +131,8 @@ export interface MatchStateView {
   openingStarterPlayerId?: string | null;
   mulliganIteration?: number;
   setupComplete?: boolean;
+  setupRemainingMs?: number;
+  dealt?: boolean;
   matchLog?: MatchLogEntry[];
   currentTurnNumber?: number;
   mulliganPlayerId?: string | null;
@@ -193,6 +195,8 @@ export interface BackendMatchStateDTO {
   openingStarterPlayerId?: string | null;
   mulliganIteration?: number;
   setupComplete?: boolean;
+  setupRemainingMs?: number;
+  dealt?: boolean;
   matchLog?: MatchLogEntry[];
   currentTurnNumber?: number;
   mulliganPlayerId?: string | null;
@@ -365,6 +369,12 @@ export class GameStateService {
     return !!state?.mulliganPlayerId && state.mulliganPlayerId === currentPlayerId;
   });
 
+  readonly isOpponentMulliganPlayer = computed(() => {
+    const state = this.matchState();
+    const currentPlayerId = this.resolveCurrentPlayerId(this.authService.currentUser(), state);
+    return !!state?.mulliganPlayerId && state.mulliganPlayerId !== currentPlayerId;
+  });
+
   readonly isMulliganBeneficiary = computed(() => {
     const state = this.matchState();
     const currentPlayerId = this.resolveCurrentPlayerId(this.authService.currentUser(), state);
@@ -516,6 +526,7 @@ export class GameStateService {
     this.loading.set(false);
     this.error.set(null);
     this.mulliganSteps.set([]);
+    this.opponentDisconnected.set(null);
   }
 
   private fetchStateWithRetry(matchId: string, retriesLeft: number): void {
@@ -576,6 +587,8 @@ export class GameStateService {
       pendingPrizeSelection: dto.pendingPrizeSelection ?? false,
       pendingPrizeSelectionPlayerId: dto.pendingPrizeSelectionPlayerId ?? null,
       setupComplete: dto.setupComplete ?? false,
+      setupRemainingMs: dto.setupRemainingMs ?? 0,
+      dealt: dto.dealt ?? false,
       matchLog: dto.matchLog ?? [],
       currentTurnNumber: dto.currentTurnNumber ?? 0,
       mulliganPlayerId: dto.mulliganPlayerId ?? null,

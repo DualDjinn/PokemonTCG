@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, AfterViewInit, inject, signal, computed, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
-import { interval, of, Subscription, switchMap } from 'rxjs';
+import { interval, of, Subscription, switchMap, startWith } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MyText } from '../../../shared/ui/my-text/my-text';
 import { MyButton } from '../../../shared/ui/my-button/my-button';
 import { MyInput } from '../../../shared/ui/my-input/my-input';
 import { MySelect, MySelectOption } from '../../../shared/ui/my-select/my-select';
@@ -29,7 +28,7 @@ import { GameOptionsComponent } from '../../game/components/game-options/game-op
   standalone: true,
   imports: [
     TranslateModule,
-    MyModal, MyText, MyButton, MyInput, MySelect, MyPageBackground,
+    MyModal, MyButton, MyInput, MySelect, MyPageBackground,
     CreateRoomModal, WaitingRoomModal,
     PixelPanelDirective, PokenavDeviceComponent, GameOptionsComponent,
   ],
@@ -85,7 +84,12 @@ export class LobbyPage implements OnInit, OnDestroy, AfterViewInit {
   readonly showPendingMatchModal = signal(false);
   readonly pendingMatch = signal<LobbyRoom | null>(null);
 
+  readonly showAbandonedModal = signal(false);
+  private readonly ABANDONED_SEEN_KEY = 'abandonedSeen';
+  private abandonPollSub: Subscription | null = null;
+
   private pollSub: Subscription | null = null;
+  private pendingPollSub: Subscription | null = null;
 
   // Filtros
   searchText = signal('');
@@ -192,8 +196,9 @@ export class LobbyPage implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.loadRooms();
-    this.checkPendingMatches();
+    this.startAbandonedPolling();
     this.restoreActiveRoom();
+    this.pendingPollSub = interval(5000).pipe(startWith(0)).subscribe(() => this.checkPendingMatches());
     this.pollSub = interval(5000)
       .pipe(
         switchMap(() => this.lobbyService.getRooms().pipe(
@@ -207,6 +212,8 @@ export class LobbyPage implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.pollSub?.unsubscribe();
+    this.pendingPollSub?.unsubscribe();
+    this.stopAbandonedPolling();
   }
 
   @HostListener('document:keydown.escape')
@@ -380,7 +387,7 @@ export class LobbyPage implements OnInit, OnDestroy, AfterViewInit {
   private checkPendingMatches(): void {
     this.lobbyService.getPendingMatches().subscribe({
       next: matches => {
-        if (matches.length > 0) {
+        if (matches.length > 0 && !this.showPendingMatchModal() && !this.showWaitingRoom()) {
           this.pendingMatch.set(matches[0]);
           this.showPendingMatchModal.set(true);
         }
@@ -391,17 +398,60 @@ export class LobbyPage implements OnInit, OnDestroy, AfterViewInit {
   onContinuePendingMatch(pm: LobbyRoom): void {
     this.showPendingMatchModal.set(false);
     this.pendingMatch.set(null);
+    this.stopAbandonedPolling();
     this.router.navigate(['/batalla', pm.matchId], { queryParams: { reconnect: true } });
   }
 
   onSurrenderPendingMatch(pm: LobbyRoom): void {
     this.showPendingMatchModal.set(false);
     this.pendingMatch.set(null);
+    this.pendingPollSub?.unsubscribe();
+    this.pendingPollSub = null;
+    this.stopAbandonedPolling();
     // Surrender via REST or Websocket — send POST to cancel
     this.lobbyService.surrenderMatch(pm.matchId).subscribe({
       next: () => this.toastService.show('Te has rendido. Partida finalizada.', 'info'),
       error: () => this.toastService.show('Error al rendirse', 'error'),
     });
+  }
+
+  dismissAbandonedModal(): void {
+    this.showAbandonedModal.set(false);
+  }
+
+  /**
+   * Consulta periódicamente si el jugador perdió recientemente una partida por
+   * abandono (desconexión sin reconexión a tiempo). El estado lo recuerda el
+   * backend, por lo que funciona también cuando el jugador cerró el navegador.
+   * Muestra el modal una sola vez por partida (seguimiento con abandonedSeen).
+   */
+  private startAbandonedPolling(): void {
+    this.stopAbandonedPolling();
+    this.abandonPollSub = interval(5000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.lobbyService.getAbandonedResult().pipe(
+          catchError(() => of({ matchId: null, abandoned: false })),
+        )),
+      )
+      .subscribe(res => {
+        if (res.abandoned && res.matchId) {
+          let seen = '';
+          try { seen = localStorage.getItem(this.ABANDONED_SEEN_KEY) ?? ''; } catch {}
+          if (seen !== res.matchId) {
+            try { localStorage.setItem(this.ABANDONED_SEEN_KEY, res.matchId); } catch {}
+            this.showPendingMatchModal.set(false);
+            this.pendingMatch.set(null);
+            this.showAbandonedModal.set(true);
+          }
+          this.stopAbandonedPolling();
+        }
+      });
+  }
+
+  private stopAbandonedPolling(): void {
+    this.abandonPollSub?.unsubscribe();
+    this.abandonPollSub = null;
   }
 
   onRefreshRooms(): void {

@@ -9,7 +9,7 @@ import { MyText } from '../my-text/my-text';
  * a new button class per use site. Renders its label through MyText so
  * typography stays consistent with the rest of the app.
  */
-export type MyButtonVariant = 'solid' | 'outline' | 'pixel';
+export type MyButtonVariant = 'solid' | 'outline' | 'pixel' | 'modern';
 export type MyButtonSize = 'small' | 'medium' | 'large';
 
 @Component({

@@ -25,6 +25,7 @@ import { finalize } from 'rxjs';
           <my-input
             [value]="code"
             [placeholder]="'LOBBY.CODE_ROOM_PLACEHOLDER' | translate"
+            variant="modern"
             (valueChange)="code = $event.toUpperCase()"
             (keydown.enter)="onJoin()"
           ></my-input>
@@ -50,13 +51,14 @@ import { finalize } from 'rxjs';
           <div class="flex gap-3 justify-end">
             <my-button
               [text]="'LOBBY.CANCEL' | translate"
-              variant="outline"
+              variant="modern"
               size="small"
               (clicked)="close.emit()"
               [disabled]="loading"
             ></my-button>
             <my-button
               [text]="'LOBBY.JOIN' | translate"
+              variant="modern"
               size="small"
               (clicked)="onJoin()"
               [disabled]="loading || !code.trim() || !activeDeckId()"
@@ -68,6 +70,7 @@ import { finalize } from 'rxjs';
             [value]="passwordValue"
             [placeholder]="'LOBBY.PASSWORD_PLACEHOLDER' | translate"
             type="password"
+            variant="modern"
             (valueChange)="passwordValue = $event"
             (keydown.enter)="onConfirmPassword()"
           ></my-input>
@@ -84,13 +87,14 @@ import { finalize } from 'rxjs';
           <div class="flex gap-3 justify-end mt-2">
             <my-button
               [text]="'LOBBY.CANCEL' | translate"
-              variant="outline"
+              variant="modern"
               size="small"
               (clicked)="reset()"
               [disabled]="loading"
             ></my-button>
             <my-button
               [text]="'LOBBY.CONFIRM_UPPER' | translate"
+              variant="modern"
               size="small"
               (clicked)="onConfirmPassword()"
               [disabled]="loading || !passwordValue.trim()"

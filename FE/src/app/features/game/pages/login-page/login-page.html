@@ -1,8 +1,6 @@
-<div id="transition-overlay" class="fixed inset-0 bg-[#0a0a1a] z-[1000] opacity-0 pointer-events-none transition-opacity duration-300"></div>
-
 <div class="fixed inset-0 z-0">
-  <video id="main-video" src="assets/video/intro.webm" [muted]="isMuted" loop playsinline preload="metadata" class="w-full h-full object-cover"></video>
-  <div class="absolute inset-0" style="background: rgba(5,5,15,0.7)"></div>
+  <video id="main-video" src="/assets/video/intro.webm" autoplay muted loop playsinline preload="auto" [muted]="isMuted" poster="/assets/img/Inicial.png" class="w-full h-full object-cover"></video>
+  <div class="absolute inset-0 transition-opacity duration-700" style="background: rgba(5,5,15,0.7);" [style.opacity]="darkness()"></div>
 </div>
 
 <button id="mute-btn" class="fixed top-5 right-5 z-[100] w-11 h-11 flex items-center justify-center cursor-pointer text-white transition-all duration-300 hover:bg-white/20 hover:border-neon-cyan rounded-full" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);" (click)="toggleMute()" [attr.aria-label]="(isMuted ? 'LOGIN.UNMUTE_AUDIO' : 'LOGIN.MUTE_AUDIO') | translate" [attr.title]="(isMuted ? 'LOGIN.UNMUTE_AUDIO' : 'LOGIN.MUTE_AUDIO') | translate">

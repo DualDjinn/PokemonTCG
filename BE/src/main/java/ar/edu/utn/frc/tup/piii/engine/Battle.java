@@ -11,6 +11,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,6 +56,9 @@ class Battle {
     private long playerOneRemainingMs = 2_340_000L;
     private long playerTwoRemainingMs = 2_340_000L;
     private java.time.Instant turnStartedAt = java.time.Instant.now();
+
+    private static final long SETUP_TIMEOUT_SECONDS = 40L;
+    private final Map<String, LocalDateTime> setupDeadlines = new ConcurrentHashMap<>();
 
     Battle(String id, Player playerOne, Player playerTwo) {
         this.id = Objects.requireNonNull(id, "id must not be null");
@@ -322,6 +328,50 @@ class Battle {
      */
     void markSetupReady(String playerId) {
         setupReadyPlayers.add(playerId);
+    }
+
+    /**
+     * Starts the 40-second setup countdown for a player (idempotent).
+     *
+     * @param playerId player whose setup deadline should start
+     */
+    void startSetupCountdown(String playerId) {
+        setupDeadlines.putIfAbsent(playerId, LocalDateTime.now().plusSeconds(SETUP_TIMEOUT_SECONDS));
+    }
+
+    /**
+     * Remaining setup time in milliseconds for a player (0 if none or expired).
+     *
+     * @param playerId player whose remaining setup time is requested
+     * @return remaining milliseconds, never negative
+     */
+    long getSetupRemainingMs(String playerId) {
+        LocalDateTime deadline = setupDeadlines.get(playerId);
+        if (deadline == null) {
+            return 0L;
+        }
+        long ms = java.time.Duration.between(LocalDateTime.now(), deadline).toMillis();
+        return Math.max(0L, ms);
+    }
+
+    /**
+     * Whether a player's setup time has expired (deadline set and passed).
+     *
+     * @param playerId player whose deadline is checked
+     * @return {@code true} when the 40 seconds are up
+     */
+    boolean isSetupExpired(String playerId) {
+        LocalDateTime deadline = setupDeadlines.get(playerId);
+        return deadline != null && !LocalDateTime.now().isBefore(deadline);
+    }
+
+    /**
+     * Clears the setup countdown for a player (called when setup is confirmed).
+     *
+     * @param playerId player whose countdown should be removed
+     */
+    void clearSetupCountdown(String playerId) {
+        setupDeadlines.remove(playerId);
     }
 
     /**

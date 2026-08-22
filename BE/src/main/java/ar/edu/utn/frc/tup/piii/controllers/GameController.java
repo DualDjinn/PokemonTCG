@@ -114,6 +114,20 @@ public class GameController {
         matchService.confirmSetup(matchId, playerId);
     }
 
+    @MessageMapping("/matches/{matchId}/setup-start")
+    public void handleSetupStart(
+            @DestinationVariable String matchId,
+            SimpMessageHeaderAccessor headerAccessor) {
+        Map<String, Object> sessionAttrs = headerAccessor.getSessionAttributes();
+        String playerId = sessionAttrs == null ? null
+                : (String) sessionAttrs.get(SessionHandshakeInterceptor.PLAYER_ID_ATTR);
+        if (playerId == null) {
+            throw new IllegalArgumentException("Not authenticated");
+        }
+
+        matchService.startSetupCountdown(matchId, playerId);
+    }
+
     @MessageMapping("/matches/{matchId}/setup")
     public void handleSetup(
             @DestinationVariable String matchId,

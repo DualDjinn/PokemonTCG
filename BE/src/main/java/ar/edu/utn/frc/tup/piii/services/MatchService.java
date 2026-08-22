@@ -395,6 +395,15 @@ public class MatchService {
     }
 
     @Transactional
+    public void startSetupCountdown(String matchId, String playerId) {
+        Match match = getMatchOrThrow(matchId);
+        requireMembership(match, playerId);
+        String engineMatchId = requireEngineMatch(match);
+
+        gameEngine.startSetupCountdown(engineMatchId, playerId);
+    }
+
+    @Transactional
     public void processSetup(String matchId, String playerId, String activeCardId, List<String> benchCardIds) {
         Match match = getMatchOrThrow(matchId);
         requireMembership(match, playerId);
@@ -748,6 +757,27 @@ public class MatchService {
             }
         }
         return results;
+    }
+
+    /**
+     * Returns the most recent match the given player lost by abandonment, if any.
+     *
+     * <p>Only considers matches that finished by forfeit (the player disconnected
+     * and failed to reconnect within the allowed window) within a recent window,
+     * so stale results from long ago are ignored.
+     *
+     * @param playerId identifier of the requesting player
+     * @return the identifier of the most recent abandoned match, or {@code null}
+     */
+    public String getRecentAbandonment(String playerId) {
+        java.time.Duration window = java.time.Duration.ofMinutes(15);
+        LocalDateTime cutoff = LocalDateTime.now().minus(window);
+        return matchRepository.findByForfeitPlayerId(playerId).stream()
+                .filter(m -> m.getStatus() == MatchStatus.FINISHED)
+                .filter(m -> m.getFinishedAt() != null && m.getFinishedAt().isAfter(cutoff))
+                .max((a, b) -> a.getFinishedAt().compareTo(b.getFinishedAt()))
+                .map(Match::getId)
+                .orElse(null);
     }
 
     private boolean engineExists(String engineMatchId) {

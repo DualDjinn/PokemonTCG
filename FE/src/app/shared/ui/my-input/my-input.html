@@ -11,6 +11,18 @@
     (blur)="onBlur()"
     (keydown)="keydownEvent.emit($event)"
   />
+} @else if (variant === 'modern') {
+  <input
+    class="my-input--modern text-sm rounded-xl px-3.5 py-2 outline-none w-full border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+    [type]="type"
+    [value]="value"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [style.color]="textColor"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+    (keydown)="keydownEvent.emit($event)"
+  />
 } @else {
   <input
     class="text-xs font-pixel border-[3px] border-dashed px-[0.85rem] py-[0.65rem] outline-none w-full focus:brightness-110 placeholder:opacity-60 placeholder:text-[var(--my-input-placeholder-color)] disabled:opacity-50 disabled:cursor-not-allowed"

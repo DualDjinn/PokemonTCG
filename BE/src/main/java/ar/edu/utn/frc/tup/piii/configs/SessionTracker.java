@@ -23,6 +23,11 @@ public class SessionTracker {
     private static final Logger log = LoggerFactory.getLogger(SessionTracker.class);
 
     private final ConcurrentHashMap<String, String> sessionToPlayer = new ConcurrentHashMap<>();
+    private final MatchDisconnectService matchDisconnectService;
+
+    public SessionTracker(MatchDisconnectService matchDisconnectService) {
+        this.matchDisconnectService = matchDisconnectService;
+    }
 
     @EventListener
     public void onSubscribe(SessionSubscribeEvent event) {
@@ -58,6 +63,7 @@ public class SessionTracker {
             String removed = sessionToPlayer.remove(wsSessionId);
             if (removed != null) {
                 log.info("WebSocket disconnected: session={} player={}", wsSessionId, removed);
+                matchDisconnectService.markDisconnected(removed);
             } else {
                 log.warn("Disconnect event for unknown session: {}", wsSessionId);
             }

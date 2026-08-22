@@ -31,7 +31,7 @@ class SessionTrackerTest {
 
     @BeforeEach
     void setUp() {
-        tracker = new SessionTracker();
+        tracker = new SessionTracker(mock(MatchDisconnectService.class));
     }
 
     private SessionSubscribeEvent subscribeEvent(String sessionId, Map<String, Object> sessionAttrs) {

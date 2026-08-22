@@ -515,6 +515,7 @@ public class GameEngine {
         }
 
         match.markSetupReady(playerId);
+        match.clearSetupCountdown(playerId);
 
         autoSetupBotIfNeeded(match);
 
@@ -537,6 +538,65 @@ public class GameEngine {
             playBotActionsUntilHumanTurn(match);
         }
 
+        battleRegistry.save(match);
+        publishMatchUpdated(match);
+    }
+
+    /**
+     * Auto-completes the setup of any player whose 40-second setup countdown has
+     * expired without them confirming ready.
+     *
+     * <p>If the player never placed an active Pokémon, the first Basic Pokémon in
+     * their hand is assigned automatically (no bench). Then the player is marked
+     * setup-ready. This is idempotent and safe to run periodically, so a page
+     * reload (F5) cannot reset the countdown nor dodge the auto-assignment.
+     */
+    public synchronized void autoCompleteExpiredSetups() {
+        for (Battle match : battleRegistry.getAll()) {
+            if (match.isSetupComplete()) {
+                continue;
+            }
+            for (String playerId : List.of(match.getPlayerOne().getId(), match.getPlayerTwo().getId())) {
+                if (match.isSetupReady(playerId) || !match.isSetupExpired(playerId)) {
+                    continue;
+                }
+                try {
+                    if (match.requiresActiveSelection(playerId)) {
+                        boolean useAttackerSide = match.isCurrentTurnPlayer(playerId);
+                        List<Card> hand = requirePlayerHand(useAttackerSide, match.getContext());
+                        String basicId = hand.stream()
+                                .filter(Objects::nonNull)
+                                .filter(PokemonCard.class::isInstance)
+                                .map(PokemonCard.class::cast)
+                                .filter(PokemonCard::isBasic)
+                                .map(Card::getId)
+                                .findFirst()
+                                .orElse(null);
+                        if (basicId != null) {
+                            selectActivePokemon(match.getId(), playerId, basicId);
+                        }
+                    }
+                    confirmSetupReady(match.getId(), playerId);
+                } catch (Exception e) {
+                    log.warn("Auto setup failed for player {} in match {}: {}",
+                            playerId, match.getId(), e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Starts the 40-second setup countdown for a player. The frontend signals this
+     * once the card dealing and any mulligan re-deals are visually finished, so the
+     * deadline does not start while those animations are still running.
+     *
+     * @param matchId  match identifier
+     * @param playerId player whose setup deadline should start
+     */
+    public synchronized void startSetupCountdown(String matchId, String playerId) {
+        Battle match = battleRegistry.getBattleOrThrow(matchId);
+        validatePlayerMembership(match, playerId);
+        match.startSetupCountdown(playerId);
         battleRegistry.save(match);
         publishMatchUpdated(match);
     }
@@ -632,6 +692,8 @@ public class GameEngine {
         response.setPendingPrizeSelectionPlayerId(match.getPendingPrizeSelectionPlayerId());
         response.setMulliganIteration(context.getMulliganIteration());
         response.setSetupComplete(match.isSetupComplete());
+        response.setSetupRemainingMs(match.getSetupRemainingMs(playerId));
+        response.setDealt(match.isDealt());
         response.setMatchLog(context.getMatchLog());
         response.setCurrentTurnNumber(context.getTurnNumber());
         response.setMulliganPlayerId(match.getMulliganPlayerId());
@@ -1289,7 +1351,7 @@ public class GameEngine {
                 }
             }
         }
-        if (changed) {
+if (changed) {
             battleRegistry.save(match);
             publishMatchUpdated(match);
         }

@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, inject, ChangeDetectionStrategy, ChangeDetectorRef, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../data-access/services/auth.service';
@@ -8,7 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { AudioSfxChannel } from '../../../../core/services/audio-sfx-channel.service';
-import { AudioService } from '../../data-access/services/audio.service';
 import { FullPageDirective } from '../../../../shared/directives';
 
 @Component({
@@ -27,7 +26,6 @@ export class LoginPage implements AfterViewInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private toastService = inject(ToastService);
   private translateService = inject(TranslateService);
-  private audioService = inject(AudioService);
   private transitionService = inject(AuthTransitionService);
 
   private readonly MOVE_TO_CENTER_MS = 1000;
@@ -38,7 +36,8 @@ export class LoginPage implements AfterViewInit, OnDestroy {
 
   currentPage: 'intro' | 'login' = 'intro';
   activeTab: 'login' | 'register' = 'login';
-  isMuted = localStorage.getItem('musicMuted') === 'true';
+  readonly darkness = signal(0);
+  isMuted = true;
   isRotating = false;
   slideLeft = false;
   showIntroHint = false;
@@ -152,6 +151,7 @@ export class LoginPage implements AfterViewInit, OnDestroy {
       video.play().catch(() => {
         video.muted = true;
         this.isMuted = true;
+        this.cdr.markForCheck();
       });
     }
   }
@@ -159,9 +159,15 @@ export class LoginPage implements AfterViewInit, OnDestroy {
   toggleMute() {
     this.isMuted = !this.isMuted;
     const video = document.getElementById('main-video') as HTMLVideoElement;
-    if (video) video.muted = this.isMuted;
+    if (video) {
+      video.muted = this.isMuted;
+      if (!this.isMuted && video.paused) {
+        video.play().catch(() => {});
+      }
+    }
     localStorage.setItem('musicMuted', String(this.isMuted));
     this.sfx.play('Mute.mp3');
+    this.cdr.markForCheck();
   }
 
   revealIntro() {
@@ -180,6 +186,7 @@ export class LoginPage implements AfterViewInit, OnDestroy {
     if (event.button === 0) {
       event.preventDefault();
       this.clearProgress();
+      this.darkness.set(1);
       this.progressStartTime = Date.now();
       this.progressInterval = setInterval(() => this.updateProgress(), 16);
     }
@@ -187,6 +194,9 @@ export class LoginPage implements AfterViewInit, OnDestroy {
 
   onMouseUp(_event: MouseEvent) {
     if (this.currentPage === 'intro') {
+      if (this.progressInterval !== null) {
+        this.darkness.set(0);
+      }
       this.clearProgress();
     }
   }
@@ -200,6 +210,7 @@ export class LoginPage implements AfterViewInit, OnDestroy {
     if (event.code === 'Space' && !event.repeat) {
       event.preventDefault();
       this.clearProgress();
+      this.darkness.set(1);
       this.progressStartTime = Date.now();
       this.progressInterval = setInterval(() => this.updateProgress(), 16);
     }
@@ -207,6 +218,9 @@ export class LoginPage implements AfterViewInit, OnDestroy {
 
   onSpaceUp(event: KeyboardEvent) {
     if (event.code === 'Space' && this.currentPage === 'intro') {
+      if (this.progressInterval !== null) {
+        this.darkness.set(0);
+      }
       this.clearProgress();
     }
   }
@@ -226,13 +240,11 @@ export class LoginPage implements AfterViewInit, OnDestroy {
     }
     if (hint) hint.style.opacity = '0.3';
     if (progress >= 1) {
+      this.darkness.set(1);
       this.clearProgress();
-      const overlay = document.getElementById('transition-overlay') as HTMLElement;
-      if (overlay) overlay.classList.add('active');
       setTimeout(() => {
         this.currentPage = 'login';
         this.cdr.markForCheck();
-        if (overlay) overlay.classList.remove('active');
         setTimeout(() => {
           this.showPokeballPulse = true;
           this.cdr.markForCheck();

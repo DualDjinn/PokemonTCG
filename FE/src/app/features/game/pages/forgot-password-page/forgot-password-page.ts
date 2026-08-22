@@ -28,12 +28,17 @@ export class ForgotPasswordPage {
   email = '';
   isLoading = false;
   submitted = false;
-  isMuted = localStorage.getItem('musicMuted') === 'true';
+  isMuted = true;
 
   toggleMute() {
     this.isMuted = !this.isMuted;
     const video = document.getElementById('fp-video') as HTMLVideoElement;
-    if (video) video.muted = this.isMuted;
+    if (video) {
+      video.muted = this.isMuted;
+      if (!this.isMuted && video.paused) {
+        video.play().catch(() => {});
+      }
+    }
     localStorage.setItem('musicMuted', String(this.isMuted));
     this.sfx.play('Mute.mp3');
     this.cdr.markForCheck();

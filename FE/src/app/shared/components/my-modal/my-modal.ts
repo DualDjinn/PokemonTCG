@@ -30,6 +30,7 @@ export class MyModal {
   @Input() showClose = true;
   @Input() backdropOpacity: number = 0.6;
   @Input() bodyOverflow: string = 'auto';
+  @Input() bodyPadding: string = 'p-4';
   @Input() panelOpacity: number = 1;
 
   @Output() close = new EventEmitter<void>();
