@@ -42,8 +42,8 @@ export class WebSocketService {
     this.stompClient = new Client({
       webSocketFactory: () => new WebSocket('/ws'),
       reconnectDelay: 0,
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
+      heartbeatIncoming: 0,
+      heartbeatOutgoing: 0,
       onConnect: () => this.onConnected(),
       onWebSocketClose: () => this.onWebSocketClose(),
       onStompError: () => this.onError(),
@@ -96,7 +96,10 @@ export class WebSocketService {
           console.log('[WebSocket] Estado recibido por topic:', parsed);
           if (parsed.type === 'MATCH_FINISHED') {
             const winnerId = parsed.payload?.winnerId;
-            this.gameStateService.matchState.update(s => s ? { ...s, winnerId, phase: 'FINISHED' } : s);
+            this.ngZone.run(() => {
+              this.gameStateService.matchState.update(s => s ? { ...s, winnerId, phase: 'FINISHED' } : s);
+              this.gameStateService.opponentDisconnected.set(null);
+            });
             return;
           }
           if (parsed.type === 'OPPONENT_HOVER') {

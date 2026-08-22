@@ -10,6 +10,20 @@
   >
     <my-text [text]="text" [color]="resolvedTextColor" [size]="fontSize" weight="bold" align="center" tag="span" />
   </button>
+} @else if (variant === 'modern') {
+  <button
+    class="my-btn--modern inline-flex items-center justify-center rounded-full cursor-pointer select-none font-orbitron font-bold uppercase tracking-wider transition-all duration-200 enabled:active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"
+    [type]="type"
+    [disabled]="disabled"
+    [style.background]="'linear-gradient(135deg, ' + color + ', ' + color + 'CC)'"
+    [style.color]="textColor"
+    [style.padding]="padding"
+    [style.--btn-color]="color"
+    (click)="onClick($event)"
+    (contextmenu)="$event.preventDefault()"
+  >
+    <my-text [text]="text" [color]="textColor" [size]="fontSize" weight="bold" align="center" tag="span" />
+  </button>
 } @else {
   <button
     class="inline-flex items-center justify-center border-[3px] border-dashed cursor-pointer select-none font-pixel uppercase tracking-wider enabled:hover:brightness-[1.2] enabled:hover:-translate-y-[2px] enabled:active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed"

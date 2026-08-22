@@ -202,6 +202,17 @@ export class TurnActionService {
     this.webSocketService.publish(`/app/matches/${matchId}/mulligan-draw`, { count });
   }
 
+  /** Avisa al backend que el setup ya es accionable (reparto + mulligans terminados). */
+  startSetupCountdown(): void {
+    const matchId = this.requireMatchId();
+    if (!matchId) {
+      console.warn('[TurnActionService] startSetupCountdown: no hay matchId');
+      return;
+    }
+    console.log(`[TurnActionService] Enviando setup-start: matchId=${matchId}`);
+    this.webSocketService.publish(`/app/matches/${matchId}/setup-start`, {});
+  }
+
   /** Publica una acción de juego hacia el endpoint de acciones de la partida. */
   private sendAction(message: GameActionMessage): void {
     const matchId = this.requireMatchId();

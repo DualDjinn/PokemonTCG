@@ -24,7 +24,7 @@ export class MySelect implements ControlValueAccessor {
   @Input() options: MySelectOption[] = [];
   @Input() value = '';
   @Input() placeholder = '';
-  @Input() variant: 'solid' | 'pixel' = 'solid';
+  @Input() variant: 'solid' | 'pixel' | 'modern' = 'solid';
   @Input() color = 'var(--neon-cyan)';
   @Input() textColor = 'var(--text-primary)';
   @Input() background = 'var(--bg-secondary)';

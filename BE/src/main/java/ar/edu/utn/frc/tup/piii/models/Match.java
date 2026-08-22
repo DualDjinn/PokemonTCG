@@ -50,6 +50,16 @@ public class Match {
     /** Identifier of the winning player once the match is FINISHED; otherwise null. */
     private String winnerId;
 
+    /**
+     * Identifier of the player who forfeited the match by disconnecting and
+     * timing out (abandonment). Only set by the disconnect scheduler when a
+     * disconnected player fails to reconnect within the allowed window.
+     */
+    private String forfeitPlayerId;
+
+    /** Timestamp when the match reached the FINISHED state, otherwise null. */
+    private LocalDateTime finishedAt;
+
     /** Creation timestamp. */
     @Column(nullable = false)
     private LocalDateTime createdAt;

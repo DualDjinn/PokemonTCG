@@ -121,6 +121,10 @@ export class MatchLobbyService {
     return this.http.get<LobbyRoom[]>('/api/matches/pending-matches');
   }
 
+  getAbandonedResult(): Observable<{ matchId: string | null; abandoned: boolean }> {
+    return this.http.get<{ matchId: string | null; abandoned: boolean }>('/api/matches/me/abandoned-result');
+  }
+
   surrenderMatch(matchId: string): Observable<void> {
     return this.http.post<void>(`/api/matches/${matchId}/surrender`, {});
   }

@@ -103,6 +103,7 @@ export class MulliganReDealComponent {
   readonly iterations = input(0);
   readonly handSize = input(0);
   readonly cardBackUrl = input<string | undefined>(undefined);
+  readonly side = input<'player' | 'opponent'>('player');
 
   readonly done = output<void>();
 
@@ -171,8 +172,8 @@ export class MulliganReDealComponent {
   }
 
   private buildReturnCards(): AnimCard[] {
-    const startTarget = this.getTargetRect('.hand-cards-row--player');
-    const end = this.getCenter('.battle-row--player .deck-area');
+    const startTarget = this.getTargetRect(this.handSelector());
+    const end = this.getCenter(this.deckSelector());
     if (!startTarget || !end) return [];
     const cards: AnimCard[] = [];
     const count = this.handSize();
@@ -190,8 +191,8 @@ export class MulliganReDealComponent {
   }
 
   private buildDealCards(): AnimCard[] {
-    const start = this.getCenter('.battle-row--player .deck-area');
-    const endTarget = this.getTargetRect('.hand-cards-row--player');
+    const start = this.getCenter(this.deckSelector());
+    const endTarget = this.getTargetRect(this.handSelector());
     if (!start || !endTarget) return [];
     const cards: AnimCard[] = [];
     const count = this.handSize();
@@ -206,6 +207,14 @@ export class MulliganReDealComponent {
       });
     }
     return cards;
+  }
+
+  private handSelector(): string {
+    return this.side() === 'opponent' ? '.hand-cards-row--opponent' : '.hand-cards-row--player';
+  }
+
+  private deckSelector(): string {
+    return this.side() === 'opponent' ? '.battle-row--opponent .deck-area' : '.battle-row--player .deck-area';
   }
 
   private getTargetRect(selector: string): TargetRect | null {

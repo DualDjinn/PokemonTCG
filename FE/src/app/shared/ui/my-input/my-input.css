@@ -27,3 +27,23 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.my-input--modern {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.my-input--modern::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.my-input--modern:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.25);
+}
+
+.my-input--modern:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -19,4 +19,5 @@ export class MyPageBackground {
   @Input({ required: true }) videoSrc = '';
   @Input() poster = '';
   @Input() overlayOpacity = 0.65;
+  @Input() overlayMode: 'dark' | 'gradient' = 'dark';
 }

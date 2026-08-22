@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ar.edu.utn.frc.tup.piii.configs.Authenticated;
 import ar.edu.utn.frc.tup.piii.dtos.common.ErrorApi;
+import ar.edu.utn.frc.tup.piii.dtos.engine.AbandonedResultResponse;
 import ar.edu.utn.frc.tup.piii.dtos.engine.CreateMatchRequest;
 import ar.edu.utn.frc.tup.piii.dtos.engine.ChooseCoinSideRequest;
 import ar.edu.utn.frc.tup.piii.dtos.engine.ChooseFirstTurnRequest;
@@ -185,6 +186,17 @@ public class MatchController {
             @PathVariable String matchId) {
         MatchStateDTO state = matchService.reconnectPlayer(matchId, player.getId());
         return ResponseEntity.ok(state);
+    }
+
+    @Operation(summary = "Check if the player recently lost by abandonment",
+               description = "Returns the most recent match the authenticated player lost by "
+                           + "disconnecting and failing to reconnect within the allowed window.")
+    @GetMapping("/me/abandoned-result")
+    public ResponseEntity<AbandonedResultResponse> abandonedResult(
+            @Authenticated Player player) {
+        String matchId = matchService.getRecentAbandonment(player.getId());
+        boolean abandoned = matchId != null;
+        return ResponseEntity.ok(new AbandonedResultResponse(matchId, abandoned));
     }
 
     @Operation(summary = "Get pending matches for the authenticated player",

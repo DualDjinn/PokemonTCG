@@ -73,7 +73,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // important behind a devtunnel that can drop idle connections. Requires a
         // TaskScheduler to send the server-side heartbeats.
         registry.enableSimpleBroker("/topic", "/queue")
-                .setHeartbeatValue(new long[] {10000, 10000})
+                .setHeartbeatValue(new long[] {0, 0})
                 .setTaskScheduler(webSocketHeartbeatScheduler());
         // Messages sent to @MessageMapping handlers should be prefixed with /app
         registry.setApplicationDestinationPrefixes("/app");

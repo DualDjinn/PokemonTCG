@@ -123,10 +123,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
     }
 
     @if (tutorialState() === 'deckSelection') {
-      <div id="deck-selection-overlay" class="fixed inset-0 z-[2000] flex flex-col items-center justify-center gap-6" style="background-color: rgba(0,0,0,0.95);">
-        <my-text [text]="'Elige tu mazo inicial'" tag="h2" size="1.2rem" weight="bold" color="var(--neon-cyan)" />
+      <div id="deck-selection-overlay" class="fixed inset-0 z-[2000] flex flex-col items-center justify-center" style="background-color: rgba(0,0,0,0.95);">
+        <div class="absolute top-[10vh] left-0 right-0 flex justify-center pointer-events-none">
+          <my-text [text]="'Elige tu mazo inicial'" tag="h2" size="1.2rem" weight="bold" color="var(--neon-cyan)" />
+        </div>
         <div class="flex gap-6">
-          @for (deck of starterDecks(); track deck.name) {
+          @for (deck of starterDecks(); track deck.name; let idx = $index) {
             <div class="flex flex-col items-center gap-3 p-4 rounded-lg transition-transform"
                  [class.cursor-pointer]="!deckSelecting()"
                  [class.hover:scale-105]="!deckSelecting()"
@@ -134,13 +136,27 @@ import { ToastService } from '../../../../shared/services/toast.service';
                  [class.pointer-events-none]="deckSelecting() !== null"
                  [class.opacity-60]="deckSelecting() !== null && deckSelecting() !== deck.name"
                  (click)="selectStarterDeck(deck.name)">
-              @if (deckSelecting() === deck.name) {
-                <div class="w-[17.28rem] h-[23.04rem] flex items-center justify-center">
-                  <div class="w-10 h-10 border-4 border-white/10 border-t-[var(--neon-cyan)] rounded-full animate-spin"></div>
+              <div class="relative">
+                <div class="deck-glow absolute -inset-6 rounded-full blur-3xl pointer-events-none"
+                     [style.background]="'radial-gradient(circle, ' + deck.glow + ', transparent 70%)'"
+                     [style.animation-delay]="(idx * 0.35) + 's'"></div>
+                <div class="deck-particles pointer-events-none" aria-hidden="true">
+                  @for (p of [0,1,2,3,4,5]; track p) {
+                    <span class="deck-particle"
+                          [style.left.px]="(p - 2.5) * 40"
+                          [style.animation-delay]="(idx * 0.15) + (p * 0.45) + 's'"
+                          [style.animation-duration]="(2.2 + (p % 3) * 0.5) + 's'"
+                          [style.background]="deck.glow"></span>
+                  }
                 </div>
-              } @else {
-                <img [src]="deck.image" [alt]="deck.name" class="w-[17.28rem] h-[23.04rem] object-contain rounded" />
-              }
+                @if (deckSelecting() === deck.name) {
+                  <div class="w-[26rem] aspect-[2816/1536] max-w-full relative flex items-center justify-center">
+                    <div class="w-10 h-10 border-4 border-white/10 border-t-[var(--neon-cyan)] rounded-full animate-spin"></div>
+                  </div>
+                } @else {
+                  <img [src]="deck.image" [alt]="deck.name" class="w-[26rem] aspect-[2816/1536] max-w-full object-contain rounded relative" />
+                }
+              </div>
               <my-text [text]="deck.label" tag="span" size="0.72rem" weight="bold" color="var(--text-primary)" />
             </div>
           }
@@ -151,7 +167,20 @@ import { ToastService } from '../../../../shared/services/toast.service';
     @if (tutorialState() === 'deckConfirmed' && confirmedDeck(); as deck) {
       <div id="deck-confirmed-overlay" class="fixed inset-0 z-[2000] flex flex-col items-center justify-center gap-6" style="background-color: rgba(0,0,0,0.95);">
         <my-text [text]="'¡Felicitaciones, elegiste ' + deck.label + '!'" tag="h2" size="1.1rem" weight="bold" color="var(--neon-cyan)" />
-        <img [src]="deck.image" [alt]="deck.name" class="w-[20.16rem] h-[25.92rem] object-contain rounded" />
+        <div class="relative">
+          <div class="deck-glow absolute -inset-6 rounded-full blur-3xl pointer-events-none"
+               [style.background]="'radial-gradient(circle, ' + deck.glow + ', transparent 70%)'"></div>
+          <div class="deck-particles pointer-events-none" aria-hidden="true">
+            @for (p of [0,1,2,3,4,5]; track p) {
+              <span class="deck-particle"
+                    [style.left.px]="(p - 2.5) * 46"
+                    [style.animation-delay]="(p * 0.45) + 's'"
+                    [style.animation-duration]="(2.2 + (p % 3) * 0.5) + 's'"
+                    [style.background]="deck.glow"></span>
+            }
+          </div>
+          <img [src]="deck.image" [alt]="deck.name" class="w-[32rem] aspect-[2816/1536] max-w-full object-contain rounded relative" />
+        </div>
         <my-button [text]="'SECRET_REVEAL.CONTINUE' | translate" variant="pixel" color="var(--neon-cyan)" textColor="var(--bg-dark)" size="medium" (clicked)="confirmDeckSelection()" />
       </div>
     }
@@ -189,6 +218,38 @@ import { ToastService } from '../../../../shared/services/toast.service';
     }
   `,
   styles: [`
+    .deck-glow {
+      animation: deck-glow-pulse 2.6s ease-in-out infinite;
+    }
+    @keyframes deck-glow-pulse {
+      0%, 100% { opacity: 0.45; transform: scale(1); }
+      50% { opacity: 0.95; transform: scale(1.08); }
+    }
+
+    .deck-particles {
+      position: absolute;
+      left: 50%;
+      bottom: -4px;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+    .deck-particle {
+      position: absolute;
+      bottom: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      opacity: 0;
+      pointer-events: none;
+      animation: deck-particle-rise 2.6s ease-out infinite;
+    }
+    @keyframes deck-particle-rise {
+      0% { opacity: 0; transform: translateY(0) translateX(0) scale(1); }
+      15% { opacity: 0.85; }
+      100% { opacity: 0; transform: translateY(-110px) translateX(12px) scale(0.35); }
+    }
+
     #npc-hint {
       position: fixed;
       z-index: 900;
@@ -433,12 +494,12 @@ export class NpcInteractionComponent {
   readonly videoProgress = signal(0);
 
   readonly starterDecks = signal([
-    { name: 'Chespin Deck', label: 'Planta - Chesnaught', image: 'assets/img/Decks/Grass Deck - Chesnaught.png' },
-    { name: 'Fennekin Deck', label: 'Fuego - Delphox', image: 'assets/img/Decks/Fire Deck - Delphos.png' },
-    { name: 'Froakie Deck', label: 'Agua - Greninja', image: 'assets/img/Decks/Water Deck - Greninja.png' },
+    { name: 'Chespin Deck', label: 'Planta - Chesnaught', image: 'assets/img/Decks/Grass Deck - Chesnaught.png', glow: 'rgba(34, 197, 94, 0.65)' },
+    { name: 'Fennekin Deck', label: 'Fuego - Delphox', image: 'assets/img/Decks/Fire Deck - Delphos.png', glow: 'rgba(239, 68, 68, 0.65)' },
+    { name: 'Froakie Deck', label: 'Agua - Greninja', image: 'assets/img/Decks/Water Deck - Greninja.png', glow: 'rgba(34, 211, 238, 0.65)' },
   ]);
 
-  readonly confirmedDeck = signal<{ name: string; label: string; image: string } | null>(null);
+  readonly confirmedDeck = signal<{ name: string; label: string; image: string; glow: string } | null>(null);
 
   readonly deckSelecting = signal<string | null>(null);
 
@@ -461,7 +522,11 @@ export class NpcInteractionComponent {
 
   private previousMusicTrack: string | null = null;
 
+  private readonly STARTER_PENDING_KEY = 'starterDeckPending';
+
   constructor() {
+    this.restoreStarterDeckSelection();
+
     // Cada vez que se abre el menú, resetear la selección al primer botón y
     // limpiar el estado de teclado del engine para que el personaje no quede
     // caminando solo si el jugador presionó una flecha justo al abrir.
@@ -480,6 +545,34 @@ export class NpcInteractionComponent {
         this.musicChannel.playOnce('numb.mp3');
       }
     });
+  }
+
+  private markStarterDeckPending(): void {
+    const user = this.authService.currentUser()?.username;
+    if (user) {
+      try {
+        localStorage.setItem(this.STARTER_PENDING_KEY, user);
+      } catch {}
+    }
+  }
+
+  private clearStarterDeckPending(): void {
+    try {
+      localStorage.removeItem(this.STARTER_PENDING_KEY);
+    } catch {}
+  }
+
+  private restoreStarterDeckSelection(): void {
+    try {
+      const user = this.authService.currentUser()?.username;
+      const pending = localStorage.getItem(this.STARTER_PENDING_KEY);
+      const hasDeck = (this.authService.currentUser()?.decks?.length ?? 0) > 0;
+      if (pending && pending === user && !hasDeck) {
+        this.tutorialState.set('deckSelection');
+      } else if (pending) {
+        this.clearStarterDeckPending();
+      }
+    } catch {}
   }
 
   /**
@@ -718,6 +811,7 @@ export class NpcInteractionComponent {
         this.claimTutorialReward('Fabio y Joaco');
       } else {
         this.tutorialState.set('deckSelection');
+        this.markStarterDeckPending();
       }
       return;
     }
@@ -823,6 +917,7 @@ export class NpcInteractionComponent {
           this.claimTutorialReward('Fabio y Joaco');
         } else {
           this.tutorialState.set('deckSelection');
+          this.markStarterDeckPending();
         }
       }, 50);
       return;
@@ -948,6 +1043,7 @@ export class NpcInteractionComponent {
   }
 
   confirmDeckSelection(): void {
+    this.clearStarterDeckPending();
     this.confirmedDeck.set(null);
     this.tutorialState.set('reward1');
     this.claimTutorialReward('Fabio y Joaco');

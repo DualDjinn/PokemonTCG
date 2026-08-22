@@ -29,7 +29,6 @@ import { GameStateService, AbilityView, InPlayPokemonView, MatchCardView, MatchL
 import { WebSocketService } from '../../services/websocket.service';
 import { TurnActionService } from '../../services/turn-action.service';
 import { AttackEffectComponent } from '../../components/attack-effect/attack-effect.component';
-import { MatchLobbyService } from '../../../lobby/services/match-lobby.service';
 import { AuthService } from '../../../game/data-access/services/auth.service';
 import { MyModal } from '../../../../shared/components/my-modal/my-modal';
 import { MyConfirmModal } from '../../../../shared/components/my-confirm-modal/my-confirm-modal';
@@ -133,9 +132,10 @@ interface AttackFlyData {
         }
         @if (mulliganDealState() === 'animating') {
           <app-mulligan-re-deal
+            [side]="mulliganSide()"
             [iterations]="mulliganIteration()"
-            [handSize]="myHand().length"
-            [cardBackUrl]="gameStateService.myCardBackUrl()"
+            [handSize]="mulliganSide() === 'player' ? myHand().length : opponentHandCount()"
+            [cardBackUrl]="mulliganSide() === 'player' ? gameStateService.myCardBackUrl() : gameStateService.opponentCardBackUrl()"
             (done)="onMulliganDealDone()"
           />
         }
@@ -143,6 +143,9 @@ interface AttackFlyData {
         @if (isSetupPhase() && setupStep()) {
           <div class="setup-banner">
             <span class="setup-banner__text">{{ setupBannerText() }}</span>
+            @if (setupCountdownActive()) {
+              <span class="setup-banner__timer">{{ setupCountdown() }}s</span>
+            }
             @if (setupStep() === 'bench') {
               <my-button
                 [text]="'BATTLE.SETUP_READY_BTN' | translate"
@@ -240,7 +243,7 @@ interface AttackFlyData {
 
         <!-- Main battle field -->
         <div class="battle-field">
-          <div class="hand-cards-row hand-cards-row--opponent" [class.hand-cards-row--hidden]="!initialDealDone()">
+          <div class="hand-cards-row hand-cards-row--opponent" [class.hand-cards-row--hidden]="!initialDealDone() || (isOpponentMulliganPlayer() && (dealingState() !== 'done' || mulliganDealState() === 'animating'))">
             <div class="opponent-cards-row">
               @for (card of opponentHandCards(); track card.id) {
                 <div class="hand-card-back">
@@ -1057,22 +1060,35 @@ interface AttackFlyData {
         }
 
         <!-- Victory / Defeat screen -->
-        @if (isVictory()) {
-          <div class="result-overlay result-overlay--victory">
-            <div class="result-content">
-              <div class="result-icon">🏆</div>
-              <div class="result-title">¡VICTORIA!</div>
-              <my-button text="Volver al lobby" variant="pixel" size="large" (clicked)="goToLobby()" />
+        @if (isVictory() || isDefeat()) {
+          <div class="result-overlay"
+               [class.result-overlay--victory]="isVictory()"
+               [class.result-overlay--defeat]="isDefeat()">
+            <div class="result-glow"></div>
+            <div class="result-particles" aria-hidden="true">
+              @for (p of resultParticles; track $index) {
+                <span class="result-particle"
+                      [style.left.%]="p.left"
+                      [style.animation-delay.s]="p.delay"
+                      [style.animation-duration.s]="p.duration"
+                      [style.width.px]="p.size"
+                      [style.height.px]="p.size"
+                      [style.--ember-rise.vh]="p.rise"
+                      [style.--ember-drift.px]="p.drift"></span>
+              }
             </div>
-          </div>
-        }
-        @if (isDefeat()) {
-          <div class="result-overlay result-overlay--defeat">
             <div class="result-content">
-              <div class="result-icon">💔</div>
-              <div class="result-title">DERROTA</div>
-              <div class="result-subtitle">¡Mejor suerte la próxima vez!</div>
-              <my-button text="Volver al lobby" variant="pixel" size="large" (clicked)="goToLobby()" />
+              <div class="result-title">{{ isVictory() ? '¡VICTORIA!' : 'DERROTA' }}</div>
+              <div class="result-stats">
+                <div class="stat"><span class="stat-label">Cartas jugadas</span><span class="stat-value">{{ resultStats().cardsPlayed }}</span></div>
+                <div class="stat"><span class="stat-label">Carta más jugada</span><span class="stat-value">{{ resultStats().mostPlayedCard }}</span></div>
+                <div class="stat"><span class="stat-label">Mazo utilizado</span><span class="stat-value">{{ resultStats().deckUsed }}</span></div>
+                <div class="stat"><span class="stat-label">Ataques</span><span class="stat-value">{{ resultStats().attacks }}</span></div>
+                <div class="stat"><span class="stat-label">Premios tomados</span><span class="stat-value">{{ resultStats().prizesTaken }}</span></div>
+              </div>
+              <div class="result-btn">
+                <my-button text="Volver al lobby" variant="modern" size="large" (clicked)="goToLobby()" />
+              </div>
             </div>
           </div>
         }
@@ -1087,7 +1103,6 @@ interface AttackFlyData {
 export class BattlePage implements OnInit, OnDestroy {
   readonly gameStateService = inject(GameStateService);
   private readonly webSocketService = inject(WebSocketService);
-  private readonly matchLobbyService = inject(MatchLobbyService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -1395,6 +1410,49 @@ export class BattlePage implements OnInit, OnDestroy {
   readonly isDefeat = computed(() => this.gameStateService.isDefeat());
   readonly needsBenchPromotion = computed(() => this.gameStateService.needsBenchPromotion());
   readonly opponentIsChoosingActive = computed(() => this.gameStateService.opponentIsChoosingActive());
+
+  readonly resultStats = computed(() => {
+    const st = this.gameStateService.matchState();
+    const myId = this.myPlayerId();
+    const log = st?.matchLog ?? [];
+    const myEntries = log.filter(e => e.playerId === myId);
+    const playTypes = new Set([
+      'PLAY_BASIC', 'EVOLVE', 'PLAY_ITEM', 'PLAY_SUPPORTER',
+      'PLAY_TOOL', 'PLAY_STADIUM', 'ATTACH_ENERGY',
+    ]);
+    const played = myEntries.filter(e => playTypes.has(e.actionType));
+    const counts = new Map<string, number>();
+    for (const e of played) {
+      const name = e.description || '—';
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    let mostPlayed = '—';
+    let mostCount = 0;
+    for (const [name, c] of counts) {
+      if (c > mostCount) {
+        mostCount = c;
+        mostPlayed = name;
+      }
+    }
+    const user = this.authService.currentUser();
+    const deck = user?.decks?.find(d => d.id === user.activeDeckId);
+    return {
+      cardsPlayed: played.length,
+      mostPlayedCard: mostPlayed,
+      attacks: myEntries.filter(e => e.actionType === 'ATTACK').length,
+      prizesTaken: myEntries.filter(e => e.actionType === 'TAKE_PRIZE').length,
+      deckUsed: deck?.name ?? 'Mazo',
+    };
+  });
+
+  readonly resultParticles = Array.from({ length: 28 }, () => ({
+    left: Math.random() * 100,
+    delay: Math.random() * 5,
+    duration: 5 + Math.random() * 4,
+    rise: 30 + Math.random() * 55,
+    drift: (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 30),
+    size: 4 + Math.random() * 3,
+  }));
 
   readonly playableCardIds = signal<Set<string>>(new Set());
 
@@ -2195,6 +2253,12 @@ export class BattlePage implements OnInit, OnDestroy {
 
   readonly setupStep = this.gameStateService.setupStep;
 
+  readonly setupCountdown = signal(40);
+  private setupTimer: ReturnType<typeof setInterval> | null = null;
+  private setupDeadlineAt = 0;
+  private setupStartSent = false;
+  readonly setupCountdownActive = signal(false);
+
   readonly setupBannerText = computed(() => {
     const step = this.setupStep();
     if (step === 'active') return this.translate.instant('BATTLE.SETUP_PLACE_ACTIVE');
@@ -2300,6 +2364,16 @@ export class BattlePage implements OnInit, OnDestroy {
     if (!this.isOpeningComplete()) return;
     if (this.dealingState() !== 'idle') return;
 
+    let alreadyDealt = false;
+    try {
+      alreadyDealt = localStorage.getItem('matchDealt_' + matchId) === '1';
+    } catch {}
+    if (alreadyDealt) {
+      this.dealingState.set('done');
+      this.initialDealDone.set(true);
+      return;
+    }
+
     if (this.myHand().length > 0) {
       this.dealingState.set('dealing');
       return;
@@ -2313,7 +2387,7 @@ export class BattlePage implements OnInit, OnDestroy {
   private readonly mulliganDealEffect = effect(() => {
     if (!this.lobbyMatchId()) return;
     if (this.dealingState() !== 'done') return;
-    if (!this.isMulliganPlayer()) return;
+    if (!this.isMulliganPlayer() && !this.isOpponentMulliganPlayer()) return;
     if (this.mulliganIteration() <= 0) return;
     if (this.mulliganDealState() !== 'idle') return;
 
@@ -2325,6 +2399,45 @@ export class BattlePage implements OnInit, OnDestroy {
     if (this.canShowContent() && this.showOpeningOverlay() && !this.musicFadeStarted) {
       this.musicFadeStarted = true;
       this.music.fadeOut(3000);
+    }
+  });
+
+  /** Avisa al backend que el setup ya es accionable (reparto + mulligans terminados). */
+  private readonly setupStartEffect = effect(() => {
+    const inSetup = this.isSetupPhase();
+    const dealDone = this.dealingState() === 'done';
+    const mulliganDone = this.mulliganDealState() !== 'animating';
+    const step = this.setupStep();
+    const ready = this.mySetupReady();
+    if (inSetup && dealDone && mulliganDone && (step === 'active' || step === 'bench') && !ready && !this.setupStartSent) {
+      this.setupStartSent = true;
+      this.turnActionService.startSetupCountdown();
+    }
+  });
+
+  /** Timer de 40s para el setup (activo/banca). Compartido entre ambos pasos. */
+  private readonly setupCountdownEffect = effect(() => {
+    const step = this.setupStep();
+    const ready = this.mySetupReady();
+    const inSetup = this.isSetupPhase();
+    const dealDone = this.dealingState() === 'done';
+    const mulliganDone = this.mulliganDealState() !== 'animating';
+    const remainingMs = this.gameStateService.matchState()?.setupRemainingMs ?? 0;
+    if (inSetup && dealDone && mulliganDone && (step === 'active' || step === 'bench') && !ready && remainingMs > 0) {
+      this.ensureSetupCountdown(remainingMs);
+    } else {
+      this.stopSetupCountdown();
+    }
+  });
+
+  /** Si no quedan cartas para poner en banca, se activa "Listo" directamente. */
+  private readonly benchAutoReadyEffect = effect(() => {
+    if (this.setupStep() !== 'bench') return;
+    if (this.mySetupReady()) return;
+    const hasBenchable = this.myHand().some(c => this.isBasicPokemon(c));
+    const benchFull = this.gameStateService.myBench().filter(Boolean).length >= 5;
+    if (!hasBenchable || benchFull) {
+      this.onSetupReady();
     }
   });
 
@@ -3038,6 +3151,12 @@ export class BattlePage implements OnInit, OnDestroy {
 
   onDealtComplete(): void {
     this.dealingState.set('done');
+    const matchId = this.lobbyMatchId() || this.gameStateService.matchId();
+    if (matchId) {
+      try {
+        localStorage.setItem('matchDealt_' + matchId, '1');
+      } catch {}
+    }
   }
 
   onFirstDealDone(): void {
@@ -3071,6 +3190,46 @@ export class BattlePage implements OnInit, OnDestroy {
 
   /** Confirma que el jugador terminÃ³ de colocar sus PokÃ©mon. */
   onSetupReady(): void {
+    this.turnActionService.confirmSetupReady();
+  }
+
+  private ensureSetupCountdown(remainingMs: number): void {
+    this.setupDeadlineAt = Date.now() + remainingMs;
+    const secs = Math.max(0, Math.ceil(remainingMs / 1000));
+    this.setupCountdown.set(secs);
+    this.setupCountdownActive.set(true);
+    if (secs <= 0) {
+      this.stopSetupCountdown();
+      this.onSetupCountdownExpired();
+      return;
+    }
+    if (this.setupTimer) return;
+    this.setupTimer = setInterval(() => {
+      const remain = this.setupDeadlineAt - Date.now();
+      const next = Math.max(0, Math.ceil(remain / 1000));
+      this.setupCountdown.set(next);
+      if (next <= 0) {
+        this.stopSetupCountdown();
+        this.onSetupCountdownExpired();
+      }
+    }, 1000);
+  }
+
+  private stopSetupCountdown(): void {
+    this.setupCountdownActive.set(false);
+    if (this.setupTimer) {
+      clearInterval(this.setupTimer);
+      this.setupTimer = null;
+    }
+  }
+
+  private onSetupCountdownExpired(): void {
+    if (this.setupStep() === 'active') {
+      const card = this.myHand().find(c => this.isBasicPokemon(c));
+      if (card) {
+        this.onSelectActive(card);
+      }
+    }
     this.turnActionService.confirmSetupReady();
   }
 
@@ -3246,6 +3405,8 @@ export class BattlePage implements OnInit, OnDestroy {
   readonly mySetupReady = this.gameStateService.mySetupReady;
 
   readonly isMulliganPlayer = this.gameStateService.isMulliganPlayer;
+  readonly isOpponentMulliganPlayer = this.gameStateService.isOpponentMulliganPlayer;
+  readonly mulliganSide = computed<'player' | 'opponent'>(() => this.isMulliganPlayer() ? 'player' : 'opponent');
   readonly isMulliganBeneficiary = this.gameStateService.isMulliganBeneficiary;
   readonly mulliganBenefitCount = this.gameStateService.mulliganBenefitCount;
   readonly isMulliganResolutionPending = this.gameStateService.isMulliganResolutionPending;
@@ -3795,14 +3956,10 @@ export class BattlePage implements OnInit, OnDestroy {
     localStorage.removeItem('activeMatchId');
     localStorage.removeItem('activeMatchHost');
     this.judgeMew.endBotSession();
+    this.stopSetupCountdown();
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
-    }
-    const matchId = this.lobbyMatchId();
-    const winnerId = this.gameStateService.matchState()?.winnerId;
-    if (matchId && !winnerId) {
-      this.matchLobbyService.cancelMatch(matchId).subscribe();
     }
     this.clearAllTimers();
     this.music.stop();

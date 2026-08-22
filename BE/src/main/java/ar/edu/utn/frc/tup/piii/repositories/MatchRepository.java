@@ -52,4 +52,6 @@ public interface MatchRepository extends JpaRepository<Match, String> {
     List<Match> findByPlayerOneIdAndStatusIn(String playerOneId, List<MatchStatus> statuses);
 
     List<Match> findByPlayerTwoIdAndStatusIn(String playerTwoId, List<MatchStatus> statuses);
+
+    List<Match> findByForfeitPlayerId(String forfeitPlayerId);
 }

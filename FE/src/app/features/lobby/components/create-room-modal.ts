@@ -20,6 +20,7 @@ import { finalize } from 'rxjs';
       [open]="open"
       [title]="'CREATE_ROOM_MODAL.TITLE' | translate"
       variant="pixel"
+      bodyPadding="p-4 pt-2 pb-2"
       (close)="close.emit()"
       width="28rem"
     >
@@ -27,7 +28,7 @@ import { finalize } from 'rxjs';
         <my-input
           [value]="roomName"
           [placeholder]="'CREATE_ROOM_MODAL.ROOM_NAME' | translate"
-          variant="pixel"
+          variant="modern"
           (valueChange)="roomName = $event"
           (keydown.enter)="onCreate()"
         ></my-input>
@@ -35,7 +36,7 @@ import { finalize } from 'rxjs';
         <my-input
           [value]="description"
           [placeholder]="'CREATE_ROOM_MODAL.DESCRIPTION' | translate"
-          variant="pixel"
+          variant="modern"
           (valueChange)="description = $event"
           (keydown.enter)="onCreate()"
         ></my-input>
@@ -54,7 +55,7 @@ import { finalize } from 'rxjs';
             [value]="password"
             [placeholder]="'CREATE_ROOM_MODAL.PASSWORD' | translate"
             type="password"
-            variant="pixel"
+            variant="modern"
             (valueChange)="password = $event"
             (keydown.enter)="onCreate()"
           ></my-input>
@@ -97,14 +98,14 @@ import { finalize } from 'rxjs';
         <div class="flex gap-3 justify-end">
           <my-button
             [text]="'CREATE_ROOM_MODAL.CANCEL' | translate"
-            variant="pixel"
+            variant="modern"
             size="small"
             (clicked)="close.emit()"
             [disabled]="loading"
           ></my-button>
           <my-button
             [text]="'CREATE_ROOM_MODAL.CREATE' | translate"
-            variant="pixel"
+            variant="modern"
             size="small"
             (clicked)="onCreate()"
             [disabled]="loading || !activeDeckId()"

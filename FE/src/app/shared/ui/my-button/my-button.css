@@ -32,3 +32,19 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.my-btn--modern {
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--btn-color) 25%, transparent);
+}
+
+.my-btn--modern:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 22px var(--btn-color),
+    0 10px 28px color-mix(in srgb, var(--btn-color) 40%, transparent);
+}
+
+.my-btn--modern:active:not(:disabled) {
+  transform: scale(1);
+  box-shadow: 0 0 10px var(--btn-color);
+}

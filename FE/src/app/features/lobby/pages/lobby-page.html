@@ -1,43 +1,40 @@
-<my-page-background videoSrc="/assets/video/lobbyVideo.webm" poster="/assets/img/MatchSalas.jpg" />
+<my-page-background videoSrc="/assets/video/lobbyVideo.webm" poster="/assets/img/MatchSalas.jpg" [overlayOpacity]="0.35" overlayMode="gradient" />
 <div class="flex flex-col h-full gap-4 p-6">
   <!-- Header row: back button, player info inline, deck info right -->
   <div class="flex items-center gap-4">
     <my-button
       [text]="'LOBBY.BACK' | translate"
-      variant="pixel"
+      variant="modern"
       size="small"
       (clicked)="goBack()"
     ></my-button>
 
     <!-- Player info card -->
-    <div class="flex items-center gap-3 px-3 py-1.5 border-2"
-         [style.borderColor]="'var(--pixel-border-bottom-right)'"
-         [style.borderTopColor]="'var(--pixel-border-top-left)'"
-         [style.borderLeftColor]="'var(--pixel-border-top-left)'">
-      <div class="flex items-center gap-2 leading-none">
-        <span class="font-orbitron text-[0.72rem] text-neon-cyan truncate">{{ playerTrainerName() }}</span>
-        <span class="font-orbitron text-[0.585rem] text-neon-magenta">Lv.{{ playerLevel() }}</span>
+    <div class="flex items-center gap-3 px-4 py-2 rounded-2xl border border-white/20"
+         style="background: rgba(255,255,255,0.08); backdrop-filter: blur(8px);">
+      <div class="flex flex-col leading-tight">
+        <span class="font-orbitron text-sm text-white font-bold truncate">{{ playerTrainerName() }}</span>
+        <span class="font-share-tech text-[0.62rem] text-text-secondary whitespace-nowrap">{{ playerExp() }}/{{ playerExpForNext() }} XP</span>
       </div>
-      <div class="flex items-center gap-1.5">
-        <div class="w-20 h-1.5 bg-[var(--bg-primary)] overflow-hidden">
-          <div
-            class="h-full bg-neon-cyan transition-all duration-300"
-            [style.width.%]="expPercent()"
-          ></div>
+      <div class="flex items-center gap-2">
+        <span class="font-orbitron text-[0.62rem] text-neon-cyan px-2 py-0.5 rounded-full border border-neon-cyan/40 whitespace-nowrap"
+              style="background: rgba(0,170,255,0.15);">Lv.{{ playerLevel() }}</span>
+        <div class="w-24 h-2 rounded-full overflow-hidden" style="background: rgba(255,255,255,0.12);">
+          <div class="h-full rounded-full bg-gradient-to-r from-neon-cyan to-neon-magenta transition-all duration-300" [style.width.%]="expPercent()"></div>
         </div>
-        <span class="font-share-tech text-[0.495rem] text-text-secondary whitespace-nowrap">{{ playerExp() }}/{{ playerExpForNext() }} XP</span>
       </div>
     </div>
 
     <div class="ml-auto flex items-center gap-3">
-      <my-text
-        [text]="('LOBBY.DECK_LABEL' | translate) + activeDeckName()"
-        size="0.675rem"
-        color="var(--text-primary)"
-      ></my-text>
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-neon-cyan/30"
+           style="background: rgba(0,170,255,0.12); backdrop-filter: blur(8px);">
+        <span class="text-neon-cyan text-[0.7rem]">🃏</span>
+        <span class="font-orbitron text-[0.62rem] text-neon-cyan uppercase tracking-wider">{{ 'LOBBY.DECK_LABEL' | translate }}</span>
+        <span class="font-orbitron text-[0.72rem] text-white font-bold truncate">{{ activeDeckName() }}</span>
+      </div>
       <my-button
         [text]="'LOBBY.CHANGE' | translate"
-        variant="pixel"
+        variant="modern"
         size="small"
         (clicked)="onChangeDeck()"
       ></my-button>
@@ -47,27 +44,27 @@
   <!-- Create / Join + Filters side by side -->
   <div class="flex gap-4">
     <!-- Left: Create / Join -->
-    <div appPixelPanel class="flex-1 p-4 opacity-80">
-      <h2 class="font-orbitron text-xs text-neon-cyan tracking-[3px] mb-3">{{ 'LOBBY.CREATE_OR_JOIN' | translate }}</h2>
-      <div class="flex gap-2 items-center flex-wrap">
+    <div appPixelPanel="glass" class="flex-1 p-4 flex flex-col justify-center">
+      <h2 class="font-orbitron text-xs text-neon-cyan tracking-[3px] mb-4">{{ 'LOBBY.CREATE_OR_JOIN' | translate }}</h2>
+      <div class="flex gap-3 items-center flex-wrap">
         <my-input
           [value]="joinCodeInput"
           [placeholder]="'LOBBY.CODE_PLACEHOLDER' | translate"
-          variant="pixel"
+          variant="modern"
           (valueChange)="joinCodeInput = $event.toUpperCase()"
           (keydown.enter)="onJoinByCode()"
-          class="!w-28"
+          class="!w-32"
         ></my-input>
         <my-button
           [text]="'LOBBY.JOIN' | translate"
-          variant="pixel"
+          variant="modern"
           size="small"
           (clicked)="onJoinByCode()"
           [disabled]="!joinCodeInput.trim()"
         ></my-button>
         <my-button
           [text]="'LOBBY.CREATE_ROOM' | translate"
-          variant="pixel"
+          variant="modern"
           size="small"
           (clicked)="showCreateModal.set(true)"
         ></my-button>
@@ -75,47 +72,56 @@
     </div>
 
     <!-- Right: Filters -->
-    <div appPixelPanel class="flex-1 p-4 opacity-80">
+    <div appPixelPanel="glass" class="flex-1 p-4">
       <h2 class="font-orbitron text-xs text-neon-cyan tracking-[3px] mb-3">{{ 'LOBBY.FILTERS' | translate }}</h2>
       <div class="flex flex-col gap-2">
         <my-input
           [value]="searchText()"
           [placeholder]="'🔍 ' + ('LOBBY.SEARCH_PLACEHOLDER' | translate)"
-          variant="pixel"
+          variant="modern"
           (valueChange)="searchText.set($event)"
         ></my-input>
         <div class="flex gap-2">
-          <my-select
-            [options]="filterTypeOptions()"
-            [value]="filterType()"
-            variant="pixel"
-            (valueChange)="onFilterTypeChange($event)"
-            class="flex-1"
-          ></my-select>
-          <my-select
-            [options]="filterStatusOptions()"
-            [value]="filterStatus()"
-            variant="pixel"
-            (valueChange)="onFilterStatusChange($event)"
-            class="flex-1"
-          ></my-select>
-          <my-select
-            [options]="filterAvailabilityOptions()"
-            [value]="filterAvailability()"
-            variant="pixel"
-            (valueChange)="onFilterAvailabilityChange($event)"
-            class="flex-1"
-          ></my-select>
+          <div class="flex-1 flex flex-col gap-1">
+            <span class="font-share-tech text-[0.55rem] text-text-secondary">{{ 'LOBBY.FILTER_DESC_TYPE' | translate }}</span>
+            <my-select
+              [options]="filterTypeOptions()"
+              [value]="filterType()"
+              variant="modern"
+              (valueChange)="onFilterTypeChange($event)"
+              class="flex-1"
+            ></my-select>
+          </div>
+          <div class="flex-1 flex flex-col gap-1">
+            <span class="font-share-tech text-[0.55rem] text-text-secondary">{{ 'LOBBY.FILTER_DESC_STATUS' | translate }}</span>
+            <my-select
+              [options]="filterStatusOptions()"
+              [value]="filterStatus()"
+              variant="modern"
+              (valueChange)="onFilterStatusChange($event)"
+              class="flex-1"
+            ></my-select>
+          </div>
+          <div class="flex-1 flex flex-col gap-1">
+            <span class="font-share-tech text-[0.55rem] text-text-secondary">{{ 'LOBBY.FILTER_DESC_AVAILABILITY' | translate }}</span>
+            <my-select
+              [options]="filterAvailabilityOptions()"
+              [value]="filterAvailability()"
+              variant="modern"
+              (valueChange)="onFilterAvailabilityChange($event)"
+              class="flex-1"
+            ></my-select>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Room list section -->
-  <div appPixelPanel class="flex-1 p-4 flex flex-col min-h-0 opacity-80">
+  <div appPixelPanel="glass" class="flex-1 p-4 flex flex-col min-h-0">
     <div class="flex items-center justify-between mb-3">
       <h2 class="font-orbitron text-xs text-neon-cyan tracking-[3px]">{{ 'LOBBY.ROOMS_TITLE' | translate }}</h2>
-      <my-button text="↻" variant="pixel" size="small" (clicked)="onRefreshRooms()"></my-button>
+      <my-button text="↻" variant="modern" size="small" (clicked)="onRefreshRooms()"></my-button>
     </div>
 
     @if (loading()) {
@@ -125,15 +131,12 @@
     } @else {
       <div class="flex-1 overflow-y-auto flex flex-col gap-3">
         @for (room of filteredRooms(); track room.matchId) {
-          <div appPixelPanel="card">
+          <div appPixelPanel="glass">
             <div class="flex items-center p-3 gap-4">
               <img
                 [src]="getCharacterPortrait(room.hostCharacter)"
                 [alt]="room.hostTrainerName"
-                class="w-10 h-10 border-2 object-cover shrink-0 self-start mt-1"
-                [style.borderColor]="'var(--pixel-border-bottom-right)'"
-                [style.borderTopColor]="'var(--pixel-border-top-left)'"
-                [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+                class="w-12 h-12 object-cover shrink-0 self-start mt-1 rounded-xl border border-white/20"
               />
               <div class="flex flex-col flex-1 min-w-0 gap-0.5">
                 <span class="font-orbitron text-[0.945rem] text-neon-cyan truncate">{{ room.roomName || ('LOBBY.UNNAMED_ROOM' | translate) }}</span>
@@ -156,7 +159,7 @@
                 </span>
                 <my-button
                   [text]="room.guestTrainerName ? ('LOBBY.FULL' | translate) : ('LOBBY.JOIN_ROOM' | translate)"
-                  variant="pixel"
+                  variant="modern"
                   size="small"
                   (clicked)="room.guestTrainerName ? null : onJoinRoom(room.matchId)"
                   [disabled]="!!room.guestTrainerName"
@@ -174,20 +177,20 @@
 <!-- Code password modal -->
 @if (showCodePasswordModal()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60" (click)="onCancelCodePassword()">
-    <div appPixelPanel="modal" class="pixel-modal-layout" (click)="$event.stopPropagation()">
+    <div appPixelPanel="glass" class="pixel-modal-layout" (click)="$event.stopPropagation()">
       <h3 class="font-orbitron text-xs text-neon-cyan tracking-[3px] mb-3">{{ 'LOBBY.PASSWORD_TITLE' | translate }}</h3>
       <p class="font-share-tech text-[0.63rem] text-text-secondary mb-3">{{ 'LOBBY.PASSWORD_DESC' | translate }}</p>
       <my-input
         [value]="codePassword"
         [placeholder]="'LOBBY.PASSWORD_PLACEHOLDER' | translate"
         type="password"
-        variant="pixel"
+        variant="modern"
         (valueChange)="codePassword = $event"
         (keydown.enter)="onConfirmCodePassword()"
       ></my-input>
       <div class="flex gap-3 justify-end mt-4">
-        <my-button [text]="'LOBBY.CANCEL' | translate" variant="pixel" size="small" (clicked)="onCancelCodePassword()"></my-button>
-        <my-button [text]="'LOBBY.CONFIRM' | translate" variant="pixel" size="small" (clicked)="onConfirmCodePassword()" [disabled]="!codePassword.trim()"></my-button>
+        <my-button [text]="'LOBBY.CANCEL' | translate" variant="modern" size="small" (clicked)="onCancelCodePassword()"></my-button>
+        <my-button [text]="'LOBBY.CONFIRM' | translate" variant="modern" size="small" (clicked)="onConfirmCodePassword()" [disabled]="!codePassword.trim()"></my-button>
       </div>
     </div>
   </div>
@@ -196,20 +199,20 @@
 <!-- Room password modal -->
 @if (showRoomPasswordModal()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60" (click)="onCancelRoomPassword()">
-    <div appPixelPanel="modal" class="pixel-modal-layout" (click)="$event.stopPropagation()">
+    <div appPixelPanel="glass" class="pixel-modal-layout" (click)="$event.stopPropagation()">
       <h3 class="font-orbitron text-xs text-neon-cyan tracking-[3px] mb-3">{{ 'LOBBY.PASSWORD_TITLE' | translate }}</h3>
       <p class="font-share-tech text-[0.63rem] text-text-secondary mb-3">{{ 'LOBBY.PASSWORD_DESC' | translate }}</p>
       <my-input
         [value]="pendingRoomPassword"
         [placeholder]="'LOBBY.PASSWORD_PLACEHOLDER' | translate"
         type="password"
-        variant="pixel"
+        variant="modern"
         (valueChange)="pendingRoomPassword = $event"
         (keydown.enter)="onConfirmRoomPassword()"
       ></my-input>
       <div class="flex gap-3 justify-end mt-4">
-        <my-button [text]="'LOBBY.CANCEL' | translate" variant="pixel" size="small" (clicked)="onCancelRoomPassword()"></my-button>
-        <my-button [text]="'LOBBY.CONFIRM' | translate" variant="pixel" size="small" (clicked)="onConfirmRoomPassword()" [disabled]="!pendingRoomPassword.trim()"></my-button>
+        <my-button [text]="'LOBBY.CANCEL' | translate" variant="modern" size="small" (clicked)="onCancelRoomPassword()"></my-button>
+        <my-button [text]="'LOBBY.CONFIRM' | translate" variant="modern" size="small" (clicked)="onConfirmRoomPassword()" [disabled]="!pendingRoomPassword.trim()"></my-button>
       </div>
     </div>
   </div>
@@ -245,8 +248,7 @@
 <!-- Pending match modal -->
 <my-modal
   [open]="showPendingMatchModal() && !!pendingMatch()"
-  title="Partida pendiente"
-  variant="pixel"
+  title="Partida pendiente" variant="pixel"
   width="24rem"
   (close)="showPendingMatchModal.set(false)"
 >
@@ -256,11 +258,26 @@
         Tenés una partida sin terminar contra <strong>{{ pm.hostTrainerName === currentTrainerName() ? pm.guestTrainerName : pm.hostTrainerName }}</strong>.
       </p>
       <div class="flex gap-3 justify-center">
-        <my-button text="Continuar" variant="pixel" (clicked)="onContinuePendingMatch(pm)" />
-        <my-button text="Rendirse" variant="pixel" color="#ff4444" (clicked)="onSurrenderPendingMatch(pm)" />
+        <my-button text="Continuar" variant="modern" (clicked)="onContinuePendingMatch(pm)" />
+        <my-button text="Rendirse" variant="modern" color="#ff4444" (clicked)="onSurrenderPendingMatch(pm)" />
       </div>
     </div>
   }
+</my-modal>
+
+<!-- Defeat by abandonment modal -->
+<my-modal
+  [open]="showAbandonedModal()"
+  title="Perdiste por abandono" variant="pixel"
+  width="24rem"
+  (close)="dismissAbandonedModal()"
+>
+  <div class="flex flex-col gap-4 items-center py-2">
+    <p class="text-center text-sm" style="color:#aaaacc">
+      No reconectaste a tiempo y tu oponente ganó la partida por abandono.
+    </p>
+    <my-button text="Aceptar" variant="modern" color="#ff4444" (clicked)="dismissAbandonedModal()" />
+  </div>
 </my-modal>
 
 <app-pokenav-device

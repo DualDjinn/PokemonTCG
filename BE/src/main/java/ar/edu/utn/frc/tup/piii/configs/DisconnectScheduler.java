@@ -51,6 +51,8 @@ public class DisconnectScheduler {
                         ? match.getPlayerTwoId() : match.getPlayerOneId();
                 match.setStatus(MatchStatus.FINISHED);
                 match.setWinnerId(winnerId);
+                match.setForfeitPlayerId(disconnectedId);
+                match.setFinishedAt(LocalDateTime.now());
                 match.setDisconnectedPlayerId(null);
                 match.setDisconnectedAt(null);
                 matchRepository.save(match);

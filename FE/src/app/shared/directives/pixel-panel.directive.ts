@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 
-export type PixelPanelVariant = 'panel' | 'modal' | 'card' | 'none';
+export type PixelPanelVariant = 'panel' | 'modal' | 'card' | 'glass' | 'none';
 
 @Directive({
   selector: '[appPixelPanel]',
@@ -24,6 +24,15 @@ export class PixelPanelDirective implements OnInit {
     if (resolved === 'none') return;
 
     const style = this.el.nativeElement.style;
+
+    if (resolved === 'glass') {
+      style.backgroundColor = 'rgba(255, 255, 255, 0.07)';
+      style.backdropFilter = 'blur(14px)';
+      style.border = '1px solid rgba(255, 255, 255, 0.18)';
+      style.borderRadius = '16px';
+      style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.25)';
+      return;
+    }
 
     if (resolved === 'card') {
       style.backgroundColor = 'var(--pixel-card-bg)';

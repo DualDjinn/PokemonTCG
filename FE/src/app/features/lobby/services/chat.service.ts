@@ -55,8 +55,8 @@ export class ChatService {
     this.stompClient = new Client({
       webSocketFactory: () => new WebSocket('/ws'),
       reconnectDelay: 3000,
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
+      heartbeatIncoming: 0,
+      heartbeatOutgoing: 0,
       onConnect: () => this.onConnected(),
       onWebSocketClose: () => this.connected.set(false),
       onStompError: () => this.connected.set(false),

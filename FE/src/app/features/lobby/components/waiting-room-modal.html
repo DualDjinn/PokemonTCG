@@ -4,7 +4,7 @@
 >
     <div class="waiting-room-glow">
       <div
-        class="flex border-3 overflow-hidden transition-all duration-300 ease-out h-[520px]"
+        class="flex border-3 overflow-hidden transition-all duration-300 ease-out h-[460px]"
         [style.background]="'var(--pixel-panel-bg)'"
         [style.backgroundImage]="'linear-gradient(45deg, rgba(0,170,255,0.04) 25%, transparent 25%), linear-gradient(-45deg, rgba(0,170,255,0.04) 25%, transparent 25%)'"
         [style.backgroundSize]="'4px 4px'"
@@ -15,7 +15,7 @@
         [class.max-w-[58rem]]="chatOpen()"
       >
     <!-- Main content -->
-    <div class="flex flex-col gap-6 p-8 min-w-[30rem] max-w-[46rem] justify-center">
+    <div class="flex flex-col gap-5 p-6 min-w-[30rem] max-w-[46rem] justify-center">
       <div class="flex justify-between items-center">
         <span class="font-orbitron text-lg text-neon-cyan">{{ roomName }}</span>
         <div class="flex items-center gap-3 border-2 px-3 py-1.5"
@@ -49,7 +49,9 @@
                [style.borderLeftColor]="'var(--pixel-border-top-left)'">
             <img [src]="portraitUrl(hostCharacter)" [alt]="hostTrainerName" class="w-full h-full object-cover" />
           </div>
-          <span class="font-orbitron text-xs text-text-primary text-center">{{ hostTrainerName }}</span>
+          <span class="font-orbitron text-xs text-text-primary text-center inline-flex items-center gap-1.5">{{ hostTrainerName }}
+            <span class="font-orbitron text-[0.5rem] px-1.5 py-0.5 rounded-full bg-neon-magenta/20 text-neon-magenta border border-neon-magenta/40">Host</span>
+          </span>
           <div class="lobby-status-badge" [class.text-neon-green]="_hostReady()" [class.border-neon-green]="_hostReady()">
             {{ _hostReady() ? ('WAITING_ROOM.READY' | translate) : ('WAITING_ROOM.WAITING' | translate) }}
           </div>
@@ -114,21 +116,21 @@
           @if (isHost) {
             <my-button
               [text]="'WAITING_ROOM.CANCEL_MATCH' | translate"
-              variant="pixel"
+              variant="modern"
               size="small"
               (clicked)="onCancel()"
               [disabled]="loading()"
             ></my-button>
             <my-button
               [text]="_hostReady() ? ('WAITING_ROOM.READY_CHECK' | translate) : ('WAITING_ROOM.I_AM_READY' | translate)"
-              variant="pixel"
+              variant="modern"
               size="small"
               (clicked)="onToggleReady()"
               [disabled]="loading() || (isHost && !_guestTrainerName())"
             ></my-button>
             <my-button
               [text]="'WAITING_ROOM.START' | translate"
-              variant="pixel"
+              variant="modern"
               size="small"
               (clicked)="onStart()"
               [disabled]="loading() || !_hostReady() || !_guestReady()"
@@ -136,14 +138,14 @@
           } @else {
             <my-button
               [text]="'WAITING_ROOM.LEAVE' | translate"
-              variant="pixel"
+              variant="modern"
               size="small"
               (clicked)="onCancel()"
               [disabled]="loading()"
             ></my-button>
             <my-button
               [text]="_guestReady() ? ('WAITING_ROOM.READY_CHECK' | translate) : ('WAITING_ROOM.I_AM_READY' | translate)"
-              variant="pixel"
+              variant="modern"
               size="small"
               (clicked)="onToggleReady()"
               [disabled]="loading()"
@@ -159,7 +161,7 @@
           @if (countdownPhase() === 'cancelable' && isHost) {
             <my-button
               [text]="'LOBBY.CANCEL' | translate"
-              variant="pixel"
+              variant="modern"
               size="small"
               (clicked)="onCancelCountdown()"
             ></my-button>

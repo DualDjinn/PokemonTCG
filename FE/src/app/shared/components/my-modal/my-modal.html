@@ -33,7 +33,7 @@
         <my-icon-button icon="✕" [variant]="variant === 'pixel' ? 'pixel' : 'solid'" size="small" ariaLabel="Close" (clicked)="onCloseClick()" />
       }
     </div>
-    <div class="p-4 overflow-auto bg-inherit">
+    <div [class]="bodyPadding + ' overflow-auto bg-inherit'">
       <ng-content />
     </div>
   </div>

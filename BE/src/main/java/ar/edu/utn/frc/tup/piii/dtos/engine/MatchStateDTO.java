@@ -40,6 +40,8 @@ public class MatchStateDTO {
     private String openingStarterPlayerId;
     private int mulliganIteration;
     private boolean setupComplete;
+    private long setupRemainingMs;
+    private boolean dealt;
     private List<MatchLogEntry> matchLog;
     private int currentTurnNumber;
     private String mulliganPlayerId;
