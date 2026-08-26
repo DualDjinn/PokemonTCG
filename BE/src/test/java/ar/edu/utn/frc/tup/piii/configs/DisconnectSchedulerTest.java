@@ -38,6 +38,9 @@ class DisconnectSchedulerTest {
     @Mock
     private SimpMessagingTemplate messagingTemplate;
 
+    @Mock
+    private ar.edu.utn.frc.tup.piii.services.PlayerStatsService playerStatsService;
+
     @InjectMocks
     private DisconnectScheduler scheduler;
 

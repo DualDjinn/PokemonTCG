@@ -84,6 +84,28 @@ interface CharOption {
   hasColor: boolean;
 }
 
+interface PlayerStatsResponse {
+  matchesPlayed: number;
+  matchesWon: number;
+  matchesLost: number;
+  matchesTied: number;
+  totalMatchTimeMs: number;
+  mostPlayedCard: string | null;
+  mostUsedDeck: string | null;
+}
+
+interface FlyCardData {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  imageUrl: string;
+  name: string;
+  opacity: number;
+  scale: number;
+  rotation: number;
+}
+
 @Component({
   selector: 'app-player-profile-page',
   imports: [ReactiveFormsModule, RouterLink, MyText, MyBadge, MySkeletonLoader, MyInput, MyButton, MyModal, MyFilterBar, MyCardThumbnail, MyPageBackground, TranslateModule, PixelPanelDirective, PixelBorderDirective, PokenavDeviceComponent, GameOptionsComponent],
@@ -91,32 +113,35 @@ interface CharOption {
     <my-page-background videoSrc="/assets/video/profileVideo.webm" poster="/assets/img/FondoPerfil.jpg" [overlayOpacity]="0.45" />
     <section class="max-w-[1200px] mx-auto px-8 pb-12 h-screen overflow-y-auto scrollbar-none">
       <div class="mb-4 pt-8">
-        <my-button [text]="'PLAYER_PROFILE.BACK' | translate" variant="pixel" size="small" (clicked)="goBackToGame()"></my-button>
+        <my-button [text]="'PLAYER_PROFILE.BACK' | translate" variant="modern" size="small" (clicked)="goBackToGame()"></my-button>
       </div>
 
-      <header appPixelPanel class="grid grid-cols-[auto_minmax(0,1fr)_280px] gap-6 p-6 opacity-80">
-        <div class="flex flex-col items-center gap-3 p-5 border-4 border-[var(--pixel-border-bottom-right)] border-t-[var(--pixel-border-top-left)] border-l-[var(--pixel-border-top-left)] bg-black/30">
+      <header appPixelPanel="glass" class="grid grid-cols-[auto_minmax(0,1fr)_280px] gap-6 p-6">
+        <div class="flex flex-col items-center gap-3 p-5 rounded-2xl border border-white/20 bg-white/5">
           <img [src]="portraitUrl()" alt="Personaje" class="w-36 h-36 object-contain" />
           <my-text [text]="trainerName()" tag="h2" size="1.125rem" weight="bold" color="var(--text-primary)" align="center"></my-text>
         </div>
 
         <div class="flex flex-col justify-between h-full">
           <div class="flex flex-row gap-2 items-start">
-            <my-button [text]="'PLAYER_PROFILE.CHANGE_NAME' | translate" variant="pixel" size="small" (clicked)="openNameModal()"></my-button>
-            <my-button [text]="'PLAYER_PROFILE.CHANGE_CHARACTER' | translate" variant="pixel" size="small" (clicked)="openCharacterModal()"></my-button>
-            <my-button [text]="'PLAYER_PROFILE.CHANGE_PASSWORD' | translate" variant="pixel" size="small" (clicked)="openPasswordModal()"></my-button>
+            <my-button [text]="'PLAYER_PROFILE.CHANGE_NAME' | translate" variant="modern" size="small" (clicked)="openNameModal()"></my-button>
+            <my-button [text]="'PLAYER_PROFILE.CHANGE_CHARACTER' | translate" variant="modern" size="small" (clicked)="openCharacterModal()"></my-button>
+            <my-button [text]="'PLAYER_PROFILE.CHANGE_PASSWORD' | translate" variant="modern" size="small" (clicked)="openPasswordModal()"></my-button>
+          </div>
+          <div class="mt-2">
+            <my-button [text]="'PLAYER_PROFILE.SHOW_STATS' | translate" variant="modern" size="small" (clicked)="openStatsModal()"></my-button>
           </div>
           <div class="grid grid-cols-3 gap-4 text-center justify-items-center">
             <div>
-              <my-text [text]="'PLAYER_PROFILE.LEVEL' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
+              <my-text [text]="'PLAYER_PROFILE.LEVEL' | translate" tag="span" size="0.675rem" weight="bold" color="#ffffff" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
               <div class="mt-1"><my-text [text]="levelLabel()" tag="span" weight="bold" size="1.0125rem" color="var(--text-primary)"></my-text></div>
             </div>
             <div>
-              <my-text [text]="'PLAYER_PROFILE.EXPERIENCE' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
+              <my-text [text]="'PLAYER_PROFILE.EXPERIENCE' | translate" tag="span" size="0.675rem" weight="bold" color="#ffffff" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
               <div class="mt-1"><my-text [text]="experienceLabel()" tag="span" weight="bold" size="1.0125rem" color="var(--text-primary)"></my-text></div>
             </div>
             <div>
-              <my-text [text]="'PLAYER_PROFILE.COINS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
+              <my-text [text]="'PLAYER_PROFILE.COINS' | translate" tag="span" size="0.675rem" weight="bold" color="#ffffff" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
               <div class="flex items-center justify-center gap-1.5 mt-1">
                 <img src="/assets/img/Moneda.png" alt="" class="w-8 h-8 object-contain" />
                 <my-text [text]="coinsLabel()" tag="span" weight="bold" size="1.0125rem" color="var(--neon-cyan)"></my-text>
@@ -125,17 +150,16 @@ interface CharOption {
           </div>
         </div>
 
-        <aside class="grid gap-3 p-5 border-4 border-[var(--pixel-border-bottom-right)] border-t-[var(--pixel-border-top-left)] border-l-[var(--pixel-border-top-left)] bg-black/30">
-          <my-text [text]="'PLAYER_PROFILE.COLLECTION_PROGRESS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
+        <aside class="grid gap-3 p-5 rounded-2xl border border-white/20 bg-white/5">
+          <my-text [text]="'PLAYER_PROFILE.COLLECTION_PROGRESS' | translate" tag="span" size="0.675rem" weight="bold" color="#ffffff" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
           <my-text [text]="cardProgressPercent() + '%'" tag="span" weight="bold" size="1.98rem" color="var(--neon-cyan)"></my-text>
-          <my-text [text]="cardProgressLabel()" tag="p" size="0.7875rem" color="var(--text-secondary)"></my-text>
+          <my-text [text]="cardProgressLabel()" tag="p" size="0.7875rem" color="#ffffff"></my-text>
         </aside>
       </header>
 
       <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6 mt-6">
-        <section appPixelPanel class="flex flex-col gap-4 p-6 opacity-80">
+        <section appPixelPanel="glass" class="flex flex-col gap-4 p-6">
           <div>
-            <my-text [text]="'PLAYER_PROFILE.COSMETICS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
             <my-text [text]="'PLAYER_PROFILE.CARD_BACKS' | translate" tag="h2" size="1.125rem" weight="bold" color="var(--text-primary)"></my-text>
           </div>
 
@@ -155,7 +179,7 @@ interface CharOption {
                     <my-badge [text]="'PLAYER_PROFILE.EQUIPPED' | translate" color="rgba(0,204,170,0.25)" textColor="#00ccaa" borderColor="rgba(0,204,170,0.5)"></my-badge>
                   </div>
                 }
-                <my-text [text]="'PLAYER_PROFILE.DEFAULT_BACK' | translate" tag="span" size="0.65rem" color="var(--text-secondary)" align="center"></my-text>
+                <my-text [text]="'PLAYER_PROFILE.DEFAULT_BACK' | translate" tag="span" size="0.65rem" color="#ffffff" align="center"></my-text>
               </div>
 
               @for (back of ownedBacks(); track back.id) {
@@ -169,23 +193,22 @@ interface CharOption {
                       <my-badge [text]="'PLAYER_PROFILE.EQUIPPED' | translate" color="rgba(0,204,170,0.25)" textColor="#00ccaa" borderColor="rgba(0,204,170,0.5)"></my-badge>
                     </div>
                   }
-                  <my-text [text]="back.name" tag="span" size="0.65rem" color="var(--text-secondary)" align="center"></my-text>
+                  <my-text [text]="back.name" tag="span" size="0.65rem" color="#ffffff" align="center"></my-text>
                 </div>
               }
             </div>
           }
         </section>
 
-        <section appPixelPanel class="flex flex-col gap-4 p-6 opacity-80">
+        <section appPixelPanel="glass" class="flex flex-col gap-4 p-6">
           <div>
-            <my-text [text]="'PLAYER_PROFILE.COSMETICS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
             <my-text [text]="'PLAYER_PROFILE.FULL_ART' | translate" tag="h2" size="1.125rem" weight="bold" color="var(--text-primary)"></my-text>
           </div>
 
           @if (cosmeticsLoading()) {
             <my-skeleton-loader [lines]="2" height="8rem" gap="0.75rem"></my-skeleton-loader>
           } @else if (playerSkins().length === 0) {
-            <div class="py-8"><my-text [text]="'PLAYER_PROFILE.NO_SKINS' | translate" tag="p" color="var(--text-secondary)" align="center"></my-text></div>
+            <div class="py-8"><my-text [text]="'PLAYER_PROFILE.NO_SKINS' | translate" tag="p" color="#ffffff" align="center"></my-text></div>
           } @else {
             <div class="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3 p-2">
               @for (skin of playerSkins(); track skin.skinId) {
@@ -199,7 +222,7 @@ interface CharOption {
                       <my-badge [text]="'PLAYER_PROFILE.EQUIPPED' | translate" color="rgba(0,204,170,0.25)" textColor="#00ccaa" borderColor="rgba(0,204,170,0.5)"></my-badge>
                     </div>
                   }
-                  <my-text [text]="skin.baseCardName || skin.skinName" tag="span" size="0.65rem" color="var(--text-secondary)" align="center"></my-text>
+                  <my-text [text]="skin.baseCardName || skin.skinName" tag="span" size="0.65rem" color="#ffffff" align="center"></my-text>
                 </div>
               }
             </div>
@@ -208,16 +231,17 @@ interface CharOption {
       </div>
 
       <div class="grid grid-cols-[minmax(0,1.7fr)_minmax(280px,0.9fr)] gap-6 mt-6 sticky top-10 h-screen overflow-hidden grid-rows-[1fr]">
-        <section appPixelPanel class="flex flex-col gap-4 p-6 opacity-80 min-h-0">
+        <section appPixelPanel="glass" class="flex flex-col gap-4 p-6 min-h-0">
           <div class="flex items-center justify-between gap-4 flex-shrink-0">
             <div>
-              <my-text [text]="'PLAYER_PROFILE.COLLECTION' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
               <my-text [text]="'PLAYER_PROFILE.CARDS_OBTAINED' | translate" tag="h2" size="1.125rem" weight="bold" color="var(--text-primary)"></my-text>
             </div>
 
             <my-filter-bar
               [options]="supertypeFilters"
               [selected]="selectedFilter()"
+              variant="modern"
+              color="#0284c7"
               (selectedChange)="setFilter($event)"
             ></my-filter-bar>
           </div>
@@ -226,10 +250,9 @@ interface CharOption {
           @if (collectionLoading() && displayedCards().length === 0) {
             <my-skeleton-loader [lines]="4" height="10rem" gap="0.75rem"></my-skeleton-loader>
           } @else if (displayedCards().length === 0) {
-            <div class="py-8"><my-text [text]="'PLAYER_PROFILE.NO_CARDS_FILTER' | translate" tag="p" color="var(--text-secondary)" align="center"></my-text></div>
+            <div class="py-8"><my-text [text]="'PLAYER_PROFILE.NO_CARDS_FILTER' | translate" tag="p" color="#ffffff" align="center"></my-text></div>
           } @else {
-            <!-- Layout en 2 columnas cuando hay carta seleccionada: grilla + panel detalle -->
-            <div [class.collection-with-detail]="selectedCard()" class="collection-layout">
+            <div class="collection-layout">
               <div class="collection-grid">
                 @for (card of displayedCards(); track card.id) {
                   @if (card.isLocked) {
@@ -239,8 +262,7 @@ interface CharOption {
                   } @else {
                     <div
                       class="card-thumb-wrapper"
-                      [class.card-thumb-wrapper--selected]="selectedCard()?.id === card.id"
-                      (click)="selectCard(card)"
+                      (click)="openCardDetail($event, card)"
                     >
                       <my-card-thumbnail
                         [imageUrl]="card.imageUrl"
@@ -254,34 +276,6 @@ interface CharOption {
                   }
                 }
               </div>
-
-              @if (selectedCard(); as sel) {
-                <aside class="card-detail-panel" appPixelPanel>
-                  <div class="flex items-center justify-between mb-3">
-                    <my-text [text]="'PLAYER_PROFILE.DETAIL' | translate" tag="span" size="0.65rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'"></my-text>
-                    <button type="button" class="close-detail-btn" (click)="closeCardDetail()" [attr.aria-label]="'COMMON.CLOSE' | translate">✕</button>
-                  </div>
-
-                  <img [src]="sel.imageUrl" [alt]="sel.name" class="w-full rounded-md mb-3" style="aspect-ratio:63/88; object-fit:contain" />
-
-                  <my-text [text]="sel.name" tag="h3" size="1.2rem" weight="bold" color="var(--text-primary)"></my-text>
-
-                  @if (selectedCardFull(); as full) {
-                    <div class="flex items-center gap-2 mt-2 flex-wrap">
-                      @if (full.hp) {
-                        <div class="inline-flex items-center gap-1 text-base font-bold text-red-500 bg-red-500/10 border border-red-500/30 rounded px-2 py-0.5 leading-tight">
-                          {{ full.hp }} <span class="text-[0.7rem] font-normal text-text-secondary">HP</span>
-                        </div>
-                      }
-                      @if (full.types?.length) {
-                        @for (t of full.types; track $index) {
-                          <span class="px-3 py-0.5 rounded-full text-xs font-bold text-white bg-[var(--neon-cyan,#00aaff)]">{{ t }}</span>
-                        }
-                      }
-                    </div>
-                  }
-                </aside>
-              }
             </div>
           }
 
@@ -289,7 +283,7 @@ interface CharOption {
             <div class="flex justify-center flex-shrink-0">
               <my-button
                 [text]="collectionLoading() ? ('PLAYER_PROFILE.LOADING' | translate) : ('PLAYER_PROFILE.LOAD_MORE' | translate)"
-                variant="pixel"
+                variant="modern"
                 size="small"
                 [disabled]="collectionLoading()"
                 (clicked)="loadMoreCollection()"
@@ -299,26 +293,25 @@ interface CharOption {
           </div>
         </section>
 
-        <section appPixelPanel class="flex flex-col gap-4 p-6 opacity-80 overflow-y-auto">
+        <section appPixelPanel="glass" class="flex flex-col gap-4 p-6 overflow-y-auto">
           <div class="flex items-center justify-between gap-4 flex-shrink-0">
             <div>
-              <my-text [text]="'PLAYER_PROFILE.MY_DECKS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" [style.letterSpacing]="'0.18em'" [style.textTransform]="'uppercase'"></my-text>
               <my-text [text]="'PLAYER_PROFILE.READY_TO_PLAY' | translate" tag="h2" size="1.125rem" weight="bold" color="var(--text-primary)"></my-text>
             </div>
-            <my-button [text]="'PLAYER_PROFILE.GO_TO_DECKS' | translate" variant="pixel" size="small" (clicked)="goToDecks()"></my-button>
+            <my-button [text]="'PLAYER_PROFILE.GO_TO_DECKS' | translate" variant="modern" size="small" (clicked)="goToDecks()"></my-button>
           </div>
 
           @if (decksLoading()) {
             <my-skeleton-loader [lines]="3" height="4.5rem" gap="0.75rem"></my-skeleton-loader>
           } @else if (decks().length === 0) {
-            <div class="py-8"><my-text [text]="'PLAYER_PROFILE.NO_DECKS' | translate" tag="p" color="var(--text-secondary)" align="center"></my-text></div>
+            <div class="py-8"><my-text [text]="'PLAYER_PROFILE.NO_DECKS' | translate" tag="p" color="#ffffff" align="center"></my-text></div>
           } @else {
             <div class="grid gap-3">
               @for (deck of decks(); track deck.id) {
                 <a routerLink="/decks" appPixelBorder class="pixel-card-interactive">
                   <div class="grid gap-1">
                     <my-text [text]="deck.name" tag="span" weight="bold" size="0.844rem" color="var(--text-primary)"></my-text>
-                    <my-text [text]="deck.cardCount + ' ' + ('PLAYER_PROFILE.CARDS' | translate)" tag="span" size="0.731rem" color="var(--text-secondary)"></my-text>
+                    <my-text [text]="deck.cardCount + ' ' + ('PLAYER_PROFILE.CARDS' | translate)" tag="span" size="0.731rem" color="#ffffff"></my-text>
                   </div>
                   <div class="flex items-center gap-2">
                     @if (deck.valid) {
@@ -335,17 +328,89 @@ interface CharOption {
       </div>
     </section>
 
-    <my-modal [open]="showNameModal()" [title]="'PLAYER_PROFILE.CHANGE_NAME_TITLE' | translate" variant="pixel" (close)="closeNameModal()" width="28rem">
+    <my-modal [open]="showNameModal()" [title]="'PLAYER_PROFILE.CHANGE_NAME_TITLE' | translate" variant="glass" backdropStyle="blur" (close)="closeNameModal()" width="28rem">
       <form [formGroup]="trainerNameForm" (ngSubmit)="saveNameFromModal()" class="flex flex-col gap-4">
-        <my-input formControlName="trainerName" [placeholder]="'PLAYER_PROFILE.NAME_PLACEHOLDER' | translate" type="text" variant="pixel" color="var(--neon-cyan)"></my-input>
+        <my-input formControlName="trainerName" [placeholder]="'PLAYER_PROFILE.NAME_PLACEHOLDER' | translate" type="text" variant="modern" color="var(--neon-cyan)"></my-input>
         <div class="flex gap-3 justify-end">
-          <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="pixel" size="small" (clicked)="closeNameModal()" [disabled]="savingTrainerName()"></my-button>
-          <my-button [text]="'PLAYER_PROFILE.SAVE' | translate" variant="pixel" size="small" type="submit" [disabled]="savingTrainerName() || trainerNameForm.invalid"></my-button>
+          <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="modern" size="small" (clicked)="closeNameModal()" [disabled]="savingTrainerName()"></my-button>
+          <my-button [text]="'PLAYER_PROFILE.SAVE' | translate" variant="modern" size="small" type="submit" [disabled]="savingTrainerName() || trainerNameForm.invalid"></my-button>
         </div>
       </form>
     </my-modal>
 
-    <my-modal [open]="showCharacterModal()" [title]="'PLAYER_PROFILE.SELECT_CHARACTER' | translate" variant="pixel" (close)="closeCharacterModal()" width="32rem">
+    <my-modal [open]="showStatsModal()" [title]="'PLAYER_PROFILE.STATS_TITLE' | translate" variant="glass" backdropStyle="blur" (close)="closeStatsModal()" width="30rem">
+      @if (statsLoading()) {
+        <div class="py-8 flex justify-center">
+          <div class="w-8 h-8 border-4 border-white/10 border-t-[var(--neon-cyan)] rounded-full animate-spin"></div>
+        </div>
+      } @else if (playerStats(); as st) {
+        <div class="flex flex-col gap-2.5">
+          <div class="flex items-center justify-between gap-3 rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Nivel</span>
+            <div class="flex flex-col items-end gap-1">
+              <span class="font-orbitron text-[0.85rem] font-bold text-[var(--text-primary)]">{{ user()?.level ?? 0 }}</span>
+              <div class="w-28 h-1.5 rounded-full overflow-hidden" style="background: rgba(255,255,255,0.12);">
+                <div class="h-full rounded-full bg-gradient-to-r from-neon-cyan to-neon-magenta transition-all duration-300" [style.width.%]="xpIntoCurrentPercent()"></div>
+              </div>
+              <span class="font-share-tech text-[0.6rem] text-[#ffffff]">{{ user()?.xpIntoCurrentLevel ?? 0 }} / {{ user()?.xpForNextLevel ?? 0 }} XP</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Partidas jugadas</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ st.matchesPlayed }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Partidas ganadas</span>
+            <span class="font-orbitron text-[0.85rem] font-bold text-[#4ade80]">{{ st.matchesWon }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Partidas perdidas</span>
+            <span class="font-orbitron text-[0.85rem] font-bold text-[#f87171]">{{ st.matchesLost }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Partidas empatadas</span>
+            <span class="font-orbitron text-[0.85rem] font-bold text-[#fbbf24]">{{ st.matchesTied }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Tiempo jugado</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ formatMatchTime(st.totalMatchTimeMs) }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Carta más jugada</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ st.mostPlayedCard || '—' }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Mazo actual</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ currentDeckName() }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Mazo más utilizado</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ st.mostUsedDeck || '—' }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Mazos construidos</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ user()?.decks?.length ?? 0 }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Colección</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ user()?.collectionCardIds?.length ?? 0 }} / {{ TOTAL_COLLECTIBLE_CARDS }}</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">% colección</span>
+            <span class="font-orbitron text-[0.85rem] font-bold">{{ cardProgressPercent() }}%</span>
+          </div>
+          <div class="flex items-center justify-between rounded-xl border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+            <span class="font-orbitron text-[0.7rem] text-[#ffffff]">Monedas</span>
+            <span class="font-orbitron text-[0.85rem] font-bold text-[var(--neon-cyan)]">{{ coinsLabel() }}</span>
+          </div>
+          <div class="flex justify-end mt-1">
+            <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="modern" size="small" (clicked)="closeStatsModal()"></my-button>
+          </div>
+        </div>
+      }
+    </my-modal>
+
+    <my-modal [open]="showCharacterModal()" [title]="'PLAYER_PROFILE.SELECT_CHARACTER' | translate" variant="glass" backdropStyle="blur" (close)="closeCharacterModal()" width="32rem">
       <div class="flex flex-col gap-4">
         <div class="grid grid-cols-3 gap-2 justify-items-center">
           @for (char of characterOptions; track char.id) {
@@ -370,7 +435,7 @@ interface CharOption {
                    [class.border-[rgba(0,204,170,0.3)]]="selectedCharColor() !== 'rojo'"
                    style="background: #e03131"
                    (click)="selectColorInModal('rojo')">
-                <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-text-secondary whitespace-nowrap -translate-x-1/2" [class.text-[#00ccaa]]="selectedCharColor() === 'rojo'">{{ 'PLAYER_PROFILE.COLOR_RED' | translate }}</span>
+                <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-[#ffffff] whitespace-nowrap -translate-x-1/2" [class.text-[#00ccaa]]="selectedCharColor() === 'rojo'">{{ 'PLAYER_PROFILE.COLOR_RED' | translate }}</span>
               </div>
               <div class="w-8 h-8 rounded-full border-2 cursor-pointer transition-all duration-300 hover:scale-110 relative"
                    [class.border-[#00ccaa]]="selectedCharColor() === 'verde'"
@@ -379,7 +444,7 @@ interface CharOption {
                    [class.border-[rgba(0,204,170,0.3)]]="selectedCharColor() !== 'verde'"
                    style="background: #2f9e44"
                    (click)="selectColorInModal('verde')">
-                <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-text-secondary whitespace-nowrap -translate-x-1/2" [class.text-[#00ccaa]]="selectedCharColor() === 'verde'">{{ 'PLAYER_PROFILE.COLOR_GREEN' | translate }}</span>
+                <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-[#ffffff] whitespace-nowrap -translate-x-1/2" [class.text-[#00ccaa]]="selectedCharColor() === 'verde'">{{ 'PLAYER_PROFILE.COLOR_GREEN' | translate }}</span>
               </div>
               <div class="w-8 h-8 rounded-full border-2 cursor-pointer transition-all duration-300 hover:scale-110 relative"
                    [class.border-[#00ccaa]]="selectedCharColor() === 'violeta'"
@@ -388,36 +453,130 @@ interface CharOption {
                    [class.border-[rgba(0,204,170,0.3)]]="selectedCharColor() !== 'violeta'"
                    style="background: #845ef7"
                    (click)="selectColorInModal('violeta')">
-                <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-text-secondary whitespace-nowrap -translate-x-1/2" [class.text-[#00ccaa]]="selectedCharColor() === 'violeta'">{{ 'PLAYER_PROFILE.COLOR_PURPLE' | translate }}</span>
+                <span class="absolute -bottom-[22px] left-1/2 text-[0.585rem] text-[#ffffff] whitespace-nowrap -translate-x-1/2" [class.text-[#00ccaa]]="selectedCharColor() === 'violeta'">{{ 'PLAYER_PROFILE.COLOR_PURPLE' | translate }}</span>
               </div>
             </div>
           }
         </div>
 
         <div class="flex gap-3 justify-end mt-2">
-          <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="pixel" size="small" (clicked)="closeCharacterModal()"></my-button>
-          <my-button [text]="'PLAYER_PROFILE.SAVE' | translate" variant="pixel" size="small" (clicked)="saveCharacterModal()"></my-button>
+          <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="modern" size="small" (clicked)="closeCharacterModal()"></my-button>
+          <my-button [text]="'PLAYER_PROFILE.SAVE' | translate" variant="modern" size="small" (clicked)="saveCharacterModal()"></my-button>
         </div>
       </div>
     </my-modal>
 
-    <my-modal [open]="showPasswordModal()" [title]="'PLAYER_PROFILE.CHANGE_PASSWORD_TITLE' | translate" variant="pixel" (close)="closePasswordModal()" width="30rem">
+    <my-modal [open]="showPasswordModal()" [title]="'PLAYER_PROFILE.CHANGE_PASSWORD_TITLE' | translate" variant="glass" backdropStyle="blur" (close)="closePasswordModal()" width="30rem">
       <div class="flex flex-col gap-4">
         @if (!passwordEmailSent()) {
-          <my-text [text]="'PLAYER_PROFILE.CHANGE_PASSWORD_DESC' | translate" tag="p" size="0.8rem" color="var(--text-secondary)"></my-text>
+          <my-text [text]="'PLAYER_PROFILE.CHANGE_PASSWORD_DESC' | translate" tag="p" size="0.8rem" color="#ffffff"></my-text>
           <my-text [text]="userEmail()" tag="p" size="0.85rem" weight="bold" color="var(--neon-cyan)" align="center"></my-text>
           <div class="flex gap-3 justify-end">
-            <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="pixel" size="small" (clicked)="closePasswordModal()" [disabled]="sendingPasswordEmail()"></my-button>
-            <my-button [text]="(sendingPasswordEmail() ? 'PLAYER_PROFILE.CHANGE_PASSWORD_SENDING' : 'PLAYER_PROFILE.CHANGE_PASSWORD_SEND') | translate" variant="pixel" size="small" (clicked)="sendPasswordResetEmail()" [disabled]="sendingPasswordEmail()"></my-button>
+            <my-button [text]="'PLAYER_PROFILE.CANCEL' | translate" variant="modern" size="small" (clicked)="closePasswordModal()" [disabled]="sendingPasswordEmail()"></my-button>
+            <my-button [text]="(sendingPasswordEmail() ? 'PLAYER_PROFILE.CHANGE_PASSWORD_SENDING' : 'PLAYER_PROFILE.CHANGE_PASSWORD_SEND') | translate" variant="modern" size="small" (clicked)="sendPasswordResetEmail()" [disabled]="sendingPasswordEmail()"></my-button>
           </div>
         } @else {
-          <my-text [text]="'PLAYER_PROFILE.CHANGE_PASSWORD_SENT' | translate" tag="p" size="0.8rem" color="var(--text-secondary)"></my-text>
+          <my-text [text]="'PLAYER_PROFILE.CHANGE_PASSWORD_SENT' | translate" tag="p" size="0.8rem" color="#ffffff"></my-text>
           <my-text [text]="userEmail()" tag="p" size="0.85rem" weight="bold" color="var(--neon-cyan)" align="center"></my-text>
           <div class="flex justify-end">
-            <my-button [text]="'PLAYER_PROFILE.CHANGE_PASSWORD_OK' | translate" variant="pixel" size="small" (clicked)="closePasswordModal()"></my-button>
+            <my-button [text]="'PLAYER_PROFILE.CHANGE_PASSWORD_OK' | translate" variant="modern" size="small" (clicked)="closePasswordModal()"></my-button>
           </div>
         }
       </div>
+    </my-modal>
+
+    @if (flyCardData(); as fly) {
+      <div
+        class="fixed z-[2000] pointer-events-none rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,170,255,0.3),0_8px_32px_rgba(0,0,0,0.5)]"
+        [style.left.px]="fly.left"
+        [style.top.px]="fly.top"
+        [style.width.px]="fly.width"
+        [style.height.px]="fly.height"
+        [style.opacity]="fly.opacity"
+        [style.transform]="'scale(' + fly.scale + ') rotateY(' + fly.rotation + 'deg)'"
+        [style.transition]="'left 800ms cubic-bezier(0.23,1,0.32,1), top 800ms cubic-bezier(0.23,1,0.32,1), width 800ms cubic-bezier(0.23,1,0.32,1), height 800ms cubic-bezier(0.23,1,0.32,1), opacity 400ms ease, transform 800ms cubic-bezier(0.23,1,0.32,1)'"
+        (transitionend)="onFlyTransitionEnd($event)"
+      >
+        @if (fly.imageUrl) {
+          <img [src]="fly.imageUrl" [alt]="fly.name" class="w-full h-full object-contain block rounded-xl" />
+        } @else {
+          <div class="w-full h-full flex items-center justify-center text-3xl text-[#00ccaa] bg-gradient-to-br from-[rgba(0,204,170,0.1)] to-[rgba(0,0,0,0.4)] rounded-xl">?</div>
+        }
+      </div>
+    }
+
+    <my-modal
+      [open]="showCardDetailModal()"
+      [title]="selectedCard()?.name ?? ''"
+      variant="glass"
+      backdropStyle="blur"
+      [backdropOpacity]="cardDetailBackdropOpacity()"
+      [panelOpacity]="cardDetailPanelOpacity()"
+      [entranceAnimated]="false"
+      (close)="closeCardDetail()"
+      width="46rem"
+      [bodyOverflow]="cardDetailBodyOverflow()"
+    >
+      @if (selectedCard(); as sel) {
+        <div class="card-detail-layout grid grid-cols-2 gap-6 items-start">
+          <div class="flex items-center justify-center">
+            <div class="card-3d-wrapper w-full max-w-[260px]">
+              @if (sel.imageUrl) {
+                <img [src]="sel.imageUrl" [alt]="sel.name" class="w-full rounded-lg" style="aspect-ratio:63/88; object-fit:contain" />
+              } @else {
+                <div class="w-full rounded-lg flex items-center justify-center text-4xl text-[#00ccaa] bg-gradient-to-br from-[rgba(0,204,170,0.1)] to-[rgba(0,0,0,0.4)]" style="aspect-ratio:63/88">?</div>
+              }
+            </div>
+          </div>
+          <div class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1 scrollbar-none">
+            @if (selectedCardLoading()) {
+              <div class="py-6 text-center text-[#cbd5e1] font-share-tech text-xs">Cargando detalle…</div>
+            } @else if (selectedCardFull(); as full) {
+              <div>
+                <my-text [text]="sel.name" tag="h3" size="1.2rem" weight="bold" color="var(--text-primary)"></my-text>
+                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                  @if (full.hp) {
+                    <div class="inline-flex items-center gap-1 text-base font-bold text-red-500 bg-red-500/10 border border-red-500/30 rounded px-2 py-0.5 leading-tight">
+                      {{ full.hp }} <span class="text-[0.7rem] font-normal text-[#ffffff]">HP</span>
+                    </div>
+                  }
+                  @if (full.types?.length) {
+                    @for (t of full.types; track $index) {
+                      <span class="px-3 py-0.5 rounded-full text-xs font-bold text-white bg-[var(--neon-cyan,#00aaff)]">{{ t }}</span>
+                    }
+                  }
+                </div>
+              </div>
+
+              @if (full.attacks?.length) {
+                <div>
+                  <span class="font-orbitron text-[0.7rem] text-[#ffffff] uppercase tracking-wider">Ataques</span>
+                  @for (atk of full.attacks; track $index) {
+                    <div class="mt-1 rounded-lg border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="font-orbitron text-[0.8rem] font-bold">{{ atk.name }}</span>
+                        <span class="font-orbitron text-[0.8rem] font-bold text-red-400">{{ atk.damage || '—' }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (full.abilities?.length) {
+                <div>
+                  <span class="font-orbitron text-[0.7rem] text-[#ffffff] uppercase tracking-wider">Habilidad</span>
+                  @for (ab of full.abilities; track $index) {
+                    <div class="mt-1 rounded-lg border border-white/15 px-3 py-2" style="background: rgba(255,255,255,0.06);">
+                      <div class="font-orbitron text-[0.8rem] font-bold">{{ ab.name }}</div>
+                      <div class="text-[0.72rem] text-[#cbd5e1]">{{ ab.text }}</div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
     </my-modal>
 
     <app-pokenav-device
@@ -456,12 +615,32 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
   private readonly cosmetics = inject(CosmeticsService);
   private readonly cardService = inject(CardService);
 
-  /** Carta seleccionada de la colección (thumbnail) para el panel lateral. */
+  /** Carta seleccionada de la colección (thumbnail) para el modal. */
   readonly selectedCard = signal<CollectionCard | null>(null);
   /** Detalle completo de la carta seleccionada (HP, ataques, etc.). Se carga via API. */
   readonly selectedCardFull = signal<Card | null>(null);
   /** Indica si el detalle de la carta seleccionada todavía se está cargando. */
   readonly selectedCardLoading = signal(false);
+
+  readonly flyCardData = signal<FlyCardData | null>(null);
+  readonly flyPhase = signal<'entering' | 'exiting' | null>(null);
+  private cardFlyOriginRect: { left: number; top: number; width: number; height: number } | null = null;
+  private flyArrived = false;
+  private cardDetailLoaded = false;
+  private flyTimers: number[] = [];
+
+  private scheduleFlyTimer(fn: () => void, ms: number): void {
+    this.flyTimers.push(window.setTimeout(fn, ms));
+  }
+
+  private clearFlyTimers(): void {
+    this.flyTimers.forEach(id => clearTimeout(id));
+    this.flyTimers = [];
+  }
+  readonly showCardDetailModal = signal(false);
+  readonly cardDetailBackdropOpacity = signal(0);
+  readonly cardDetailPanelOpacity = signal(1);
+  readonly cardDetailBodyOverflow = signal('auto');
 
   private readonly collectionPageSize = 200;
   private readonly collectionPage = signal(0);
@@ -475,6 +654,9 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
   readonly decksLoading = signal(false);
   readonly savingTrainerName = signal(false);
   readonly hasMoreCollection = signal(true);
+  readonly showStatsModal = signal(false);
+  readonly statsLoading = signal(false);
+  readonly playerStats = signal<PlayerStatsResponse | null>(null);
 
   readonly cardBacks = signal<PlayerCardBacks | null>(null);
   readonly playerSkins = signal<PlayerSkin[]>([]);
@@ -587,7 +769,7 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
   });
   readonly experienceLabel = computed(() => `${this.user()?.experience ?? 0} XP`);
   readonly coinsLabel = computed(() => `${this.user()?.coins ?? 0}`);
-  private readonly TOTAL_COLLECTIBLE_CARDS = 146;
+  readonly TOTAL_COLLECTIBLE_CARDS = 146;
   private readonly POKESECRET_IDS = Array.from({ length: 16 }, (_, i) => `pokesecret-${i + 1}`);
 
   readonly cardProgressLabel = computed(() => {
@@ -708,25 +890,36 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
     this.collectionCards.set([]);
     this.hasMoreCollection.set(true);
     this.loadCollectionPage();
-    // Cerrar el panel de detalle al cambiar de filtro: la carta seleccionada
+    // Cerrar el detalle al cambiar de filtro: la carta seleccionada
     // podría no aparecer ya en la grilla filtrada.
-    this.closeCardDetail();
+    this.resetCardDetailState();
   }
 
   /**
-   * Marca la carta como seleccionada y dispara la carga del detalle completo
-   * (HP, ataques, habilidades, etc.) desde {@code /cards/:id}.
+   * Abre el modal de detalle de la carta con la animación de "carta voladora"
+   * (misma mecánica que DeckListPage): la carta clickeada vuela hacia el modal,
+   * que aparece con backdrop blur y fade.
    */
-  selectCard(card: CollectionCard): void {
-    if (this.selectedCard()?.id === card.id) {
-      // Re-click sobre la misma carta cierra el panel.
-      this.closeCardDetail();
-      return;
-    }
+  openCardDetail(event: MouseEvent, card: CollectionCard): void {
     this.sfx.play('Click.mp3');
+    const target = event.currentTarget as HTMLElement;
+    const originRect = target.getBoundingClientRect();
+
+    this.clearFlyTimers();
+    this.flyPhase.set(null);
+    this.flyArrived = false;
+    this.cardDetailLoaded = false;
+    this.flyCardData.set(null);
+    this.cardFlyOriginRect = originRect;
+    this.cardDetailBodyOverflow.set('visible');
+
     this.selectedCard.set(card);
     this.selectedCardFull.set(null);
     this.selectedCardLoading.set(true);
+    this.showCardDetailModal.set(true);
+    this.cardDetailBackdropOpacity.set(0);
+    this.cardDetailPanelOpacity.set(0);
+
     this.cardService.getCardById(card.id)
       .pipe(
         timeout(3000),
@@ -737,20 +930,145 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
         next: full => {
           if (full && this.selectedCard()?.id === card.id) {
             this.selectedCardFull.set(full);
+            this.cardDetailLoaded = true;
+            this.showModalAndFadePortal();
           }
           this.selectedCardLoading.set(false);
         },
       });
+
+    setTimeout(() => {
+      const cardWrapper = document.querySelector('.card-detail-layout .card-3d-wrapper') as HTMLElement;
+      if (!cardWrapper) {
+        this.cardDetailBackdropOpacity.set(0.85);
+        this.cardDetailPanelOpacity.set(1);
+        return;
+      }
+      const targetRect = cardWrapper.getBoundingClientRect();
+
+      this.flyCardData.set({
+        left: originRect.left,
+        top: originRect.top,
+        width: originRect.width,
+        height: originRect.height,
+        imageUrl: card.imageUrl,
+        name: card.name,
+        opacity: 1,
+        scale: 1.08,
+        rotation: 0,
+      });
+      this.flyPhase.set('entering');
+
+      this.scheduleFlyTimer(() => {
+        if (this.flyPhase() === 'entering' && !this.flyArrived) {
+          this.flyArrived = true;
+          this.showModalAndFadePortal();
+        }
+      }, 900);
+
+      requestAnimationFrame(() => {
+        this.flyCardData.set({
+          left: targetRect.left,
+          top: targetRect.top,
+          width: targetRect.width,
+          height: targetRect.height,
+          imageUrl: card.imageUrl,
+          name: card.name,
+          opacity: 1,
+          scale: 1,
+          rotation: 720,
+        });
+      });
+    });
   }
 
-  /** Cierra el panel lateral de detalle. */
-  closeCardDetail(): void {
-    if (this.selectedCard()) {
-      this.sfx.play('Click.mp3');
+  onFlyTransitionEnd(event: TransitionEvent): void {
+    if (event.propertyName !== 'left') return;
+    const phase = this.flyPhase();
+    this.flyPhase.set(null);
+    if (phase === 'entering') {
+      this.flyArrived = true;
+      this.showModalAndFadePortal();
+    } else if (phase === 'exiting') {
+      this.resetCardDetailState();
     }
+  }
+
+  private showModalAndFadePortal(): void {
+    if (!this.flyArrived || !this.cardDetailLoaded) return;
+    this.cardDetailBackdropOpacity.set(0.85);
+    this.cardDetailPanelOpacity.set(1);
+    this.flyCardData.set(null);
+  }
+
+  /** Cierra el modal volando la carta de vuelta a su posición original. */
+  closeCardDetail(): void {
+    this.sfx.play('Click.mp3');
+    const origin = this.cardFlyOriginRect;
+    const card = this.selectedCard();
+    if (!origin || !card) {
+      this.resetCardDetailState();
+      return;
+    }
+
+    const cardWrapper = document.querySelector('.card-detail-layout .card-3d-wrapper') as HTMLElement;
+    const currentRect = cardWrapper?.getBoundingClientRect();
+
+    this.showCardDetailModal.set(false);
+    this.cardDetailBackdropOpacity.set(0);
+    this.cardDetailPanelOpacity.set(0);
+
+    if (currentRect) {
+      this.flyCardData.set({
+        left: currentRect.left,
+        top: currentRect.top,
+        width: currentRect.width,
+        height: currentRect.height,
+        imageUrl: card.imageUrl,
+        name: card.name,
+        opacity: 1,
+        scale: 1,
+        rotation: 0,
+      });
+      this.flyPhase.set('exiting');
+
+      this.scheduleFlyTimer(() => {
+        if (this.flyPhase() !== 'exiting') return;
+        requestAnimationFrame(() => {
+          if (this.flyPhase() !== 'exiting') return;
+          this.flyCardData.set({
+            left: origin.left,
+            top: origin.top,
+            width: origin.width,
+            height: origin.height,
+            imageUrl: card.imageUrl,
+            name: card.name,
+            opacity: 1,
+            scale: 1.08,
+            rotation: -720,
+          });
+        });
+      }, 0);
+    } else {
+      this.resetCardDetailState();
+    }
+  }
+
+  private resetCardDetailState(): void {
+    this.clearFlyTimers();
+    this.flyArrived = false;
+    this.cardDetailLoaded = false;
+    this.cardFlyOriginRect = null;
     this.selectedCard.set(null);
     this.selectedCardFull.set(null);
     this.selectedCardLoading.set(false);
+    this.showCardDetailModal.set(false);
+    this.cardDetailBackdropOpacity.set(0);
+    this.cardDetailPanelOpacity.set(0);
+    this.cardDetailBodyOverflow.set('auto');
+    this.flyPhase.set(null);
+    this.flyCardData.update(d => (d ? { ...d, opacity: 0 } : null));
+    this.scheduleFlyTimer(() => this.flyCardData.set(null), 350);
   }
 
   openNameModal(): void {
@@ -765,6 +1083,49 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
     this.showNameModal.set(false);
     this.trainerNameForm.reset({ trainerName: this.trainerName() });
   }
+
+  openStatsModal(): void {
+    this.sfx.play('Click.mp3');
+    this.showStatsModal.set(true);
+    this.statsLoading.set(true);
+    this.http.get<PlayerStatsResponse>('/api/players/me/stats').subscribe({
+      next: s => {
+        this.playerStats.set(s);
+        this.statsLoading.set(false);
+      },
+      error: () => {
+        this.playerStats.set(null);
+        this.statsLoading.set(false);
+      },
+    });
+  }
+
+  closeStatsModal(): void {
+    this.sfx.play('Click.mp3');
+    this.showStatsModal.set(false);
+  }
+
+  formatMatchTime(ms: number): string {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  readonly currentDeckName = computed(() => {
+    const u = this.user();
+    return u?.decks?.find(d => d.id === u.activeDeckId)?.name ?? '—';
+  });
+
+  readonly xpIntoCurrentPercent = computed(() => {
+    const u = this.user();
+    const total = u?.xpForNextLevel ?? 1;
+    const into = u?.xpIntoCurrentLevel ?? 0;
+    return Math.min(100, Math.max(0, Math.round((into / total) * 100)));
+  });
 
   saveNameFromModal(): void {
     if (this.trainerNameForm.invalid || this.savingTrainerName()) {

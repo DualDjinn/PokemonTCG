@@ -37,9 +37,15 @@ export class MyInput implements ControlValueAccessor {
   @Input() textColor = 'var(--text-primary)';
   @Input() background = 'transparent';
   @Input() disabled = false;
+  @Input() autocomplete?: string;
 
   @Output() valueChange = new EventEmitter<string>();
   @Output('keydown') keydownEvent = new EventEmitter<KeyboardEvent>();
+
+  get resolvedAutocomplete(): string {
+    if (this.autocomplete) return this.autocomplete;
+    return this.type === 'password' ? 'new-password' : 'off';
+  }
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};

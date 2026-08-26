@@ -120,7 +120,7 @@ import {
             Requiere un <code>matchId</code> válido y el BE corriendo.
           </p>
           <label>matchId
-            <input class="input" type="text" [(ngModel)]="beMatchId" placeholder="uuid del match" />
+            <input class="input" type="text" [(ngModel)]="beMatchId" autocomplete="off" placeholder="uuid del match" />
           </label>
           <label>Categoría
             <select class="input" [(ngModel)]="beCategory">

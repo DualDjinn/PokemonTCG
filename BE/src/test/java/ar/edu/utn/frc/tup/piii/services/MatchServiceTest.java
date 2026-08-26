@@ -71,8 +71,9 @@ class MatchServiceTest {
         cardBackService = mock(CardBackService.class);
         objectMapper = mock(com.fasterxml.jackson.databind.ObjectMapper.class);
         cardRegistryService = mock(CardRegistryService.class);
+        PlayerStatsService playerStatsService = mock(PlayerStatsService.class);
         matchService = new MatchService(matchRepository, playerRepository, gameEngine, messagingTemplate,
-                cardBackService, objectMapper, cardRegistryService);
+                cardBackService, objectMapper, cardRegistryService, playerStatsService);
 
         when(matchRepository.save(any(Match.class))).thenAnswer(inv -> inv.getArgument(0));
         when(matchRepository.findByJoinCode(any())).thenReturn(Optional.empty());

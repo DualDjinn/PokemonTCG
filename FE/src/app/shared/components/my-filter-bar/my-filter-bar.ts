@@ -17,6 +17,7 @@ export interface FilterOption {
 export class MyFilterBar {
   @Input() options: FilterOption[] = [];
   @Input() selected = '';
+  @Input() variant: 'pixel' | 'modern' = 'pixel';
   @Input() color = 'var(--neon-cyan, #00ccaa)';
   @Input() translate = true;
 
@@ -24,6 +25,14 @@ export class MyFilterBar {
 
   btnClass(value: string): string {
     const active = this.selected === value;
+    if (this.variant === 'modern') {
+      const base =
+        'px-3 py-1.5 border rounded-full font-orbitron text-[0.7rem] cursor-pointer transition-all duration-150 tracking-wide';
+      if (active) {
+        return base + ' font-bold scale-105';
+      }
+      return base + ' hover:scale-105';
+    }
     const base =
       'px-2 py-1 border border-dashed border-[var(--filter-color)] rounded-full font-pixel text-[0.5rem] cursor-pointer transition-all duration-150 uppercase tracking-wider hover:opacity-100 hover:bg-[rgba(var(--filter-color-rgb),0.15)] hover:scale-105';
     if (active) {

@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
  * without coupling this component to a specific icon library.
  */
 export type MyIconButtonSize = 'small' | 'medium' | 'large';
-export type MyIconButtonVariant = 'solid' | 'pixel';
+export type MyIconButtonVariant = 'solid' | 'pixel' | 'modern';
 
 @Component({
   selector: 'my-icon-button',

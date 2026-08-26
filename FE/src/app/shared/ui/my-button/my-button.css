@@ -34,17 +34,22 @@
 }
 
 .my-btn--modern {
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--btn-color) 25%, transparent);
+  box-shadow:
+    inset 0 0 0 1.5px color-mix(in srgb, var(--btn-color) 45%, black),
+    0 6px 20px color-mix(in srgb, var(--btn-color) 25%, transparent);
 }
 
 .my-btn--modern:hover:not(:disabled) {
   transform: scale(1.06);
   box-shadow:
+    inset 0 0 0 1.5px color-mix(in srgb, var(--btn-color) 60%, black),
     0 0 22px var(--btn-color),
     0 10px 28px color-mix(in srgb, var(--btn-color) 40%, transparent);
 }
 
 .my-btn--modern:active:not(:disabled) {
   transform: scale(1);
-  box-shadow: 0 0 10px var(--btn-color);
+  box-shadow:
+    inset 0 0 0 1.5px color-mix(in srgb, var(--btn-color) 60%, black),
+    0 0 10px var(--btn-color);
 }

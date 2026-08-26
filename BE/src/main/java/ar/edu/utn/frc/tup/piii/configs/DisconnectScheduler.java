@@ -3,6 +3,7 @@ package ar.edu.utn.frc.tup.piii.configs;
 import ar.edu.utn.frc.tup.piii.models.Match;
 import ar.edu.utn.frc.tup.piii.models.MatchStatus;
 import ar.edu.utn.frc.tup.piii.repositories.MatchRepository;
+import ar.edu.utn.frc.tup.piii.services.PlayerStatsService;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,14 @@ public class DisconnectScheduler {
 
     private final MatchRepository matchRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final PlayerStatsService playerStatsService;
 
     public DisconnectScheduler(MatchRepository matchRepository,
-                                SimpMessagingTemplate messagingTemplate) {
+                               SimpMessagingTemplate messagingTemplate,
+                               PlayerStatsService playerStatsService) {
         this.matchRepository = matchRepository;
         this.messagingTemplate = messagingTemplate;
+        this.playerStatsService = playerStatsService;
     }
 
     @Scheduled(fixedRate = 1000)
@@ -56,6 +60,7 @@ public class DisconnectScheduler {
                 match.setDisconnectedPlayerId(null);
                 match.setDisconnectedAt(null);
                 matchRepository.save(match);
+                playerStatsService.recordFinishedMatch(match);
 
                 // Notify both players
                 Map<String, Object> forfeitEvent = new LinkedHashMap<>();

@@ -32,12 +32,14 @@ import ar.edu.utn.frc.tup.piii.dtos.player.ForgotPasswordRequest;
 import ar.edu.utn.frc.tup.piii.dtos.player.GoogleLoginRequest;
 import ar.edu.utn.frc.tup.piii.dtos.player.ResetPasswordRequest;
 import ar.edu.utn.frc.tup.piii.dtos.common.ErrorApi;
-import java.util.Map;
+import ar.edu.utn.frc.tup.piii.dtos.engine.PlayerStatsResponse;
 import ar.edu.utn.frc.tup.piii.models.Player;
-import ar.edu.utn.frc.tup.piii.services.PlayerService;
-import ar.edu.utn.frc.tup.piii.services.DeckService;
 import ar.edu.utn.frc.tup.piii.services.CollectionService;
+import ar.edu.utn.frc.tup.piii.services.DeckService;
+import ar.edu.utn.frc.tup.piii.services.PlayerService;
+import ar.edu.utn.frc.tup.piii.services.PlayerStatsService;
 import java.util.List;
+import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -55,13 +57,16 @@ public class PlayerController {
     private final PlayerService playerService;
     private final DeckService deckService;
     private final CollectionService collectionService;
+    private final PlayerStatsService playerStatsService;
 
     public PlayerController(PlayerService playerService,
                             DeckService deckService,
-                            CollectionService collectionService) {
+                            CollectionService collectionService,
+                            PlayerStatsService playerStatsService) {
         this.playerService = playerService;
         this.deckService = deckService;
         this.collectionService = collectionService;
+        this.playerStatsService = playerStatsService;
     }
 
     @Operation(summary = "Register a new player",
@@ -174,6 +179,14 @@ public class PlayerController {
     public ResponseEntity<PlayerResponse> getCurrentPlayer(@Authenticated Player player) {
         PlayerResponse response = playerService.getPlayerById(player.getId());
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get player statistics",
+               description = "Returns the authenticated player's accumulated match statistics "
+                           + "(played/won/lost/tied, time in matches, most played card and most used deck).")
+    @GetMapping("/me/stats")
+    public ResponseEntity<PlayerStatsResponse> getStats(@Authenticated Player player) {
+        return ResponseEntity.ok(playerStatsService.getStats(player.getId()));
     }
 
     @Operation(summary = "Claim starter deck",

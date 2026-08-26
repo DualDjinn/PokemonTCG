@@ -24,3 +24,28 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.my-icon-btn--modern {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  line-height: 1;
+  transition: all 0.25s ease;
+}
+
+.my-icon-btn--modern:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(0.85);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+}
+
+.my-icon-btn--modern:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

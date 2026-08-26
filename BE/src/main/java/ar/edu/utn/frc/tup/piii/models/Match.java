@@ -64,6 +64,9 @@ public class Match {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    /** Timestamp when the match actually started (left the waiting room). */
+    private LocalDateTime startedAt;
+
     /**
      * Short, human-shareable code the opponent uses to join the match while it is
      * WAITING. Unique across active lobbies.

@@ -243,6 +243,7 @@
               [value]="chatInput()"
               (input)="onChatInput($event)"
               (keydown)="onChatInputKeydown($event)"
+              autocomplete="off"
               [placeholder]="'WAITING_ROOM.CHAT_PLACEHOLDER' | translate"
               class="flex-1 bg-[var(--bg-primary)] border-2 px-3 py-2 text-xs font-share-tech text-text-primary outline-none transition-colors"
               [style.borderColor]="'var(--pixel-border-bottom-right)'"

@@ -23,7 +23,7 @@ export class MySearchBar implements ControlValueAccessor {
 
   @Input() value = '';
   @Input() placeholder = 'Search...';
-  @Input() variant: 'solid' | 'pixel' = 'solid';
+  @Input() variant: 'solid' | 'pixel' | 'modern' = 'solid';
   @Input() color = 'var(--neon-cyan)';
   @Input() textColor = 'var(--text-primary)';
   @Input() background = 'transparent';

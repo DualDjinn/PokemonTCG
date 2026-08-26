@@ -1,3 +1,53 @@
 :host {
     display: contents;
 }
+
+.my-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.my-modal-backdrop--animated {
+    animation: my-modal-backdrop-in 0.45s ease-out;
+}
+
+.my-modal-backdrop--fade {
+    transition: opacity 0.35s ease;
+}
+
+.my-modal-backdrop--blur {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+@keyframes my-modal-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.my-modal-panel {
+    will-change: opacity;
+}
+
+.my-modal-panel--animated {
+    animation: my-modal-panel-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.my-modal-panel--fade {
+    transition: opacity 0.35s ease;
+}
+
+.my-modal-panel--glass {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes my-modal-panel-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}

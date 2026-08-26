@@ -13,15 +13,12 @@ import { CardSummary } from '../../domain/models/deck.models';
         (mouseleave)="onMouseLeave()"
       >
         <div
-          class="card-3d-inner w-full rounded-xl shadow-[0_0_20px_rgba(0,204,170,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+          class="card-3d-inner w-full rounded-xl shadow-[0_0_20px_rgba(0,170,255,0.15),0_8px_32px_rgba(0,0,0,0.4)]"
           [style.transform]="cardTransform()"
         >
           <div
-            class="card-face relative w-full aspect-[2.5/3.5] overflow-hidden flex items-center justify-center"
-            [class.border-4]="true"
-            [style.borderColor]="'var(--pixel-border-bottom-right)'"
-            [style.borderTopColor]="'var(--pixel-border-top-left)'"
-            [style.borderLeftColor]="'var(--pixel-border-top-left)'"
+            class="card-face relative w-full aspect-[2.5/3.5] overflow-hidden rounded-xl border flex items-center justify-center"
+            [style.borderColor]="'rgba(255,255,255,0.2)'"
             [class.card-holo]="isHolo()"
           >
             @if (card().imageUrl) {
@@ -38,7 +35,7 @@ import { CardSummary } from '../../domain/models/deck.models';
         </div>
       </div>
       @if (count() >= 1 && showCount()) {
-        <div class="bg-[#00ccaa] text-[#050508] text-sm font-bold px-3 py-1 rounded-full leading-tight">x{{ count() }}</div>
+        <div class="bg-[#0284c7] text-white text-sm font-bold px-3 py-1 rounded-full leading-tight">x{{ count() }}</div>
       }
     </div>
   `,
