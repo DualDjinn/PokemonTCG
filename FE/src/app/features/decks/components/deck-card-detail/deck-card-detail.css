@@ -17,7 +17,7 @@
 }
 
 .card-3d-inner:hover {
-  box-shadow: 0 16px 40px rgba(0, 204, 170, 0.2),
+  box-shadow: 0 16px 40px rgba(0, 170, 255, 0.2),
               0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -27,6 +27,6 @@
 }
 
 .card-3d-inner:hover .card-face {
-  border-color: rgba(0, 204, 170, 0.9);
-  box-shadow: 0 0 24px rgba(0, 204, 170, 0.25);
+  border-color: rgba(0, 170, 255, 0.9);
+  box-shadow: 0 0 24px rgba(0, 170, 255, 0.25);
 }

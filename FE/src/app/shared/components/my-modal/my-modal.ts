@@ -21,9 +21,10 @@ import { MyIconButton } from '../../ui/my-icon-button/my-icon-button';
 export class MyModal {
   @Input() open = false;
   @Input() title = '';
-  @Input() variant: 'solid' | 'pixel' = 'solid';
+  @Input() variant: 'solid' | 'pixel' | 'glass' = 'solid';
   @Input() color = 'var(--neon-cyan)';
   @Input() background = 'var(--bg-secondary)';
+  @Input() backdropStyle: 'dark' | 'blur' = 'dark';
   @Input() titleColor = 'var(--text-primary)';
   @Input() width = '32rem';
   @Input() closeOnBackdrop = true;
@@ -32,6 +33,7 @@ export class MyModal {
   @Input() bodyOverflow: string = 'auto';
   @Input() bodyPadding: string = 'p-4';
   @Input() panelOpacity: number = 1;
+  @Input() entranceAnimated = true;
 
   @Output() close = new EventEmitter<void>();
 

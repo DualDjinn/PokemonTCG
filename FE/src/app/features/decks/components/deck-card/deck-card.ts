@@ -11,15 +11,17 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [MyText, MyBadge, MyIconButton, TranslateModule],
   template: `
     @if (isCreateCard()) {
-      <button type="button" class="deck-card-btn flex flex-col gap-2 items-center justify-center w-full h-full p-4 border-4 border-[var(--pixel-border-bottom-right)] border-t-[var(--pixel-border-top-left)] border-l-[var(--pixel-border-top-left)] cursor-pointer text-left font-inherit box-border min-h-[100px] opacity-70 bg-bg-secondary/50 hover:opacity-100" (click)="create.emit()">
-        <span class="text-2xl text-[#00ccaa] leading-none">+</span>
-        <my-text [text]="'DECK_CARD.CREATE_DECK' | translate" tag="span" size="0.9rem" weight="bold" color="var(--neon-cyan)" align="center"></my-text>
+      <button type="button" class="deck-card-btn flex flex-col gap-2 items-center justify-center w-full h-full p-4 rounded-2xl border-2 border-dashed border-white/20 cursor-pointer text-left font-inherit box-border min-h-[100px] bg-white/5 backdrop-blur hover:border-[#0284c7] hover:bg-white/10 transition-all duration-200 group" (click)="create.emit()">
+        <span class="text-2xl text-[#0284c7] leading-none transition-transform duration-200 group-hover:scale-125">+</span>
+        <my-text [text]="'DECK_CARD.CREATE_DECK' | translate" tag="span" size="0.9rem" weight="bold" color="#ffffff" align="center"></my-text>
       </button>
     } @else {
       <button
         type="button"
-        class="deck-card-btn relative flex flex-col gap-2 w-full h-full p-4 border-4 border-[var(--pixel-border-bottom-right)] border-t-[var(--pixel-border-top-left)] border-l-[var(--pixel-border-top-left)] cursor-pointer text-left font-inherit box-border bg-bg-secondary/85 backdrop-blur"
-        [class.shadow-[0_0_16px_rgba(0,204,170,0.3)]]="selected()"
+        class="deck-card-btn relative flex flex-col gap-2 w-full h-full p-4 rounded-2xl border bg-white/5 backdrop-blur cursor-pointer text-left font-inherit box-border"
+        [class.border-white/20]="!selected()"
+        [class.border-[#0284c7]]="selected()"
+        [class.shadow-[0_0_20px_rgba(2,132,199,0.35)]]="selected()"
         (click)="selectDeck()"
         [attr.aria-label]="'DECK_CARD.SELECT_DECK' | translate:{name: deck().name}"
       >
@@ -27,8 +29,8 @@ import { TranslateModule } from '@ngx-translate/core';
           <my-text [text]="deck().name" tag="span" size="0.9rem" weight="bold" color="var(--text-primary)"></my-text>
           <my-icon-button
             [icon]="isFavorite() ? '★' : '☆'"
-            [color]="isFavorite() ? 'var(--neon-magenta)' : 'var(--text-secondary)'"
-            variant="pixel"
+            [color]="isFavorite() ? 'var(--neon-magenta)' : '#cbd5e1'"
+            variant="modern"
             size="small"
             [ariaLabel]="isFavorite() ? ('DECK_CARD.REMOVE_FAVORITE' | translate) : ('DECK_CARD.ADD_FAVORITE' | translate)"
             (clicked)="toggleFav($event)"
@@ -36,11 +38,16 @@ import { TranslateModule } from '@ngx-translate/core';
         </div>
 
         <div class="flex justify-between items-center gap-2">
-          <my-text [text]="deck().cardCount + ' / 60'" tag="span" size="0.765rem" weight="normal" color="var(--text-secondary)"></my-text>
+          <span
+            class="px-2 py-0.5 rounded-full text-xs font-bold border leading-tight"
+            [style.background]="deck().valid ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'"
+            [style.color]="deck().valid ? '#4ade80' : '#f87171'"
+            [style.borderColor]="deck().valid ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)'"
+          >{{ deck().cardCount }} / 60</span>
           @if (deck().valid) {
             <my-badge [text]="'DECK_CARD.VALID' | translate" color="var(--success-color, #22c55e)"></my-badge>
           } @else {
-            <my-badge [text]="deck().validationMessage || ('DECK_CARD.INVALID' | translate)" color="var(--error-color, #ef4444)"></my-badge>
+            <my-badge [text]="'DECK_CARD.INVALID' | translate" color="var(--error-color, #ef4444)"></my-badge>
           }
         </div>
       </button>

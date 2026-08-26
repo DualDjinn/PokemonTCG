@@ -3,11 +3,11 @@
     <button
       type="button"
       [class]="btnClass(opt.value)"
-      [style.borderColor]="color"
+      [style.borderColor]="variant === 'modern' ? (selected === opt.value ? color : 'rgba(255,255,255,0.18)') : color"
       [style.--filter-color]="color"
-      [style.background]="selected === opt.value ? color : 'transparent'"
-      [style.color]="selected === opt.value ? '#050508' : 'inherit'"
-      [style.boxShadow]="selected === opt.value ? '0 0 10px ' + color : 'none'"
+      [style.background]="variant === 'modern' ? (selected === opt.value ? color : 'rgba(255,255,255,0.05)') : (selected === opt.value ? color : 'transparent')"
+      [style.color]="variant === 'modern' ? (selected === opt.value ? '#ffffff' : '#cbd5e1') : (selected === opt.value ? '#050508' : 'inherit')"
+      [style.boxShadow]="variant === 'modern' ? (selected === opt.value ? '0 0 14px ' + color + '66' : 'none') : (selected === opt.value ? '0 0 10px ' + color : 'none')"
       (click)="select(opt.value)"
     >
       @if (translate) {

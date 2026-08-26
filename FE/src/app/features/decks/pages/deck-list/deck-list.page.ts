@@ -84,10 +84,10 @@ interface FlyCardData {
     GameOptionsComponent,
   ],
   template: `
-    <my-page-background videoSrc="/assets/video/decksVideo.webm" poster="/assets/img/deck-list-bg.jpg" />
+    <my-page-background videoSrc="/assets/video/decksVideo.webm" poster="/assets/img/deck-list-bg.jpg" [overlayOpacity]="0.45" />
     <div class="max-w-[1400px] mx-auto p-8 flex flex-col h-screen">
       <div class="grid grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-6 flex-1 min-h-0">
-        <section class="flex flex-col gap-4 overflow-y-auto p-4 min-h-0 scrollbar-none opacity-80">
+        <section appPixelPanel="glass" class="flex flex-col gap-4 overflow-y-auto p-6 min-h-0 scrollbar-none">
           <header class="flex flex-col gap-3 flex-shrink-0">
             <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -96,18 +96,20 @@ interface FlyCardData {
               <img src="/assets/img/login/pokeball.svg" class="title-pokeball" />
             </div>
               <!-- Botón "volver al juego" traducido -->
-              <my-button [text]="'DECKS.BACK_TO_GAME' | translate" variant="pixel" size="small" (clicked)="goBackToGame()"></my-button>
+              <my-button [text]="'DECKS.BACK_TO_GAME' | translate" variant="modern" size="small" (clicked)="goBackToGame()"></my-button>
             </div>
             <div class="flex gap-4 items-center flex-wrap">
               <my-search-bar
                 [value]="searchQuery()"
                 [placeholder]="'DECKS.SEARCH' | translate"
-                variant="pixel"
+                variant="modern"
                 (valueChange)="searchQuery.set($event)"
               ></my-search-bar>
               <my-filter-bar
                 [options]="filterOptions"
                 [selected]="filterMode()"
+                variant="modern"
+                color="#0284c7"
                 (selectedChange)="setFilterMode($event)"
               ></my-filter-bar>
             </div>
@@ -133,20 +135,20 @@ interface FlyCardData {
                 ></app-deck-card>
               } @empty {
                 <div class="col-span-full py-8">
-                  <my-text [text]="'DECKS.NO_DECKS' | translate" tag="p" color="var(--text-secondary)" align="center"></my-text>
+                  <my-text [text]="'DECKS.NO_DECKS' | translate" tag="p" color="#ffffff" align="center"></my-text>
                 </div>
               }
             </div>
           }
         </section>
 
-        <aside appPixelPanel class="flex flex-col gap-3 p-5 min-h-0 overflow-y-auto scrollbar-none opacity-80">
+        <aside appPixelPanel="glass" class="flex flex-col gap-3 p-6 min-h-0 overflow-y-auto scrollbar-none">
           @if (selectedDeck(); as deck) {
             <div class="flex items-center gap-2 shrink-0">
               <my-icon-button
                 [icon]="favoriteIds().has(deck.id) ? '★' : '☆'"
-                [color]="favoriteIds().has(deck.id) ? 'var(--page-teal)' : 'var(--text-secondary)'"
-                variant="pixel"
+                [color]="favoriteIds().has(deck.id) ? 'var(--page-teal)' : '#cbd5e1'"
+                variant="modern"
                 size="small"
                 (clicked)="toggleFavorite(deck.id)"
               ></my-icon-button>
@@ -156,15 +158,15 @@ interface FlyCardData {
                   #renameInput
                   [value]="renameValue()"
                   [placeholder]="'DECKS.DECK_NAME_PLACEHOLDER' | translate"
-                  variant="pixel"
+                  variant="modern"
                   (valueChange)="renameValue.set($event)"
                   (keydown.enter)="saveRename()"
                 ></my-input>
-                <my-button [text]="'DECKS.SAVE' | translate" variant="pixel" size="small" (clicked)="saveRename()"></my-button>
-                <my-button [text]="'DECKS.CANCEL' | translate" variant="pixel" size="small" color="var(--text-secondary)" (clicked)="cancelRename()"></my-button>
+                <my-button [text]="'DECKS.SAVE' | translate" variant="modern" size="small" (clicked)="saveRename()"></my-button>
+                <my-button [text]="'DECKS.CANCEL' | translate" variant="modern" size="small" color="#64748b" (clicked)="cancelRename()"></my-button>
               } @else {
                 <my-text [text]="deck.name" tag="h2" size="1.215rem" weight="bold" color="var(--text-primary)"></my-text>
-                <my-icon-button icon="&#9998;" variant="pixel" size="small" color="var(--text-secondary)" (clicked)="startRename(deck.id)"></my-icon-button>
+                <my-icon-button icon="&#9998;" variant="modern" size="small" color="#cbd5e1" (clicked)="startRename(deck.id)"></my-icon-button>
               }
             </div>
 
@@ -189,19 +191,19 @@ interface FlyCardData {
 
             <div class="flex flex-col gap-2 shrink-0">
               @if (deck.id === authService.currentUser()?.activeDeckId) {
-                <my-button [text]="'DECKS.SELECTED_DECK' | translate" variant="pixel" size="large" color="var(--neon-green)" [disabled]="true"></my-button>
+                <my-button [text]="'DECKS.SELECTED_DECK' | translate" variant="modern" size="large" color="var(--neon-green)" [disabled]="true"></my-button>
               } @else {
-                <my-button [text]="'DECKS.SELECT_DECK' | translate" variant="pixel" size="large" [disabled]="selectingDeck() || !deck.valid" (clicked)="selectAsActiveDeck(deck.id)"></my-button>
+                <my-button [text]="'DECKS.SELECT_DECK' | translate" variant="modern" size="large" [disabled]="selectingDeck() || !deck.valid" (clicked)="selectAsActiveDeck(deck.id)"></my-button>
               }
             </div>
             <div class="flex flex-row gap-3 justify-center shrink-0">
-              <my-button [text]="'DECKS.EDIT_DECK' | translate" variant="pixel" size="large" (clicked)="editDeck(deck.id)"></my-button>
-              <my-button [text]="'DECKS.DELETE_DECK' | translate" variant="pixel" size="large" color="var(--neon-magenta)" (clicked)="openDeleteModal(deck)"></my-button>
+              <my-button [text]="'DECKS.EDIT_DECK' | translate" variant="modern" size="large" (clicked)="editDeck(deck.id)"></my-button>
+              <my-button [text]="'DECKS.DELETE_DECK' | translate" variant="modern" size="large" color="#ef4444" (clicked)="openDeleteModal(deck)"></my-button>
             </div>
 
             @if (groupedCards().length > 0) {
               <my-divider class="shrink-0"></my-divider>
-              <my-text [text]="('DECKS.CARDS_IN_DECK' | translate) + ' (' + deck.cardCount + ')'" tag="p" size="0.855rem" weight="bold" color="var(--text-secondary)"></my-text>
+              <my-text [text]="('DECKS.CARDS_IN_DECK' | translate) + ' (' + deck.cardCount + ')'" tag="p" size="0.855rem" weight="bold" color="#ffffff"></my-text>
               <div class="grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-2 p-1 scrollbar-none">
                 @for (group of groupedCards(); track group.id) {
                   <my-card-thumbnail
@@ -216,7 +218,7 @@ interface FlyCardData {
             }
           } @else {
             <div class="flex items-center justify-center flex-1 py-8 shrink-0">
-              <my-text [text]="'DECKS.SELECT_TO_SEE' | translate" tag="p" color="var(--text-secondary)" align="center"></my-text>
+              <my-text [text]="'DECKS.SELECT_TO_SEE' | translate" tag="p" color="#ffffff" align="center"></my-text>
             </div>
           }
         </aside>
@@ -227,7 +229,8 @@ interface FlyCardData {
     <my-modal
       [open]="showCreateModal()"
       [title]="'DECKS.NEW_DECK' | translate"
-      variant="pixel"
+      variant="glass"
+      backdropStyle="blur"
       (close)="closeCreateModal()"
       width="24rem"
     >
@@ -235,13 +238,13 @@ interface FlyCardData {
         <my-input
           [value]="newDeckName()"
           [placeholder]="'DECKS.DECK_NAME_PLACEHOLDER' | translate"
-          variant="pixel"
+          variant="modern"
           (valueChange)="newDeckName.set($event)"
           (keydown.enter)="createDeck()"
         ></my-input>
           <div class="flex gap-3 justify-end">
-            <my-button [text]="'DECKS.CANCEL' | translate" variant="pixel" size="medium" color="var(--text-secondary)" (clicked)="closeCreateModal()"></my-button>
-            <my-button [text]="'DECKS.CREATE' | translate" variant="pixel" size="medium" [disabled]="creating() || !newDeckName().trim()" (clicked)="createDeck()"></my-button>
+            <my-button [text]="'DECKS.CANCEL' | translate" variant="modern" size="medium" color="#64748b" (clicked)="closeCreateModal()"></my-button>
+            <my-button [text]="'DECKS.CREATE' | translate" variant="modern" size="medium" [disabled]="creating() || !newDeckName().trim()" (clicked)="createDeck()"></my-button>
           </div>
       </div>
     </my-modal>
@@ -254,13 +257,15 @@ interface FlyCardData {
       [cancelText]="'DECKS.CANCEL' | translate"
       [destructive]="true"
       [loading]="deleting()"
+      variant="glass"
+      backdropStyle="blur"
       (confirm)="deleteDeck()"
       (cancel)="closeDeleteModal()"
     ></my-confirm-modal>
 
     @if (flyCardData(); as fly) {
       <div
-        class="fixed z-[2000] pointer-events-none rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,204,170,0.3),0_8px_32px_rgba(0,0,0,0.5)]"
+        class="fixed z-[2000] pointer-events-none rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,170,255,0.3),0_8px_32px_rgba(0,0,0,0.5)]"
         [style.left.px]="fly.left"
         [style.top.px]="fly.top"
         [style.width.px]="fly.width"
@@ -281,10 +286,11 @@ interface FlyCardData {
     <my-modal
       [open]="showCardDetailModal()"
       [title]="selectedCardForDetail()?.name ?? ''"
-      variant="pixel"
+      variant="glass"
+      backdropStyle="blur"
       [backdropOpacity]="cardDetailBackdropOpacity()"
       [panelOpacity]="cardDetailPanelOpacity()"
-      [background]="'#0d0f1a'"
+      [entranceAnimated]="false"
       (close)="closeCardDetail()"
       width="46rem"
       [bodyOverflow]="cardDetailBodyOverflow()"
@@ -301,7 +307,7 @@ interface FlyCardData {
               @if (full.supertype === 'Pokemon') {
                 <div class="flex items-center gap-3 pb-2">
                   @if (full.hp) {
-                    <div class="inline-flex items-center gap-1 text-2xl font-bold text-red-500 bg-red-500/10 border-2 border-red-500/30 rounded-lg px-3 py-1 leading-tight">{{ full.hp }} <span class="text-sm font-normal text-text-secondary">HP</span></div>
+                    <div class="inline-flex items-center gap-1 text-2xl font-bold text-red-500 bg-red-500/10 border-2 border-red-500/30 rounded-lg px-3 py-1 leading-tight">{{ full.hp }} <span class="text-sm font-normal text-[#cbd5e1]">HP</span></div>
                   }
                   @if (full.types?.length) {
                     <div class="flex gap-1 flex-wrap">
@@ -335,7 +341,7 @@ interface FlyCardData {
                         <div class="bg-[rgba(0,204,170,0.05)] border border-[rgba(0,204,170,0.15)] rounded p-2 flex flex-col gap-0.5">
                           <span class="text-sm text-text-primary font-bold">{{ ability.name }}</span>
                           <span class="text-xs text-[#00ccaa] font-medium leading-none">{{ ability.type }}</span>
-                          <p class="text-xs text-text-secondary leading-tight m-0">{{ ability.text }}</p>
+                          <p class="text-xs text-[#cbd5e1] leading-tight m-0">{{ ability.text }}</p>
                         </div>
                       }
                     </div>
@@ -363,7 +369,7 @@ interface FlyCardData {
                             }
                           </div>
                           @if (attack.text) {
-                            <p class="text-xs text-text-secondary leading-tight m-0">{{ attack.text }}</p>
+                            <p class="text-xs text-[#cbd5e1] leading-tight m-0">{{ attack.text }}</p>
                           }
                         </div>
                       }
@@ -376,19 +382,19 @@ interface FlyCardData {
                   <div class="flex flex-col gap-1 flex-1 text-sm text-text-primary leading-tight">
                     @if (full.weaknesses?.length) {
                       <div class="flex items-center gap-2">
-                        <span class="text-xs text-text-secondary min-w-[5rem]">{{ 'DECKS.WEAKNESS' | translate }}</span>
+                        <span class="text-xs text-[#cbd5e1] min-w-[5rem]">{{ 'DECKS.WEAKNESS' | translate }}</span>
                         <span class="text-sm text-text-primary font-semibold flex items-center gap-1">{{ full.weaknesses![0].type }} {{ full.weaknesses![0].value }}</span>
                       </div>
                     }
                     @if (full.resistances?.length) {
                       <div class="flex items-center gap-2">
-                        <span class="text-xs text-text-secondary min-w-[5rem]">{{ 'DECKS.RESISTANCE' | translate }}</span>
+                        <span class="text-xs text-[#cbd5e1] min-w-[5rem]">{{ 'DECKS.RESISTANCE' | translate }}</span>
                         <span class="text-sm text-text-primary font-semibold flex items-center gap-1">{{ full.resistances![0].type }} {{ full.resistances![0].value }}</span>
                       </div>
                     }
                     @if (full.retreatCost?.length) {
                       <div class="flex items-center gap-2">
-                        <span class="text-xs text-text-secondary min-w-[5rem]">{{ 'DECKS.RETREAT' | translate }}</span>
+                        <span class="text-xs text-[#cbd5e1] min-w-[5rem]">{{ 'DECKS.RETREAT' | translate }}</span>
                           <span class="text-sm text-text-primary font-semibold flex items-center gap-1">
                             @for (e of full.retreatCost; track $index) {
                               <img [src]="energyIcon(e)" alt="" class="w-5 h-5 inline-block flex-shrink-0" />
@@ -413,7 +419,7 @@ interface FlyCardData {
                     }
                     @if (full.rules?.length) {
                       @for (rule of full.rules; track $index) {
-                        <p class="text-xs text-text-secondary leading-tight m-0">{{ rule }}</p>
+                        <p class="text-xs text-[#cbd5e1] leading-tight m-0">{{ rule }}</p>
                       }
                     }
                   </div>
@@ -425,17 +431,17 @@ interface FlyCardData {
                 <div class="flex flex-col gap-0.5 flex-1 text-sm text-text-primary leading-tight">
                   @if (full.rarity) {
                     <div class="flex items-center gap-2">
-                      <span class="text-xs text-text-secondary min-w-[4rem]">{{ 'DECKS.RARITY' | translate }}</span>
+                      <span class="text-xs text-[#cbd5e1] min-w-[4rem]">{{ 'DECKS.RARITY' | translate }}</span>
                       <span class="text-sm text-text-primary font-semibold">{{ full.rarity }}</span>
                     </div>
                   }
                   <div class="flex items-center gap-2">
-                    <span class="text-xs text-text-secondary min-w-[4rem]">{{ 'DECKS.SET' | translate }}</span>
+                    <span class="text-xs text-[#cbd5e1] min-w-[4rem]">{{ 'DECKS.SET' | translate }}</span>
                     <span class="text-sm text-text-primary font-semibold">{{ full.set.name }}</span>
                   </div>
                   @if (full.number) {
                     <div class="flex items-center gap-2">
-                      <span class="text-xs text-text-secondary min-w-[4rem]">{{ 'DECKS.NUMBER' | translate }}</span>
+                      <span class="text-xs text-[#cbd5e1] min-w-[4rem]">{{ 'DECKS.NUMBER' | translate }}</span>
                       <span class="text-sm text-text-primary font-semibold">{{ full.number }}/{{ full.set.printedTotal }}</span>
                     </div>
                   }
@@ -543,6 +549,16 @@ export class DeckListPage implements AfterViewInit {
 
   private flyArrived = false;
   private cardDetailLoaded = false;
+  private flyTimers: number[] = [];
+
+  private scheduleFlyTimer(fn: () => void, ms: number): void {
+    this.flyTimers.push(window.setTimeout(fn, ms));
+  }
+
+  private clearFlyTimers(): void {
+    this.flyTimers.forEach(id => clearTimeout(id));
+    this.flyTimers = [];
+  }
 
   readonly deleteMessage = computed(() => {
     const name = this.deletingDeck()?.name ?? '';
@@ -854,8 +870,11 @@ export class DeckListPage implements AfterViewInit {
     const imgWrapper = target.querySelector('.card-img-wrapper');
     const originRect = (imgWrapper ?? target).getBoundingClientRect();
 
+    this.clearFlyTimers();
+    this.flyPhase.set(null);
     this.flyArrived = false;
     this.cardDetailLoaded = false;
+    this.flyCardData.set(null);
     this.cardFlyOriginRect = originRect;
     this.cardDetailBodyOverflow.set('visible');
 
@@ -892,6 +911,13 @@ export class DeckListPage implements AfterViewInit {
 
       this.flyPhase.set('entering');
 
+      this.scheduleFlyTimer(() => {
+        if (this.flyPhase() === 'entering' && !this.flyArrived) {
+          this.flyArrived = true;
+          this.showModalAndFadePortal();
+        }
+      }, 900);
+
       requestAnimationFrame(() => {
         this.flyCardData.set({
           left: targetRect.left,
@@ -927,8 +953,7 @@ export class DeckListPage implements AfterViewInit {
 
     this.cardDetailBackdropOpacity.set(0.85);
     this.cardDetailPanelOpacity.set(1);
-    this.flyCardData.update(d => d ? { ...d, opacity: 0 } : null);
-    setTimeout(() => this.flyCardData.set(null), 350);
+    this.flyCardData.set(null);
   }
 
   private loadCardDetail(cardId: string): void {
@@ -978,8 +1003,10 @@ export class DeckListPage implements AfterViewInit {
 
       this.flyPhase.set('exiting');
 
-      setTimeout(() => {
+      this.scheduleFlyTimer(() => {
+        if (this.flyPhase() !== 'exiting') return;
         requestAnimationFrame(() => {
+          if (this.flyPhase() !== 'exiting') return;
           this.flyCardData.set({
             left: origin.left,
             top: origin.top,
@@ -992,13 +1019,14 @@ export class DeckListPage implements AfterViewInit {
             rotation: -720,
           });
         });
-      });
+      }, 0);
     } else {
       this.resetCardDetailState();
     }
   }
 
   private resetCardDetailState(): void {
+    this.clearFlyTimers();
     this.flyArrived = false;
     this.cardDetailLoaded = false;
     this.cardFlyOriginRect = null;

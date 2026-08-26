@@ -13,8 +13,8 @@
 
 .deck-card-btn:hover {
   transform: translateY(-4px) rotateX(2deg) scale(1.02);
-  box-shadow: 0 12px 28px rgba(0, 204, 170, 0.18),
-              0 0 12px rgba(0, 204, 170, 0.25);
+  box-shadow: 0 12px 28px rgba(0, 170, 255, 0.18),
+              0 0 12px rgba(0, 170, 255, 0.25);
 }
 
 .deck-card-btn::before {
@@ -24,10 +24,10 @@
   border-radius: inherit;
   background: conic-gradient(from 0deg,
     transparent 0deg,
-    rgba(0, 204, 170, 0.35) 20deg,
+    rgba(0, 170, 255, 0.35) 20deg,
     transparent 40deg,
     transparent 180deg,
-    rgba(0, 204, 170, 0.15) 200deg,
+    rgba(0, 170, 255, 0.15) 200deg,
     transparent 220deg,
     transparent 360deg);
   animation: rotateGlow 5s linear infinite;

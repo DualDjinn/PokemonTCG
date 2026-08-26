@@ -1,7 +1,8 @@
 <my-modal
   [open]="open"
   [title]="title"
-  variant="pixel"
+  [variant]="variant"
+  [backdropStyle]="backdropStyle"
   [color]="resolvedConfirmColor"
   [width]="width"
   (close)="onCancel()"
@@ -14,14 +15,14 @@
     <div class="flex gap-3 justify-end">
       <my-button
         [text]="cancelText"
-        variant="pixel"
+        [variant]="variant === 'pixel' ? 'pixel' : 'modern'"
         size="small"
-        color="var(--text-secondary, rgba(255,255,255,0.3))"
+        [color]="variant === 'pixel' ? 'var(--text-secondary, rgba(255,255,255,0.3))' : '#64748b'"
         (clicked)="onCancel()"
       ></my-button>
       <my-button
         [text]="confirmText"
-        variant="pixel"
+        [variant]="variant === 'pixel' ? 'pixel' : 'modern'"
         size="small"
         [color]="resolvedConfirmColor"
         [disabled]="loading"

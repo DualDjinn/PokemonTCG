@@ -26,9 +26,7 @@ import { MyButton } from '../../../../shared/ui/my-button/my-button';
 import { MyInput } from '../../../../shared/ui/my-input/my-input';
 import { MySelect, MySelectOption } from '../../../../shared/ui/my-select/my-select';
 import { MyBadge } from '../../../../shared/ui/my-badge/my-badge';
-import { MyCard } from '../../../../shared/ui/my-card/my-card';
 import { MyIconButton } from '../../../../shared/ui/my-icon-button/my-icon-button';
-import { MyPageBackground } from '../../../../shared/components/my-page-background/my-page-background';
 import { PixelPanelDirective, PixelBorderDirective } from '../../../../shared/directives';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../../../../core/services/language.service';
@@ -66,8 +64,8 @@ type ShopTab = 'cards' | 'splashArt' | 'cardBacks' | 'packs';
     TranslateModule,
     ReactiveFormsModule,
     CartDrawer, DeckCardDetail, MyModal, PokenavDeviceComponent, GameOptionsComponent,
-    MyText, MyButton, MyInput, MySelect, MyBadge, MyCard, MyIconButton,
-    MyPageBackground, PixelPanelDirective, PixelBorderDirective,
+    MyText, MyButton, MyInput, MySelect, MyBadge, MyIconButton,
+    PixelPanelDirective, PixelBorderDirective,
     PackShopComponent, PackOpeningAnimationComponent,
   ],
   templateUrl: './pokedex-page.html',

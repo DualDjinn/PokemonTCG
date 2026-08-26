@@ -12,6 +12,19 @@
   >
     {{ icon }}
   </button>
+} @else if (variant === 'modern') {
+  <button
+    class="my-icon-btn--modern"
+    type="button"
+    [disabled]="disabled"
+    [attr.aria-label]="ariaLabel || icon"
+    [style.width]="dimension"
+    [style.height]="dimension"
+    [style.fontSize]="fontSize"
+    (click)="onClick($event)"
+  >
+    {{ icon }}
+  </button>
 } @else {
   <button
     class="pixel-icon-btn"

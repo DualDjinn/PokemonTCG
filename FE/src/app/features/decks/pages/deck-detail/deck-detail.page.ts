@@ -20,9 +20,11 @@ import { MyBadge } from '../../../../shared/ui/my-badge/my-badge';
 import { MyDivider } from '../../../../shared/ui/my-divider/my-divider';
 import { MySkeletonLoader } from '../../../../shared/components/my-skeleton-loader/my-skeleton-loader';
 import { MyModal } from '../../../../shared/components/my-modal/my-modal';
+import { MyConfirmModal } from '../../../../shared/components/my-confirm-modal/my-confirm-modal';
 import { MyFilterBar } from '../../../../shared/components/my-filter-bar/my-filter-bar';
 import { MyCardThumbnail } from '../../../../shared/components/my-card-thumbnail/my-card-thumbnail';
 import { MySearchBar } from '../../../../shared/components/my-search-bar/my-search-bar';
+import { MyPageBackground } from '../../../../shared/components/my-page-background/my-page-background';
 import { MyValidationChecklist, ValidationCheck } from '../../../../shared/components/my-validation-checklist/my-validation-checklist';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { AuthService } from '../../../game/data-access/services/auth.service';
@@ -77,9 +79,11 @@ interface FlyCardData {
     MyDivider,
     MySkeletonLoader,
     MyModal,
+    MyConfirmModal,
     MyFilterBar,
     MyCardThumbnail,
     MySearchBar,
+    MyPageBackground,
     MyValidationChecklist,
     DeckCardDetail,
     TranslateModule,
@@ -88,47 +92,45 @@ interface FlyCardData {
     GameOptionsComponent,
   ],
   template: `
-    <video class="bg-video" autoplay muted loop playsinline preload="auto" poster="/assets/img/deck-list-bg.jpg">
-      <source src="/assets/video/decksVideo.webm" type="video/webm" />
-    </video>
-    <div class="bg-overlay"></div>
-    <div class="max-w-[1400px] mx-auto p-8 flex flex-col h-screen">
-      <header class="flex items-center justify-between flex-shrink-0 pb-4 gap-4">
-        <div class="flex items-center gap-3">
-          <my-icon-button icon="←" variant="pixel" size="small" color="var(--text-secondary)" (clicked)="goBack()"></my-icon-button>
-          <div class="flex items-center gap-3">
-            <img src="/assets/img/login/pokeball.svg" class="title-pokeball" />
-            <my-text [text]="'DECK_DETAIL.TITLE' | translate" tag="h1" size="0.7rem" weight="bold" color="var(--text-primary)" align="left"></my-text>
-            <img src="/assets/img/login/pokeball.svg" class="title-pokeball" />
+    <my-page-background videoSrc="/assets/video/decksVideo.webm" poster="/assets/img/deck-list-bg.jpg" [overlayOpacity]="0.45" />
+    <div class="max-w-[1400px] w-full mx-auto flex flex-col h-screen">
+      <header class="flex items-center justify-between flex-shrink-0 px-8 pt-8 pb-4 gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+          <my-icon-button icon="←" variant="modern" size="small" color="#cbd5e1" (clicked)="goBack()"></my-icon-button>
+          <div class="flex items-center gap-3 shrink-0">
+            <img src="/assets/img/login/pokeball.svg" class="title-pokeball shrink-0" />
+            <my-text [text]="'DECK_DETAIL.TITLE' | translate" tag="h1" size="0.7rem" weight="bold" color="var(--text-primary)" align="center"></my-text>
+            <img src="/assets/img/login/pokeball.svg" class="title-pokeball shrink-0" />
           </div>
           @if (deckDetail(); as deck) {
-            <my-text [text]="deck.name" tag="span" size="0.9rem" color="var(--text-secondary)" align="left"></my-text>
+            <div class="px-4 py-1 rounded-lg border border-white/25 bg-white/5 text-center shrink-0">
+              <span class="rainbow-text font-orbitron font-bold" [style.fontSize]="'1.15rem'" [style.letterSpacing]="'0.05em'" [style.textAlign]="'center'">{{ deck.name }}</span>
+            </div>
           }
         </div>
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-3">
-            <my-text [text]="totalCardsLabel()" tag="span" size="0.855rem" weight="bold" color="var(--neon-cyan)" align="left"></my-text>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
             @for (check of validationChecks(); track check.label) {
-              <my-badge
-                [text]="(check.passed ? '✅' : '❌') + ' ' + check.label"
-                [color]="check.passed ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'"
-                [textColor]="check.passed ? '#22c55e' : '#ef4444'"
-                [borderColor]="check.passed ? '#22c55e' : '#ef4444'"
-              ></my-badge>
+              <span
+                class="rounded-lg border px-2.5 py-1 text-center leading-tight font-orbitron text-[0.75rem]"
+                [style.maxWidth]="'9.5rem'"
+                [style.color]="check.passed ? '#22c55e' : '#ef4444'"
+                [style.borderColor]="check.passed ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)'"
+                [style.background]="check.passed ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'"
+              >{{ check.label }}</span>
             }
           </div>
-          <div class="flex items-center gap-3">
-            <my-button [text]="'DECKS.SAVE' | translate" variant="pixel" size="large" [disabled]="saving()" (clicked)="save()"></my-button>
-          </div>
+          <my-button [text]="'DECK_DETAIL.RESET' | translate" variant="modern" size="small" color="#64748b" [disabled]="saving() || !hasChanges()" (clicked)="openResetConfirm()"></my-button>
+          <my-button [text]="'DECKS.SAVE' | translate" variant="modern" size="small" [disabled]="saving()" (clicked)="openSaveConfirm()"></my-button>
         </div>
       </header>
 
-      <div class="grid grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-6 flex-1 min-h-0">
-        <section class="flex flex-col gap-4 overflow-y-auto p-4 min-h-0 scrollbar-none">
+      <div class="px-8 pb-8 grid grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-6 flex-1 min-h-0">
+        <section appPixelPanel="glass" class="flex flex-col gap-4 overflow-y-auto p-6 min-h-0 scrollbar-none">
           <my-search-bar
             [value]="searchQuery()"
             [placeholder]="'DECK_DETAIL.SEARCH' | translate"
-            variant="pixel"
+            variant="modern"
             (valueChange)="searchQuery.set($event)"
           ></my-search-bar>
 
@@ -140,7 +142,7 @@ interface FlyCardData {
                 @let isFull = card.supertype !== 'Energy' && card.count <= 0;
                   <button
                     type="button"
-                    [class]="'flex flex-col gap-1 p-1.5 border border-[rgba(0,204,170,0.2)] rounded-lg bg-black/30 cursor-pointer font-inherit text-inherit text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-[#00ccaa] hover:shadow-[0_0_10px rgba(0,204,170,0.15)]' + (isFull ? ' opacity-30 grayscale pointer-events-none' : '')"
+                    [class]="'flex flex-col gap-1 p-1.5 rounded-xl border border-white/15 bg-white/5 cursor-pointer font-inherit text-inherit text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-[#0284c7] hover:shadow-[0_0_12px rgba(2,132,199,0.2)]' + (isFull ? ' opacity-30 grayscale pointer-events-none' : '')"
                     (click)="addToDeck($event, card)"
                     [title]="isFull ? ('DECK_DETAIL.NO_COPIES' | translate) : ('DECK_DETAIL.ADD_TITLE' | translate: {name: card.name})"
                 >
@@ -160,21 +162,21 @@ interface FlyCardData {
                         <span class="inline-block bg-[rgba(0,204,170,0.15)] text-[#00ccaa] text-xs font-bold px-1.5 py-0.5 rounded-full leading-tight">{{ card.count }}</span>
                       }
                       @if (card.inDeck > 0) {
-                        <span class="text-xs text-text-secondary">({{ card.inDeck }})</span>
+                        <span class="text-xs text-[#cbd5e1]">({{ card.inDeck }})</span>
                       }
                     </div>
                   </div>
                 </button>
               } @empty {
                 <div class="col-span-full py-8">
-                  <my-text [text]="'DECK_DETAIL.NO_CARDS' | translate" tag="p" color="var(--text-secondary)" align="center"></my-text>
+                  <my-text [text]="'DECK_DETAIL.NO_CARDS' | translate" tag="p" color="#ffffff" align="center"></my-text>
                 </div>
               }
             </div>
           }
         </section>
 
-        <aside appPixelPanel class="flex flex-col gap-3 p-5 min-h-0 overflow-y-auto scrollbar-none">
+        <aside appPixelPanel="glass" class="flex flex-col gap-3 p-6 min-h-0 overflow-y-auto scrollbar-none">
           @if (deckDetail(); as deck) {
             <div class="flex items-center gap-2 shrink-0">
               <my-text [text]="deck.name" tag="h2" size="1.215rem" weight="bold" color="var(--text-primary)"></my-text>
@@ -203,6 +205,8 @@ interface FlyCardData {
                 class="shrink-0"
                 [options]="supertypeFilterOptions"
                 [selected]="supertypeFilter()"
+                variant="modern"
+                color="#0284c7"
                 (selectedChange)="toggleSupertypeFilter($event)"
               ></my-filter-bar>
             </div>
@@ -214,7 +218,7 @@ interface FlyCardData {
                 tag="p"
                 size="0.855rem"
                 weight="bold"
-                color="var(--text-secondary)"
+                color="#ffffff"
               ></my-text>
               <div class="grid grid-cols-[repeat(auto-fill,minmax(90px,1fr))] gap-2 p-1 scrollbar-none">
                 @for (group of groupedDeckCards(); track group.id) {
@@ -239,16 +243,16 @@ interface FlyCardData {
       <my-modal
         [open]="showExitModal()"
         [title]="'DECK_DETAIL.UNSAVED_CHANGES' | translate"
-        variant="pixel"
-        color="#ef4444"
+        variant="glass"
+        backdropStyle="blur"
         (close)="closeExitModal()"
         width="28rem"
       >
         <div class="flex flex-col gap-4">
-          <my-text [text]="'DECK_DETAIL.UNSAVED_DESC' | translate" tag="p" size="0.855rem" color="var(--text-secondary)"></my-text>
+          <my-text [text]="'DECK_DETAIL.UNSAVED_DESC' | translate" tag="p" size="0.855rem" color="#ffffff"></my-text>
           <my-divider></my-divider>
           <div class="flex flex-col gap-2">
-            <my-text [text]="'DECK_DETAIL.VALIDATION_STATUS' | translate" tag="p" size="0.765rem" weight="bold" color="var(--text-secondary)"></my-text>
+            <my-text [text]="'DECK_DETAIL.VALIDATION_STATUS' | translate" tag="p" size="0.765rem" weight="bold" color="#ffffff"></my-text>
             @for (check of validationChecks(); track check.label) {
               <div class="flex items-center gap-2 text-sm">
                 <span>{{ check.passed ? '✅' : '❌' }}</span>
@@ -258,22 +262,49 @@ interface FlyCardData {
           </div>
           <my-divider></my-divider>
           <div class="flex gap-3 justify-end">
-            <my-button [text]="'DECK_DETAIL.CLOSE' | translate" variant="pixel" size="medium" color="var(--text-secondary)" (clicked)="closeExitModal()"></my-button>
-            <my-button [text]="'DECK_DETAIL.EXIT_WITHOUT_SAVING' | translate" variant="pixel" size="medium" color="var(--neon-magenta)" (clicked)="goBackWithoutSaving()"></my-button>
-            <my-button [text]="'DECK_DETAIL.SAVE_AND_EXIT' | translate" variant="pixel" size="medium" [disabled]="saving()" (clicked)="saveAndGoBack()"></my-button>
+            <my-button [text]="'DECK_DETAIL.CLOSE' | translate" variant="modern" size="medium" color="#64748b" (clicked)="closeExitModal()"></my-button>
+            <my-button [text]="'DECK_DETAIL.EXIT_WITHOUT_SAVING' | translate" variant="modern" size="medium" color="#ef4444" (clicked)="goBackWithoutSaving()"></my-button>
+            <my-button [text]="'DECK_DETAIL.SAVE_AND_EXIT' | translate" variant="modern" size="medium" [disabled]="saving()" (clicked)="saveAndGoBack()"></my-button>
           </div>
         </div>
       </my-modal>
     }
+
+    <my-confirm-modal
+      [open]="showSaveConfirm()"
+      [title]="'DECK_DETAIL.SAVE_CONFIRM_TITLE' | translate"
+      [message]="'DECK_DETAIL.SAVE_CONFIRM_MSG' | translate"
+      [confirmText]="'DECKS.SAVE' | translate"
+      [cancelText]="'DECK_DETAIL.CLOSE' | translate"
+      [loading]="saving()"
+      variant="glass"
+      backdropStyle="blur"
+      (confirm)="save()"
+      (cancel)="closeSaveConfirm()"
+    ></my-confirm-modal>
+
+    <my-confirm-modal
+      [open]="showResetConfirm()"
+      [title]="'DECK_DETAIL.RESET_CONFIRM_TITLE' | translate"
+      [message]="'DECK_DETAIL.RESET_CONFIRM_MSG' | translate"
+      [confirmText]="'DECK_DETAIL.RESET' | translate"
+      [cancelText]="'DECK_DETAIL.CLOSE' | translate"
+      variant="glass"
+      backdropStyle="blur"
+      (confirm)="resetDeck()"
+      (cancel)="closeResetConfirm()"
+    ></my-confirm-modal>
 
     @if (showCardModal()) {
       @if (modalCardData(); as card) {
         <my-modal
           [open]="showCardModal()"
           [title]="card.name"
-          variant="pixel"
+          variant="glass"
+          backdropStyle="blur"
           [backdropOpacity]="cardDetailBackdropOpacity()"
           [panelOpacity]="cardDetailPanelOpacity()"
+          [entranceAnimated]="false"
           [bodyOverflow]="cardDetailBodyOverflow()"
           (close)="closeCardDetail()"
           width="46rem"
@@ -285,22 +316,22 @@ interface FlyCardData {
               </div>
               <div class="flex flex-col gap-2 w-full">
                 <div class="flex justify-between items-center">
-                  <span class="text-sm text-text-secondary">{{ 'DECK_DETAIL.CAN_ADD' | translate }}</span>
+                  <span class="text-sm text-[#cbd5e1]">{{ 'DECK_DETAIL.CAN_ADD' | translate }}</span>
                   <span class="text-sm font-bold text-text-primary">{{ card.supertype === 'Energy' ? '∞' : card.available }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="text-sm text-text-secondary">{{ 'DECK_DETAIL.IN_DECK' | translate }}</span>
+                  <span class="text-sm text-[#cbd5e1]">{{ 'DECK_DETAIL.IN_DECK' | translate }}</span>
                   <span class="text-sm font-bold text-text-primary">{{ card.inDeck }}</span>
                 </div>
               </div>
               <my-divider></my-divider>
               <div class="flex items-center gap-4">
-                <button type="button" class="w-9 h-9 border border-[#ef4444] rounded-full font-inherit text-lg cursor-pointer transition-all duration-150 hover:bg-[rgba(239,68,68,0.15)] hover:scale-110 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none" [disabled]="card.inDeck <= 0" (click)="removeOneFromDeck(card.id)">−</button>
+                <button type="button" class="w-9 h-9 rounded-full font-inherit text-lg cursor-pointer transition-all duration-150 bg-white/5 border border-white/20 text-[#f87171] hover:border-[#ef4444] hover:text-white hover:bg-[rgba(239,68,68,0.15)] hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none" [disabled]="card.inDeck <= 0" (click)="removeOneFromDeck(card.id)">−</button>
                 <span class="text-xl font-bold text-text-primary min-w-[2rem] text-center">{{ card.inDeck }}</span>
-                <button type="button" class="w-9 h-9 border border-[#00ccaa] rounded-full font-inherit text-lg cursor-pointer transition-all duration-150 bg-[#00ccaa] text-[#050508] font-bold shadow-[0_0_8px_rgba(0,204,170,0.4)] hover:scale-110 hover:shadow-[0_0_15px_rgba(0,204,170,0.6)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none" [disabled]="card.supertype !== 'Energy' && card.inDeck >= 4" (click)="addOneToDeck(card.id)">+</button>
+                <button type="button" class="w-9 h-9 rounded-full font-inherit text-lg cursor-pointer transition-all duration-150 bg-[#0284c7] text-white font-bold border border-[#0284c7] shadow-[0_0_10px_rgba(2,132,199,0.4)] hover:scale-110 hover:shadow-[0_0_16px_rgba(2,132,199,0.6)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none" [disabled]="card.supertype !== 'Energy' && card.inDeck >= 4" (click)="addOneToDeck(card.id)">+</button>
               </div>
               <div class="flex justify-center mt-2">
-                <my-button [text]="'DECK_DETAIL.CLOSE' | translate" variant="pixel" size="medium" color="var(--text-secondary)" (clicked)="closeCardDetail()"></my-button>
+                <my-button [text]="'DECK_DETAIL.CLOSE' | translate" variant="modern" size="medium" color="#64748b" (clicked)="closeCardDetail()"></my-button>
               </div>
             </div>
             <div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-1 scrollbar-none">
@@ -308,7 +339,7 @@ interface FlyCardData {
                 @if (full.supertype === 'Pokemon') {
                   <div class="flex items-center gap-3 pb-2">
                     @if (full.hp) {
-                      <div class="inline-flex items-center gap-1 text-2xl font-bold text-red-500 bg-red-500/10 border-2 border-red-500/30 rounded-lg px-3 py-1 leading-tight">{{ full.hp }} <span class="text-sm font-normal text-text-secondary">HP</span></div>
+                      <div class="inline-flex items-center gap-1 text-2xl font-bold text-red-500 bg-red-500/10 border-2 border-red-500/30 rounded-lg px-3 py-1 leading-tight">{{ full.hp }} <span class="text-sm font-normal text-[#cbd5e1]">HP</span></div>
                     }
                     @if (full.types?.length) {
                       <div class="flex gap-1 flex-wrap">
@@ -342,7 +373,7 @@ interface FlyCardData {
                           <div class="bg-[rgba(0,204,170,0.05)] border border-[rgba(0,204,170,0.15)] rounded p-2 flex flex-col gap-0.5">
                             <span class="text-sm text-text-primary font-bold">{{ ability.name }}</span>
                             <span class="text-xs text-[#00ccaa] font-medium leading-none">{{ ability.type }}</span>
-                            <p class="text-xs text-text-secondary leading-tight m-0">{{ ability.text }}</p>
+                            <p class="text-xs text-[#cbd5e1] leading-tight m-0">{{ ability.text }}</p>
                           </div>
                         }
                       </div>
@@ -370,7 +401,7 @@ interface FlyCardData {
                              }
                            </div>
                             @if (attack.text) {
-                              <p class="text-xs text-text-secondary leading-tight m-0">{{ attack.text }}</p>
+                              <p class="text-xs text-[#cbd5e1] leading-tight m-0">{{ attack.text }}</p>
                             }
                           </div>
                         }
@@ -383,19 +414,19 @@ interface FlyCardData {
                     <div class="flex flex-col gap-1 flex-1 text-sm text-text-primary leading-tight">
                       @if (full.weaknesses?.length) {
                         <div class="flex items-center gap-2">
-                          <span class="text-xs text-text-secondary min-w-[5rem]">{{ 'DECKS.WEAKNESS' | translate }}</span>
+                          <span class="text-xs text-[#cbd5e1] min-w-[5rem]">{{ 'DECKS.WEAKNESS' | translate }}</span>
                           <span class="text-sm text-text-primary font-semibold flex items-center gap-1">{{ full.weaknesses![0].type }} {{ full.weaknesses![0].value }}</span>
                         </div>
                       }
                       @if (full.resistances?.length) {
                         <div class="flex items-center gap-2">
-                          <span class="text-xs text-text-secondary min-w-[5rem]">{{ 'DECKS.RESISTANCE' | translate }}</span>
+                          <span class="text-xs text-[#cbd5e1] min-w-[5rem]">{{ 'DECKS.RESISTANCE' | translate }}</span>
                           <span class="text-sm text-text-primary font-semibold flex items-center gap-1">{{ full.resistances![0].type }} {{ full.resistances![0].value }}</span>
                         </div>
                       }
                       @if (full.retreatCost?.length) {
                         <div class="flex items-center gap-2">
-                          <span class="text-xs text-text-secondary min-w-[5rem]">{{ 'DECKS.RETREAT' | translate }}</span>
+                          <span class="text-xs text-[#cbd5e1] min-w-[5rem]">{{ 'DECKS.RETREAT' | translate }}</span>
                           <span class="text-sm text-text-primary font-semibold flex items-center gap-1">
                             @for (e of full.retreatCost; track $index) {
                               <img [src]="energyIcon(e)" alt="" class="w-5 h-5 inline-block flex-shrink-0" />
@@ -420,7 +451,7 @@ interface FlyCardData {
                       }
                       @if (full.rules?.length) {
                         @for (rule of full.rules; track $index) {
-                          <p class="text-xs text-text-secondary leading-tight m-0">{{ rule }}</p>
+                          <p class="text-xs text-[#cbd5e1] leading-tight m-0">{{ rule }}</p>
                         }
                       }
                     </div>
@@ -432,17 +463,17 @@ interface FlyCardData {
                   <div class="flex flex-col gap-0.5 flex-1 text-sm text-text-primary leading-tight">
                     @if (full.rarity) {
                       <div class="flex items-center gap-2">
-                        <span class="text-xs text-text-secondary min-w-[4rem]">{{ 'DECKS.RARITY' | translate }}</span>
+                        <span class="text-xs text-[#cbd5e1] min-w-[4rem]">{{ 'DECKS.RARITY' | translate }}</span>
                         <span class="text-sm text-text-primary font-semibold">{{ full.rarity }}</span>
                       </div>
                     }
                     <div class="flex items-center gap-2">
-                      <span class="text-xs text-text-secondary min-w-[4rem]">{{ 'DECKS.SET' | translate }}</span>
+                      <span class="text-xs text-[#cbd5e1] min-w-[4rem]">{{ 'DECKS.SET' | translate }}</span>
                       <span class="text-sm text-text-primary font-semibold">{{ full.set.name }}</span>
                     </div>
                     @if (full.number) {
                       <div class="flex items-center gap-2">
-                        <span class="text-xs text-text-secondary min-w-[4rem]">{{ 'DECKS.NUMBER' | translate }}</span>
+                        <span class="text-xs text-[#cbd5e1] min-w-[4rem]">{{ 'DECKS.NUMBER' | translate }}</span>
                         <span class="text-sm text-text-primary font-semibold">{{ full.number }}/{{ full.set.printedTotal }}</span>
                       </div>
                     }
@@ -459,7 +490,7 @@ interface FlyCardData {
 
     @if (flyCardData(); as fly) {
       <div
-        class="fixed z-[2000] pointer-events-none rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,204,170,0.3),0_8px_32px_rgba(0,0,0,0.5)]"
+        class="fixed z-[2000] pointer-events-none rounded-xl overflow-hidden shadow-[0_0_30px_rgba(0,170,255,0.3),0_8px_32px_rgba(0,0,0,0.5)]"
         [style.left.px]="fly.left"
         [style.top.px]="fly.top"
         [style.width.px]="fly.width"
@@ -530,6 +561,8 @@ export class DeckDetailPage implements AfterViewInit {
 
   readonly originalCardIds = signal<string[]>([]);
   readonly showExitModal = signal(false);
+  readonly showSaveConfirm = signal(false);
+  readonly showResetConfirm = signal(false);
   readonly showCardModal = signal(false);
   readonly showMenu = signal(false);
   readonly showOptions = signal(false);
@@ -553,6 +586,16 @@ export class DeckDetailPage implements AfterViewInit {
   private cardFlyOriginRect: DOMRect | null = null;
   private flyArrived = false;
   private cardDetailLoaded = false;
+  private flyTimers: number[] = [];
+
+  private scheduleFlyTimer(fn: () => void, ms: number): void {
+    this.flyTimers.push(window.setTimeout(fn, ms));
+  }
+
+  private clearFlyTimers(): void {
+    this.flyTimers.forEach(id => clearTimeout(id));
+    this.flyTimers = [];
+  }
 
   readonly hasChanges = computed(() => {
     const current = this.currentCardIds();
@@ -575,8 +618,7 @@ export class DeckDetailPage implements AfterViewInit {
 
   readonly totalCardsLabel = computed(() => {
     const count = this.currentCardIds().length;
-    this.langService.currentLang();
-    return this.translateService.instant('DECK_DETAIL.DECK_CARDS') + ' (' + count + ')';
+    return count + ' / 60';
   });
 
   readonly deckValid = computed(() => {
@@ -706,6 +748,7 @@ export class DeckDetailPage implements AfterViewInit {
   }
 
   save(): void {
+    this.showSaveConfirm.set(false);
     this.sfx.play('Click.mp3');
     this.saveInternal(false);
   }
@@ -745,6 +788,36 @@ export class DeckDetailPage implements AfterViewInit {
     this.showExitModal.set(false);
   }
 
+  resetDeck(): void {
+    if (this.saving()) return;
+    this.showResetConfirm.set(false);
+    this.sfx.play('Click.mp3');
+    this.currentCardIds.set([...this.originalCardIds()]);
+    this.toastService.show(this.translateService.instant('DECK_DETAIL.RESET_TOAST'), 'info');
+  }
+
+  openSaveConfirm(): void {
+    if (this.saving()) return;
+    this.sfx.play('Click.mp3');
+    this.showSaveConfirm.set(true);
+  }
+
+  closeSaveConfirm(): void {
+    this.sfx.play('Click.mp3');
+    this.showSaveConfirm.set(false);
+  }
+
+  openResetConfirm(): void {
+    if (this.saving() || !this.hasChanges()) return;
+    this.sfx.play('Click.mp3');
+    this.showResetConfirm.set(true);
+  }
+
+  closeResetConfirm(): void {
+    this.sfx.play('Click.mp3');
+    this.showResetConfirm.set(false);
+  }
+
   closeCardDetail(): void {
     this.sfx.play('Click.mp3');
     const origin = this.cardFlyOriginRect;
@@ -776,8 +849,10 @@ export class DeckDetailPage implements AfterViewInit {
 
       this.flyPhase.set('exiting');
 
-      setTimeout(() => {
+      this.scheduleFlyTimer(() => {
+        if (this.flyPhase() !== 'exiting') return;
         requestAnimationFrame(() => {
+          if (this.flyPhase() !== 'exiting') return;
           this.flyCardData.set({
             left: origin.left,
             top: origin.top,
@@ -790,7 +865,7 @@ export class DeckDetailPage implements AfterViewInit {
             rotation: -720,
           });
         });
-      });
+      }, 0);
     } else {
       this.resetCardDetailState();
     }
@@ -827,8 +902,11 @@ export class DeckDetailPage implements AfterViewInit {
     const imgWrapper = target.querySelector('.card-img-wrapper');
     const originRect = (imgWrapper ?? target).getBoundingClientRect();
 
+    this.clearFlyTimers();
+    this.flyPhase.set(null);
     this.flyArrived = false;
     this.cardDetailLoaded = false;
+    this.flyCardData.set(null);
     this.cardFlyOriginRect = originRect;
     this.cardDetailBodyOverflow.set('visible');
 
@@ -861,6 +939,13 @@ export class DeckDetailPage implements AfterViewInit {
       });
 
       this.flyPhase.set('entering');
+
+      this.scheduleFlyTimer(() => {
+        if (this.flyPhase() === 'entering' && !this.flyArrived) {
+          this.flyArrived = true;
+          this.showModalAndFadePortal();
+        }
+      }, 900);
 
       requestAnimationFrame(() => {
         this.flyCardData.set({
@@ -897,11 +982,11 @@ export class DeckDetailPage implements AfterViewInit {
 
     this.cardDetailBackdropOpacity.set(0.85);
     this.cardDetailPanelOpacity.set(1);
-    this.flyCardData.update(d => d ? { ...d, opacity: 0 } : null);
-    setTimeout(() => this.flyCardData.set(null), 350);
+    this.flyCardData.set(null);
   }
 
   private resetCardDetailState(): void {
+    this.clearFlyTimers();
     this.flyArrived = false;
     this.cardDetailLoaded = false;
     this.cardFlyOriginRect = null;

@@ -22,6 +22,8 @@ export class MyConfirmModal {
   @Input() destructive = false;
   @Input() loading = false;
   @Input() width = '24rem';
+  @Input() variant: 'solid' | 'pixel' | 'glass' = 'pixel';
+  @Input() backdropStyle: 'dark' | 'blur' = 'dark';
 
   @Output() confirm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();

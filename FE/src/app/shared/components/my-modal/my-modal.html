@@ -1,18 +1,25 @@
 @if (open) {
   <div
-    class="fixed inset-0 bg-black z-[1000]"
-    [style.opacity]="backdropOpacity"
+    class="my-modal-backdrop"
+    [class.my-modal-backdrop--animated]="entranceAnimated"
+    [class.my-modal-backdrop--fade]="!entranceAnimated"
+    [class.my-modal-backdrop--blur]="backdropStyle === 'blur'"
+    [style.background]="backdropStyle === 'blur' ? 'rgba(10,10,20,0.45)' : (entranceAnimated ? 'rgba(0,0,0,' + backdropOpacity + ')' : 'rgba(0,0,0,1)')"
+    [style.opacity]="entranceAnimated ? 1 : backdropOpacity"
     (click)="onBackdropClick()"
   ></div>
   <div
-    class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1001] max-w-[92vw] max-h-[88vh] flex flex-col overflow-hidden"
-    [class.border-[3px]]="true"
-    [class.border-dashed]="variant !== 'pixel'"
-    [style.background]="variant === 'pixel' ? 'var(--pixel-panel-bg)' : background"
+    class="my-modal-panel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1001] max-w-[92vw] max-h-[88vh] flex flex-col overflow-hidden"
+    [class.my-modal-panel--animated]="entranceAnimated"
+    [class.my-modal-panel--fade]="!entranceAnimated"
+    [class.my-modal-panel--glass]="variant === 'glass'"
+    [class.border-[3px]]="variant !== 'glass'"
+    [class.border-dashed]="variant !== 'pixel' && variant !== 'glass'"
+    [style.background]="variant === 'pixel' ? 'var(--pixel-panel-bg)' : (variant === 'glass' ? 'rgba(255,255,255,0.08)' : background)"
     [style.backgroundImage]="variant === 'pixel' ? 'linear-gradient(45deg, var(--pixel-panel-pattern-color) 25%, transparent 25%), linear-gradient(-45deg, var(--pixel-panel-pattern-color) 25%, transparent 25%)' : 'none'"
     [style.backgroundSize]="variant === 'pixel' ? 'var(--pixel-panel-pattern-size) var(--pixel-panel-pattern-size)' : 'auto'"
-    [style.borderColor]="variant === 'pixel' ? 'var(--pixel-border-top-left) var(--pixel-border-bottom-right) var(--pixel-border-bottom-right) var(--pixel-border-top-left)' : color"
-    [style.boxShadow]="variant === 'pixel' ? '0 0 30px ' + color : '8px 8px 0px ' + color"
+    [style.borderColor]="variant === 'pixel' ? 'var(--pixel-border-top-left) var(--pixel-border-bottom-right) var(--pixel-border-bottom-right) var(--pixel-border-top-left)' : (variant === 'glass' ? 'rgba(255,255,255,0.22)' : color)"
+    [style.boxShadow]="variant === 'pixel' ? '0 0 30px ' + color : (variant === 'glass' ? '0 8px 40px rgba(0,0,0,0.35)' : '8px 8px 0px ' + color)"
     [style.width]="width"
     [style.opacity]="panelOpacity"
     (click)="$event.stopPropagation()"
@@ -20,9 +27,9 @@
     <div
       class="flex items-center justify-between px-4 py-3"
       [class.border-b-[2px]]="variant === 'pixel'"
-      [class.border-b-[3px]]="variant !== 'pixel'"
-      [class.border-dashed]="variant !== 'pixel'"
-      [style.borderColor]="variant === 'pixel' ? 'rgba(0,170,255,0.15)' : color"
+      [class.border-b-[3px]]="variant !== 'pixel' && variant !== 'glass'"
+      [class.border-dashed]="variant !== 'pixel' && variant !== 'glass'"
+      [style.borderColor]="variant === 'pixel' ? 'rgba(0,170,255,0.15)' : (variant === 'glass' ? 'rgba(255,255,255,0.12)' : color)"
     >
       @if (title) {
         <my-text [text]="title" tag="h3" [color]="titleColor" size="0.765rem" weight="bold" />
@@ -30,7 +37,7 @@
         <span></span>
       }
       @if (showClose) {
-        <my-icon-button icon="✕" [variant]="variant === 'pixel' ? 'pixel' : 'solid'" size="small" ariaLabel="Close" (clicked)="onCloseClick()" />
+        <my-icon-button icon="✕" [variant]="variant === 'pixel' ? 'pixel' : (variant === 'glass' ? 'modern' : 'solid')" size="small" ariaLabel="Close" (clicked)="onCloseClick()" />
       }
     </div>
     <div [class]="bodyPadding + ' overflow-auto bg-inherit'">

@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import ar.edu.utn.frc.tup.piii.dtos.engine.CreateMatchResponse;
 import ar.edu.utn.frc.tup.piii.dtos.engine.GameAction;
+import ar.edu.utn.frc.tup.piii.dtos.engine.GameActionType;
 import ar.edu.utn.frc.tup.piii.dtos.engine.MatchStateDTO;
 import ar.edu.utn.frc.tup.piii.engine.GameEngine;
 import ar.edu.utn.frc.tup.piii.engine.bot.BotDifficulty;
@@ -50,6 +51,16 @@ public class MatchService {
 
     private static final int JOIN_CODE_LENGTH = 6;
 
+    private static final java.util.Set<GameActionType> CARD_PLAY_ACTIONS =
+            java.util.EnumSet.of(
+                    GameActionType.PLAY_BASIC,
+                    GameActionType.EVOLVE,
+                    GameActionType.ATTACH_ENERGY,
+                    GameActionType.PLAY_ITEM,
+                    GameActionType.PLAY_SUPPORTER,
+                    GameActionType.PLAY_STADIUM,
+                    GameActionType.ATTACH_TOOL);
+
     private static final Logger log = LoggerFactory.getLogger(MatchService.class);
 
     private final MatchRepository matchRepository;
@@ -59,6 +70,7 @@ public class MatchService {
     private final CardBackService cardBackService;
     private final ObjectMapper objectMapper;
     private final CardRegistryService cardRegistryService;
+    private final PlayerStatsService playerStatsService;
 
     public MatchService(MatchRepository matchRepository,
                         PlayerRepository playerRepository,
@@ -66,7 +78,8 @@ public class MatchService {
                         SimpMessagingTemplate messagingTemplate,
                         CardBackService cardBackService,
                         ObjectMapper objectMapper,
-                        CardRegistryService cardRegistryService) {
+                        CardRegistryService cardRegistryService,
+                        PlayerStatsService playerStatsService) {
         this.matchRepository = matchRepository;
         this.playerRepository = playerRepository;
         this.gameEngine = gameEngine;
@@ -74,6 +87,7 @@ public class MatchService {
         this.cardBackService = cardBackService;
         this.objectMapper = objectMapper;
         this.cardRegistryService = cardRegistryService;
+        this.playerStatsService = playerStatsService;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -350,6 +364,10 @@ public class MatchService {
 
         gameEngine.submitAction(engineMatchId, playerId, action);
         syncStatusFromEngine(match, getEngineState(engineMatchId, playerId, match));
+
+        if (CARD_PLAY_ACTIONS.contains(action.getType()) && action.getCardId() != null) {
+            playerStatsService.recordCardPlayed(playerId, action.getCardId());
+        }
     }
 
     /**
@@ -472,6 +490,7 @@ public class MatchService {
         match.setStatus(MatchStatus.FINISHED);
         match.setWinnerId(opponentId);
         matchRepository.save(match);
+        playerStatsService.recordFinishedMatch(match);
         publishMatchEnded(match.getId(), opponentId, match.getPlayerOneId(), match.getPlayerTwoId());
     }
 
@@ -619,6 +638,7 @@ public class MatchService {
         match.setEngineMatchId(engineMatchId);
         match.setStatus(MatchStatus.SETUP);
         match.setStarted(true);
+        match.setStartedAt(LocalDateTime.now());
         match = matchRepository.save(match);
         publishLobbyEvent(match.getId(), "MATCH_STARTED");
         return toCreateMatchResponse(match);
@@ -654,6 +674,7 @@ public class MatchService {
             match.setStatus(MatchStatus.FINISHED);
             match.setWinnerId(opponentId);
             matchRepository.save(match);
+            playerStatsService.recordFinishedMatch(match);
 
             Map<String, Object> payload = new HashMap<>();
             payload.put("phase", "FINISHED");
@@ -864,6 +885,9 @@ public class MatchService {
             match.setStatus(MatchStatus.FINISHED);
             match.setWinnerId(state.getWinnerPlayerId());
             grantProgressCardBacks(state.getWinnerPlayerId());
+            if (previous != MatchStatus.FINISHED) {
+                playerStatsService.recordFinishedMatch(match);
+            }
         } else if (!state.isWaitingForActiveSelection() && state.isSetupComplete()) {
             match.setStatus(MatchStatus.ACTIVE);
         }

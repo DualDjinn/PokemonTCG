@@ -22,7 +22,7 @@ export type MyButtonSize = 'small' | 'medium' | 'large';
 })
 export class MyButton {
   @Input() text = '';
-  @Input() color = 'var(--neon-cyan)';
+  @Input() color = '#0284c7';
   @Input() textColor = 'var(--text-primary)';
   @Input() variant: MyButtonVariant = 'solid';
   @Input() size: MyButtonSize = 'medium';
