@@ -1,0 +1,48 @@
+<section id="hero" class="w-full flex flex-col justify-between gap-3 flex-1 h-full min-h-0 overflow-hidden">
+  <div class="hero-grid grid grid-cols-1 md:grid-cols-[1.5fr_3fr] lg:grid-cols-[1.3fr_3fr] xl:grid-cols-[1.1fr_3fr] gap-6 items-stretch w-full flex-1 min-h-0 overflow-hidden">
+    <!-- Left Column: Video -->
+    <app-video-section class="animate-fade-up h-full flex flex-col min-h-0" />
+
+    <!-- Right Column: Bento Grid or Active Section -->
+    <div class="right-content w-full min-w-0 h-full flex flex-col flex-1 min-h-0 overflow-hidden">
+      @switch (activeSection()) {
+        @case ('sobres') {
+          <app-sobres-section
+            class="h-full flex-1 flex flex-col min-h-0 overflow-hidden"
+            (back)="onSectionChange(null)"
+          />
+        }
+        @case ('decks') {
+          <app-decks-section
+            class="h-full flex-1 flex flex-col min-h-0 overflow-hidden"
+            (back)="onSectionChange(null)"
+          />
+        }
+        @case ('singles') {
+          <app-singles-section
+            class="h-full flex-1 flex flex-col min-h-0 overflow-hidden"
+            (back)="onSectionChange(null)"
+            (cardDetail)="cardDetail.emit($event)"
+          />
+        }
+        @case ('accesorios') {
+          <app-accesorios-section
+            class="h-full flex-1 flex flex-col min-h-0 overflow-hidden"
+            (back)="onSectionChange(null)"
+            (splashDetail)="splashDetail.emit($event)"
+            (cardBackDetail)="cardBackDetail.emit($event)"
+          />
+        }
+        @default {
+          <app-bento-grid
+            class="h-full flex-1 flex flex-col min-h-0"
+            (openSection)="onSectionChange($event)"
+          />
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Marquee Banner (Ofertas) at bottom -->
+  <app-offers-marquee class="w-full shrink-0" />
+</section>

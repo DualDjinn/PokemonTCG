@@ -1,0 +1,9 @@
+<div
+  class="shiny-title"
+  [style]="style()"
+  [style.--shine-color]="shineColor()"
+  [style.--speed]="speed() + 's'"
+>
+  <span class="base" [style.color]="textColor()">{{ text() }}</span>
+  <span class="shine" aria-hidden="true">{{ text() }}</span>
+</div>

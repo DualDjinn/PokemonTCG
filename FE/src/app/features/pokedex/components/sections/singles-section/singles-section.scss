@@ -1,0 +1,75 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.singles-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cards-scroll-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+  padding-bottom: 12px;
+
+  --scrollbar-thumb: rgba(201, 255, 61, 0.4);
+  --scrollbar-track: rgba(20, 19, 43, 0.6);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+    &:hover {
+      background: rgba(201, 255, 61, 0.7);
+    }
+  }
+}
+
+.rarity-pill {
+  border: 1px solid rgba(237, 235, 255, 0.1);
+  background: #0b0a1f;
+  color: #9c98c7;
+
+  &:hover {
+    color: #edebff;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &.active {
+    background: rgba(201, 255, 61, 0.15);
+    color: #c9ff3d;
+    border-color: rgba(201, 255, 61, 0.4);
+  }
+}
+
+.energy-pill {
+  &.active-energy {
+    background: rgba(201, 255, 61, 0.15);
+    color: #c9ff3d;
+    border-color: rgba(201, 255, 61, 0.4);
+    box-shadow: 0 0 10px rgba(201, 255, 61, 0.2);
+  }
+}
+
+.add-single-btn:active {
+  transform: scale(0.94);
+}

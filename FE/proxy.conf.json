@@ -1,29 +1,29 @@
 {
-  "/api/**": {
+  "/api": {
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
-  "/cards/**": {
+  "/cards": {
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
-  "/full-art-pokemon/**": {
+  "/full-art-pokemon": {
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
-  "/media/**": {
+  "/media": {
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
-  "/ws/**": {
+  "/ws": {
     "target": "http://localhost:8080",
     "secure": false,
     "ws": true,

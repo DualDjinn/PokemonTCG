@@ -1,24 +1,17 @@
-/* El fondo lo pone <my-page-background> (video + overlay), igual que en Perfil / Mazos / Lobby */
 :host {
   display: block;
-  min-height: 100dvh;
   height: 100dvh;
-  overflow-y: auto;
-  color: var(--text-primary);
+  max-height: 100dvh;
+  overflow: hidden;
+  background-color: #0b0a1f;
+  color: #edebff;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.bg-video {
-  position: fixed;
-  inset: 0;
-  width: 100%;
+.shop-wrapper {
   height: 100%;
-  object-fit: cover;
-  z-index: -2;
-}
-
-.bg-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(5, 5, 8, 0.65);
-  z-index: -1;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }

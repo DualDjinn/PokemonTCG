@@ -23,6 +23,7 @@ describe('GameStateService', () => {
     coins: 0,
     activeDeckId: null,
     collectionCardIds: [],
+    collectionQuantities: {},
     decks: [],
   });
 
@@ -40,6 +41,7 @@ describe('GameStateService', () => {
       coins: 0,
       activeDeckId: null,
       collectionCardIds: [],
+      collectionQuantities: {},
       decks: [],
     });
 

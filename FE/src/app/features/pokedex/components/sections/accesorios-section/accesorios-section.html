@@ -1,0 +1,196 @@
+<section class="accesorios-section animate-fade-up flex flex-col h-full min-h-0">
+  <header class="flex items-center justify-between gap-4 mb-3 flex-wrap shrink-0">
+    <div>
+      <app-shiny-title text="Accesorios & Full Arts" shineColor="#c9ff3d" [speed]="2" [fontSize]="'1.6rem'" />
+      <p class="text-xs text-[#9c98c7] font-sans mt-0.5">
+        Personaliza tu experiencia con artes completos, reversos de cartas y cosméticos exclusivos
+      </p>
+    </div>
+    <button
+      type="button"
+      class="font-rajdhani font-bold text-sm tracking-wider uppercase text-[#c9ff3d] hover:underline cursor-pointer"
+      (click)="back.emit()"
+    >
+      ← Volver al Inicio
+    </button>
+  </header>
+
+  <!-- Sub-tabs y Barra de Búsqueda -->
+  <div class="filters-bar rounded-2xl border border-white/10 bg-[#14132b] p-3 mb-3 flex items-center justify-between gap-4 flex-wrap shrink-0">
+    <!-- Sub-tab pills -->
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="subtab-btn px-4 py-2 rounded-xl font-rajdhani font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+        [class.active-subtab]="activeSubTab() === 'fullArts'"
+        (click)="setSubTab('fullArts')"
+      >
+        ✨ Full Arts ({{ splashArts().length }})
+      </button>
+      <button
+        type="button"
+        class="subtab-btn px-4 py-2 rounded-xl font-rajdhani font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+        [class.active-subtab]="activeSubTab() === 'cardBacks'"
+        (click)="setSubTab('cardBacks')"
+      >
+        🎴 Reversos ({{ cardBacks().length }})
+      </button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-input-wrap min-w-[200px] relative">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#9c98c7]">🔍</span>
+      <input
+        type="text"
+        [formControl]="searchControl"
+        [placeholder]="activeSubTab() === 'fullArts' ? 'Buscar Full Art...' : 'Buscar Reverso...'"
+        class="w-full bg-[#0b0a1f] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-[#edebff] placeholder-[#9c98c7]/50 focus:outline-none focus:border-[#c9ff3d]/60 font-sans"
+      />
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex-1 flex flex-col items-center justify-center p-16 gap-3">
+      <div class="w-10 h-10 border-4 border-white/10 border-t-[#c9ff3d] rounded-full animate-spin"></div>
+      <span class="text-xs text-[#9c98c7] font-rajdhani uppercase tracking-wider">Cargando accesorios...</span>
+    </div>
+  } @else {
+    <div class="accesorios-scroll-container">
+      <!-- Full Arts Grid -->
+      @if (activeSubTab() === 'fullArts') {
+      @if (filteredSplashArts().length === 0) {
+        <div class="flex flex-col items-center justify-center p-16 rounded-2xl border border-white/10 bg-[#14132b] text-center">
+          <span class="text-3xl mb-2">🎨</span>
+          <h3 class="font-rajdhani font-bold text-base text-[#edebff] uppercase">No se encontraron Full Arts</h3>
+          <p class="text-xs text-[#9c98c7] mt-1 font-sans">Prueba con otro término de búsqueda.</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 w-full">
+          @for (sa of filteredSplashArts(); track sa.id) {
+            <div
+              class="card-tile group rounded-2xl border border-white/10 bg-[#14132b] p-3 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c9ff3d]/50 shadow-lg shadow-black/30 cursor-pointer"
+              (click)="splashDetail.emit(sa)"
+            >
+              <!-- Image & Badge -->
+              <div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
+                <img
+                  [src]="sa.imageUrl"
+                  [alt]="sa.name"
+                  class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+                @if (getQtyInCart(sa.id); as qty) {
+                  <div class="absolute top-2 right-2 min-w-[20px] h-5 rounded-full bg-[#c9ff3d] text-[#0b0a1f] text-xs font-jetbrains font-bold flex items-center justify-center px-1 shadow-md">
+                    ×{{ qty }}
+                  </div>
+                }
+              </div>
+
+              <!-- Metadata -->
+              <div class="flex flex-col gap-1">
+                <h4 class="font-rajdhani font-bold text-sm text-[#edebff] uppercase truncate group-hover:text-[#c9ff3d] transition-colors">
+                  {{ sa.name }}
+                </h4>
+
+                <div class="flex items-center justify-between text-[10px] text-[#9c98c7] font-sans">
+                  <span>{{ sa.pokemonName }}</span>
+                  <span class="font-semibold text-[#c9ff3d]">{{ sa.rarity }}</span>
+                </div>
+
+                <!-- Price and Add to Cart -->
+                <div class="flex items-center justify-between pt-2 mt-1 border-t border-white/10">
+                  <div class="flex items-center gap-1">
+                    <img src="/assets/img/Moneda.png" alt="Moneda" class="w-3.5 h-3.5 object-contain" />
+                    <span class="font-jetbrains font-bold text-xs text-[#c9ff3d]">₽{{ getSplashPrice(sa) }}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-lg text-xs font-rajdhani font-bold uppercase tracking-wider bg-white/10 hover:bg-[#c9ff3d] text-[#edebff] hover:text-[#0b0a1f] transition-all cursor-pointer"
+                    (click)="addSplashToCart(sa, $event)"
+                    title="Añadir al carrito"
+                  >
+                    + Carrito
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Reversos (Card Backs) Grid -->
+    @if (activeSubTab() === 'cardBacks') {
+      @if (filteredCardBacks().length === 0) {
+        <div class="flex flex-col items-center justify-center p-16 rounded-2xl border border-white/10 bg-[#14132b] text-center">
+          <span class="text-3xl mb-2">🎴</span>
+          <h3 class="font-rajdhani font-bold text-base text-[#edebff] uppercase">No se encontraron reversos</h3>
+        </div>
+      } @else {
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 w-full">
+          @for (cb of filteredCardBacks(); track cb.id) {
+            <div
+              class="card-tile group rounded-2xl border border-white/10 bg-[#14132b] p-3 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c9ff3d]/50 shadow-lg shadow-black/30 cursor-pointer"
+              (click)="cardBackDetail.emit(cb)"
+            >
+              <!-- Card Back Image -->
+              <div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
+                <img
+                  [src]="cb.imageUrl"
+                  [alt]="cb.name"
+                  (error)="$any($event.target).src = '/assets/img/card-backs/backCardPixel.png'"
+                  class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+                @if (isCardBackOwned(cb.id)) {
+                  <div class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#00aaff] text-white text-[10px] font-rajdhani font-bold uppercase tracking-wider shadow-md">
+                    Adquirido
+                  </div>
+                } @else if (getQtyInCart(cb.id); as qty) {
+                  <div class="absolute top-2 right-2 min-w-[20px] h-5 rounded-full bg-[#c9ff3d] text-[#0b0a1f] text-xs font-jetbrains font-bold flex items-center justify-center px-1 shadow-md">
+                    ×{{ qty }}
+                  </div>
+                }
+              </div>
+
+              <!-- Metadata -->
+              <div class="flex flex-col gap-1">
+                <h4 class="font-rajdhani font-bold text-sm text-[#edebff] uppercase truncate group-hover:text-[#c9ff3d] transition-colors">
+                  {{ cb.name }}
+                </h4>
+
+                <div class="flex items-center justify-between text-[10px] text-[#9c98c7] font-sans">
+                  <span>Reverso Oficial</span>
+                </div>
+
+                <!-- Price and Add to Cart -->
+                <div class="flex items-center justify-between pt-2 mt-1 border-t border-white/10">
+                  <div class="flex items-center gap-1">
+                    <img src="/assets/img/Moneda.png" alt="Moneda" class="w-3.5 h-3.5 object-contain" />
+                    <span class="font-jetbrains font-bold text-xs text-[#c9ff3d]">
+                      {{ cb.price ? ('₽' + cb.price) : 'Gratis' }}
+                    </span>
+                  </div>
+
+                  @if (!isCardBackOwned(cb.id) && cb.price) {
+                    <button
+                      type="button"
+                      class="px-2.5 py-1 rounded-lg text-xs font-rajdhani font-bold uppercase tracking-wider bg-white/10 hover:bg-[#c9ff3d] text-[#edebff] hover:text-[#0b0a1f] transition-all cursor-pointer"
+                      (click)="addCardBackToCart(cb, $event)"
+                      title="Añadir al carrito"
+                    >
+                      + Carrito
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+    </div>
+  }
+</section>

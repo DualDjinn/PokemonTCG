@@ -1,0 +1,10 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+}
+
+.hero-grid {
+  min-height: 480px;
+}

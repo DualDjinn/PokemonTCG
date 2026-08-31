@@ -1,0 +1,85 @@
+<nav class="shop-nav sticky top-0 z-40 backdrop-blur-md bg-[#0b0a1f]/80 border-b border-white/10 w-full">
+  <div class="w-full px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-4 flex-wrap">
+    <!-- Brand / Inicio -->
+    <div class="flex items-center gap-4 cursor-pointer" (click)="onSectionClick(null)">
+      <app-sparkle-text [text]="'reverseHolo.'" />
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="flex items-center gap-1 sm:gap-2 font-rajdhani font-bold text-sm tracking-wider uppercase">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="activeSection() === 'sobres'"
+        (click)="onSectionClick('sobres', $event)"
+      >
+        Sobres
+      </button>
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="activeSection() === 'decks'"
+        (click)="onSectionClick('decks', $event)"
+      >
+        Decks
+      </button>
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="activeSection() === 'singles'"
+        (click)="onSectionClick('singles', $event)"
+      >
+        Singles
+      </button>
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="activeSection() === 'accesorios'"
+        (click)="onSectionClick('accesorios', $event)"
+      >
+        Accesorios
+      </button>
+    </div>
+
+    <!-- Action buttons (Coins, Cart, Exit) -->
+    <div class="flex items-center gap-3">
+      <!-- Monedas & Recargar -->
+      <div class="coins-pill flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-[#14132b] shadow-inner">
+        <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5 object-contain" />
+        <span class="font-jetbrains font-bold text-sm text-[#c9ff3d]">{{ userCoins() }}</span>
+        <button
+          type="button"
+          class="buy-coins-btn text-xs font-rajdhani font-bold text-[#0b0a1f] bg-[#c9ff3d] hover:bg-[#d8ff66] px-2 py-0.5 rounded-full uppercase tracking-wider transition-colors ml-1"
+          (click)="openCoinsModal.emit()"
+          title="Comprar Monedas"
+        >
+          + Monedas
+        </button>
+      </div>
+
+      <!-- Carrito -->
+      <button
+        type="button"
+        class="cart-btn relative flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-[#14132b] text-[#edebff] hover:border-[#c9ff3d]/60 hover:text-[#c9ff3d] transition-all cursor-pointer"
+        (click)="openCart.emit()"
+        aria-label="Abrir Carrito"
+      >
+        <span class="text-base">🛒</span>
+        @if (cartCount() > 0) {
+          <span class="cart-badge absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-[#ff3366] text-white text-[10px] font-jetbrains font-bold flex items-center justify-center px-1">
+            {{ cartCount() }}
+          </span>
+        }
+      </button>
+
+      <!-- Botón Salir al Mapa -->
+      <button
+        type="button"
+        class="exit-btn text-xs font-rajdhani font-bold text-[#edebff] hover:text-[#ff3366] border border-white/10 hover:border-[#ff3366]/40 px-3 py-1.5 rounded-lg bg-white/5 transition-all uppercase tracking-wider flex items-center gap-1 cursor-pointer"
+        (click)="exit.emit()"
+      >
+        ← Salir
+      </button>
+    </div>
+  </div>
+</nav>

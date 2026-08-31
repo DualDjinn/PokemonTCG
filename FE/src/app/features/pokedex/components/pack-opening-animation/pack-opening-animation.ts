@@ -22,7 +22,7 @@ type RarityClass = 'rarity-common' | 'rarity-uncommon' | 'rarity-rare' | 'rarity
 @Component({
   selector: 'app-pack-opening-animation',
   standalone: true,
-  imports: [TranslateModule, MyText, MyButton, MyBadge, MyModal, DeckCardDetail, HoloCardDirective],
+  imports: [TranslateModule, MyText, MyButton, DeckCardDetail, HoloCardDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (openedSig(); as op) {
@@ -134,9 +134,9 @@ type RarityClass = 'rarity-common' | 'rarity-uncommon' | 'rarity-rare' | 'rarity
                       <div class="holo-flash"></div>
                     }
 
-                    <!-- Dorso de la carta: imagen fondo según tipo de sobre -->
+                    <!-- Dorso de la carta: imagen fondo según tipo de sobre o reverso activo -->
                     <div class="card-face card-back">
-                      <img [src]="cardBackImg()" class="card-back-img" alt="card back" />
+                      <img [src]="cardBackImg()" class="card-back-img" alt="card back" (error)="$any($event.target).src = '/assets/img/card-backs/backCardPixel.png'" />
                       <div class="card-back-glint"></div>
                     </div>
 
@@ -149,7 +149,6 @@ type RarityClass = 'rarity-common' | 'rarity-uncommon' | 'rarity-rare' | 'rarity
                       @if (rarityClass(card.rarity) === 'rarity-holo') {
                         <div class="glitter-layer"></div>
                       }
-                      <span class="card-name">{{ card.name }}</span>
                     </div>
 
                     @if (revealed()[i] && (rarityClass(card.rarity) === 'rarity-rare' || rarityClass(card.rarity) === 'rarity-holo')) {
@@ -189,90 +188,119 @@ type RarityClass = 'rarity-common' | 'rarity-uncommon' | 'rarity-rare' | 'rarity
         }
 
         @if (selectedCard(); as sc) {
-          <my-modal
-            [open]="true"
-            [title]="sc.name"
-            width="40rem"
-            (close)="closeDetail()">
-            <div class="flex flex-col md:flex-row gap-6">
-              <div class="flex-shrink-0 w-full md:w-[240px]">
-                <app-deck-card-detail [card]="toCardSummary(sc)" [showCount]="false" />
+          <div
+            class="fixed inset-0 z-[2500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
+            (click)="closeDetail()"
+          >
+            <div
+              class="relative w-full max-w-2xl bg-[#14132b] border border-white/15 rounded-3xl p-6 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              (click)="$event.stopPropagation()"
+            >
+              <!-- Header -->
+              <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                <h3 class="font-rajdhani font-bold text-xl text-[#edebff] uppercase tracking-wider">
+                  {{ sc.name }}
+                </h3>
+                <button
+                  type="button"
+                  class="w-8 h-8 rounded-full border border-white/10 bg-white/5 text-[#9c98c7] hover:text-[#edebff] hover:border-white/30 flex items-center justify-center text-sm transition-all cursor-pointer"
+                  (click)="closeDetail()"
+                  aria-label="Cerrar detalle"
+                >
+                  ✕
+                </button>
               </div>
 
-              @if (selectedCardInfo(); as info) {
-                <div class="flex-1 flex flex-col gap-3 min-w-0">
-                  <div class="flex flex-wrap gap-1.5">
-                    <my-badge [text]="info.supertype" color="var(--neon-blue)" />
-                    @if (info.hp) {
-                      <my-badge [text]="info.hp + ' HP'" color="var(--neon-magenta)" />
+              <!-- Body: Two-column layout with 3D card tilt & Stats -->
+              <div class="flex flex-col md:flex-row gap-6">
+                <div class="w-full md:w-[220px] flex-shrink-0 flex items-center justify-center">
+                  <app-deck-card-detail [card]="toCardSummary(sc)" [showCount]="false" />
+                </div>
+
+                <div class="flex-1 flex flex-col gap-3 min-w-0 overflow-y-auto max-h-[55vh] pr-1">
+                  @if (selectedCardInfo(); as info) {
+                    <!-- Badges -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#00aaff]/20 text-[#00aaff] border border-[#00aaff]/30">
+                        {{ info.supertype }}
+                      </span>
+                      @if (info.hp) {
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30">
+                          {{ info.hp }} HP
+                        </span>
+                      }
+                      <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-white/5 text-[#9c98c7] border border-white/10">
+                        {{ info.rarity }}
+                      </span>
+                    </div>
+
+                    <!-- Subtypes -->
+                    @if (info.subtypes && info.subtypes.length > 0) {
+                      <p class="text-xs text-[#9c98c7] font-sans">{{ info.subtypes.join(' · ') }}</p>
                     }
-                    <my-badge [text]="info.rarity" color="var(--text-secondary)" />
-                  </div>
 
-                  @if (info.types && info.types.length > 0) {
-                    <div class="flex flex-wrap gap-1">
-                      @for (t of info.types; track t) {
-                        <my-badge [text]="t" [color]="typeColorMap[t.toLowerCase()] ?? '#6b7280'" />
-                      }
-                    </div>
-                  }
+                    <!-- Abilities -->
+                    @if (info.abilities && info.abilities.length > 0) {
+                      <div class="flex flex-col gap-1 mt-1">
+                        <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider">Habilidades</span>
+                        @for (a of info.abilities; track a.name) {
+                          <div class="p-2 rounded-lg bg-[#0b0a1f] border border-white/10 text-xs">
+                            <strong class="text-[#edebff]">{{ a.name }}:</strong>
+                            <span class="text-[#9c98c7] ml-1">{{ a.text }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
 
-                  @if (info.subtypes && info.subtypes.length > 0) {
-                    <my-text [text]="info.subtypes.join(' · ')" tag="p" size="0.72rem" color="var(--text-secondary)" />
-                  }
-
-                  @if (info.abilities && info.abilities.length > 0) {
-                    <div class="flex flex-col gap-1.5 mt-1">
-                      <my-text [text]="'POKEDEX.ABILITIES' | translate" tag="h4" size="0.675rem" weight="bold" color="var(--neon-cyan)" />
-                      @for (a of info.abilities; track a.name) {
-                        <div class="p-2 rounded-lg bg-white/[0.03] border border-white/10">
-                          <my-text [text]="a.name" tag="span" size="0.72rem" weight="bold" color="var(--text-primary)" />
-                          <my-text [text]="a.text" tag="p" size="0.63rem" color="var(--text-secondary)" />
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  @if (info.attacks && info.attacks.length > 0) {
-                    <div class="flex flex-col gap-1.5 mt-1">
-                      <my-text [text]="'POKEDEX.ATTACKS' | translate" tag="h4" size="0.675rem" weight="bold" color="var(--neon-cyan)" />
-                      @for (a of info.attacks; track a.name) {
-                        <div class="p-2 rounded-lg bg-white/[0.03] border border-white/10">
-                          <div class="flex items-center justify-between gap-2">
-                            <my-text [text]="a.name" tag="span" size="0.72rem" weight="bold" color="var(--text-primary)" />
-                            @if (a.damage) {
-                              <my-badge [text]="a.damage" color="var(--neon-magenta)" />
+                    <!-- Attacks -->
+                    @if (info.attacks && info.attacks.length > 0) {
+                      <div class="flex flex-col gap-1 mt-1">
+                        <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider">Ataques</span>
+                        @for (a of info.attacks; track a.name) {
+                          <div class="p-2 rounded-lg bg-[#0b0a1f] border border-white/10 text-xs">
+                            <div class="flex items-center justify-between gap-2">
+                              <strong class="text-[#edebff]">{{ a.name }}</strong>
+                              @if (a.damage) {
+                                <span class="font-jetbrains font-bold text-[#ff3366]">{{ a.damage }} DMG</span>
+                              }
+                            </div>
+                            @if (a.text) {
+                              <p class="text-[#9c98c7] mt-0.5 text-[11px]">{{ a.text }}</p>
                             }
                           </div>
-                          @if (a.text) {
-                            <my-text [text]="a.text" tag="p" size="0.63rem" color="var(--text-secondary)" />
-                          }
-                        </div>
-                      }
+                        }
+                      </div>
+                    }
+                  } @else {
+                    <!-- Loading skeleton or basic info while fetching -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#00aaff]/20 text-[#00aaff] border border-[#00aaff]/30">
+                        {{ sc.supertype || 'Pokémon' }}
+                      </span>
+                      <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-white/5 text-[#9c98c7] border border-white/10">
+                        {{ sc.rarity }}
+                      </span>
                     </div>
+                    <p class="text-xs text-[#9c98c7] font-sans">Cargando detalles...</p>
                   }
 
-                  @if (info.weaknesses && info.weaknesses.length > 0) {
-                    <div class="flex items-center gap-2 mt-1">
-                      <my-text [text]="'POKEDEX.WEAKNESS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" />
-                      @for (w of info.weaknesses; track w.type) {
-                        <my-badge [text]="w.type + ' ' + w.value" color="#a16207" />
-                      }
-                    </div>
-                  }
-
-                  @if (info.resistances && info.resistances.length > 0) {
-                    <div class="flex items-center gap-2">
-                      <my-text [text]="'POKEDEX.RESISTANCE' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" />
-                      @for (r of info.resistances; track r.type) {
-                        <my-badge [text]="r.type + ' ' + r.value" color="#4ade80" />
-                      }
-                    </div>
-                  }
+                  <!-- Footer -->
+                  <div class="pt-4 border-t border-white/10 flex items-center justify-between mt-auto">
+                    <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider flex items-center gap-1.5">
+                      <span>✓</span> En tu colección
+                    </span>
+                    <button
+                      type="button"
+                      class="px-5 py-2.5 rounded-xl font-rajdhani font-bold text-sm uppercase tracking-wider bg-white/10 hover:bg-[#c9ff3d] text-[#edebff] hover:text-[#0b0a1f] transition-all cursor-pointer"
+                      (click)="closeDetail()"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
                 </div>
-              }
+              </div>
             </div>
-          </my-modal>
+          </div>
         }
       </div>
     }
@@ -1058,7 +1086,7 @@ export class PackOpeningAnimationComponent implements OnChanges {
       const active = backs.owned.find(b => b.id === backs.activeCardBackId);
       if (active?.imageUrl) return active.imageUrl;
     }
-    return '/assets/animation_store/fondo_base.png';
+    return '/assets/img/card-backs/backCardPixel.png';
   });
 
   segAngle = computed(() => this.peelAngle() / PackOpeningAnimationComponent.SEG_COUNT);

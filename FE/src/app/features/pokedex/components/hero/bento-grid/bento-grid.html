@@ -1,0 +1,14 @@
+<div class="bento-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-[1fr_1fr] gap-3.5 h-full flex-1 min-h-0">
+  @for (card of cards; track card.title; let i = $index) {
+    <app-bento-card
+      [card]="card"
+      (open)="onCardClick($event)"
+      [class.col-span-1]="card.span === 'normal'"
+      [class.col-span-full]="card.span === 'full'"
+      [class.sm:col-span-2]="card.span === 'full'"
+      [class.md:col-span-3]="card.span === 'full'"
+      class="animate-fade-up h-full flex flex-col min-h-0"
+      [style.animation-delay]="i * 80 + 'ms'"
+    />
+  }
+</div>

@@ -1,0 +1,50 @@
+.shiny-title {
+  position: relative;
+  display: inline-flex;
+  white-space: nowrap;
+  line-height: 1;
+
+  .base {
+    position: relative;
+    z-index: 1;
+  }
+
+  .shine {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    color: var(--shine-color);
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 30%,
+      currentColor 50%,
+      transparent 70%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 30%,
+      currentColor 50%,
+      transparent 70%
+    );
+    -webkit-mask-size: 150% 100%;
+    mask-size: 150% 100%;
+    animation: sweep var(--speed) ease-in-out infinite;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    -webkit-mask-position: 200% 0;
+    mask-position: 200% 0;
+  }
+  100% {
+    -webkit-mask-position: -100% 0;
+    mask-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shine {
+    animation: none;
+  }
+}

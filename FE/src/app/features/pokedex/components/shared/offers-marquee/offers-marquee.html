@@ -1,0 +1,261 @@
+<div class="marquee" aria-label="Ofertas destacadas">
+  <div class="marquee-track">
+    @for (offer of offers(); track offer.name + '-' + $index) {
+      <button
+        type="button"
+        class="offer-chip cursor-pointer"
+        (click)="openOfferModal(offer, $event)"
+        title="¡Haz clic para ver la oferta y añadir al carrito!"
+      >
+        <app-energy-icon [type]="offer.type" [size]="18" />
+        <span class="name">{{ offer.name }}</span>
+        @if (offer.oldPrice) {
+          <span class="old mono">₽{{ offer.oldPrice }}</span>
+        }
+        @if (offer.price) {
+          <span class="price mono">₽{{ offer.price }}</span>
+        }
+        @if (offer.highlight) {
+          <span class="highlight">{{ offer.highlight }}</span>
+        }
+      </button>
+    }
+    @for (offer of offers(); track offer.name + '-dup-' + $index) {
+      <button
+        type="button"
+        class="offer-chip cursor-pointer"
+        (click)="openOfferModal(offer, $event)"
+        title="¡Haz clic para ver la oferta y añadir al carrito!"
+      >
+        <app-energy-icon [type]="offer.type" [size]="18" />
+        <span class="name">{{ offer.name }}</span>
+        @if (offer.oldPrice) {
+          <span class="old mono">₽{{ offer.oldPrice }}</span>
+        }
+        @if (offer.price) {
+          <span class="price mono">₽{{ offer.price }}</span>
+        }
+        @if (offer.highlight) {
+          <span class="highlight">{{ offer.highlight }}</span>
+        }
+      </button>
+    }
+  </div>
+</div>
+
+<!-- Modal Centrado de Oferta Destacada Completo -->
+@if (selectedOffer(); as offer) {
+  <div class="fixed inset-0 z-[1200] flex items-center justify-center p-4">
+    <!-- Backdrop oscuro con blur -->
+    <div
+      class="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
+      (click)="closeOfferModal()"
+    ></div>
+
+    <!-- Contenido del modal estilo Singles Detail -->
+    <div
+      class="relative z-10 w-full max-w-2xl bg-[#14132b] border border-white/15 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-purple-950/60 flex flex-col gap-4 animate-fade-up max-h-[92vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Cabecera del Modal -->
+      <div class="flex items-center justify-between gap-3 pb-3 border-b border-white/10">
+        <div class="flex items-center gap-2.5">
+          <app-energy-icon [type]="offer.type" [size]="24" />
+          <div>
+            <span class="text-[10px] font-bold font-rajdhani uppercase tracking-widest text-[#c9ff3d]">
+              OFERTA EXCLUSIVA
+            </span>
+            <h3 class="font-rajdhani font-bold text-xl sm:text-2xl text-[#edebff] uppercase tracking-wide leading-tight">
+              {{ offer.name }}
+            </h3>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold font-jetbrains bg-[#c9ff3d]/15 text-[#c9ff3d] border border-[#c9ff3d]/30">
+            {{ offer.highlight }}
+          </span>
+          <button
+            type="button"
+            class="w-8 h-8 rounded-full border border-white/10 bg-white/5 hover:bg-white/15 text-[#9c98c7] hover:text-white flex items-center justify-center transition-colors cursor-pointer text-sm"
+            (click)="closeOfferModal()"
+            aria-label="Cerrar modal"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuerpo del Modal: 2 Columnas (Presentación + Detalles/Ataques/Precios) -->
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Columna Izquierda: Carta 3D o Sobre -->
+        <div class="w-full md:w-[230px] flex-shrink-0 flex flex-col items-center justify-center">
+          @if (offer.cardData) {
+            <app-deck-card-detail [card]="toCardSummary(offer.cardData)" [showCount]="false" />
+          } @else if (offer.imageUrl) {
+            <div class="relative group">
+              <img
+                [src]="offer.imageUrl"
+                [alt]="offer.name"
+                class="h-56 sm:h-64 object-contain rounded-xl drop-shadow-[0_16px_32px_rgba(0,0,0,0.8)] filter transition-transform duration-300 group-hover:scale-105"
+              />
+              <div class="absolute -bottom-2 inset-x-4 h-6 bg-[#c9ff3d]/25 blur-xl rounded-full pointer-events-none"></div>
+            </div>
+          } @else {
+            <div class="w-40 h-56 rounded-xl bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-2">
+              <app-energy-icon [type]="offer.type" [size]="48" />
+              <span class="text-xs font-rajdhani text-[#9c98c7] uppercase font-bold">{{ offer.itemType }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Columna Derecha: Badges, Subtypes, Habilidades, Ataques y Precio -->
+        <div class="flex-1 flex flex-col gap-3 min-w-0">
+          <!-- Badges de Tipo y HP -->
+          <div class="flex items-center gap-2 flex-wrap">
+            @if (offer.cardData?.supertype) {
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#00aaff]/20 text-[#00aaff] border border-[#00aaff]/30">
+                {{ offer.cardData?.supertype }}
+              </span>
+            } @else {
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#00aaff]/20 text-[#00aaff] border border-[#00aaff]/30">
+                Sobre Booster
+              </span>
+            }
+
+            @if (offer.cardData?.hp) {
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30">
+                {{ offer.cardData?.hp }} HP
+              </span>
+            }
+
+            @if (offer.rarity) {
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-white/5 text-[#9c98c7] border border-white/10">
+                {{ offer.rarity }}
+              </span>
+            }
+          </div>
+
+          <!-- Subtipos -->
+          @if (offer.cardData?.subtypes && (offer.cardData?.subtypes?.length ?? 0) > 0) {
+            <p class="text-xs text-[#9c98c7] font-sans">{{ offer.cardData?.subtypes?.join(' · ') }}</p>
+          }
+
+          <!-- Descripción de Sobre (si aplica) -->
+          @if (offer.packDescription) {
+            <div class="p-3 rounded-xl bg-[#0b0a1f] border border-white/10 text-xs text-[#edebff]">
+              <span class="font-bold text-[#c9ff3d] font-rajdhani uppercase block mb-1">Contenido Garantizado</span>
+              {{ offer.packDescription }}
+            </div>
+          }
+
+          <!-- Habilidades (si la carta tiene) -->
+          @if (offer.cardData?.abilities && (offer.cardData?.abilities?.length ?? 0) > 0) {
+            <div class="flex flex-col gap-1 mt-1">
+              <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider">Habilidades</span>
+              @for (a of offer.cardData?.abilities; track a.name) {
+                <div class="p-2.5 rounded-xl bg-[#0b0a1f] border border-white/10 text-xs">
+                  <strong class="text-[#edebff]">{{ a.name }}:</strong>
+                  <span class="text-[#9c98c7] ml-1">{{ a.text }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Ataques (si la carta tiene) -->
+          @if (offer.cardData?.attacks && (offer.cardData?.attacks?.length ?? 0) > 0) {
+            <div class="flex flex-col gap-1.5 mt-1">
+              <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider">Ataques</span>
+              @for (a of offer.cardData?.attacks; track a.name) {
+                <div class="p-2.5 rounded-xl bg-[#0b0a1f] border border-white/10 text-xs">
+                  <div class="flex items-center justify-between gap-2">
+                    <strong class="text-[#edebff] font-semibold text-sm">{{ a.name }}</strong>
+                    @if (a.damage) {
+                      <span class="font-jetbrains font-bold text-[#ff3366] text-xs px-2 py-0.5 rounded bg-[#ff3366]/15 border border-[#ff3366]/30">
+                        {{ a.damage }} DMG
+                      </span>
+                    }
+                  </div>
+                  @if (a.text) {
+                    <p class="text-[#9c98c7] mt-1 text-[11px] leading-relaxed">{{ a.text }}</p>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Comparación de Precios y Ahorro -->
+          <div class="bg-[#0b0a1f]/80 border border-white/10 rounded-2xl p-3.5 flex flex-col gap-1.5 mt-2">
+            <div class="flex items-center justify-between text-xs text-[#9c98c7] font-rajdhani font-semibold uppercase tracking-wider">
+              <span>Precio original</span>
+              <span class="line-through font-jetbrains text-sm text-[#9c98c7]">₽{{ offer.oldPrice }} c/u</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-rajdhani font-bold text-[#edebff] uppercase">Precio en Oferta</span>
+              <div class="flex items-baseline gap-1.5 font-jetbrains font-extrabold text-2xl text-[#c9ff3d]">
+                <span>₽{{ offer.price }}</span>
+                <span class="text-xs font-normal text-[#9c98c7]">/ unidad</span>
+              </div>
+            </div>
+
+            <div class="pt-1.5 mt-0.5 border-t border-white/5 flex items-center justify-between text-xs text-[#c9ff3d] font-sans font-medium">
+              <span>Ahorro por unidad:</span>
+              <span class="font-jetbrains font-bold">₽{{ offer.oldPrice - offer.price }} ({{ offer.highlight }})</span>
+            </div>
+          </div>
+
+          <!-- Advertencia de límite de colección para cartas -->
+          @if (offer.itemType === 'card' && getOwnedCount(offer.id) >= 4) {
+            <div class="px-3 py-2 rounded-xl bg-[#ff3366]/15 border border-[#ff3366]/30 text-[#ff3366] text-xs font-rajdhani font-bold uppercase tracking-wider text-center">
+              ⚠️ Ya posees el límite de 4/4 copias en tu colección
+            </div>
+          } @else if (offer.itemType === 'card' && maxSelectableQty(offer) === 0) {
+            <div class="px-3 py-2 rounded-xl bg-[#00aaff]/15 border border-[#00aaff]/30 text-[#00aaff] text-xs font-rajdhani font-bold uppercase tracking-wider text-center">
+              ℹ️ Ya tienes el máximo disponible añadido en tu carrito
+            </div>
+          }
+
+          <!-- Selector de Cantidad y Botones de Compra -->
+          <div class="flex items-center justify-between gap-4 pt-1">
+            <div class="flex items-center gap-3 bg-[#0b0a1f] border border-white/10 rounded-xl px-3 py-1.5">
+              <button
+                type="button"
+                class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 text-[#edebff] hover:text-[#c9ff3d] flex items-center justify-center font-jetbrains font-bold text-base transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                (click)="decrementQty()"
+                [disabled]="quantity() <= 1 || maxSelectableQty(offer) <= 0"
+              >
+                -
+              </button>
+              <span class="font-jetbrains font-bold text-base text-[#edebff] min-w-[20px] text-center">
+                {{ quantity() }}
+              </span>
+              <button
+                type="button"
+                class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 text-[#edebff] hover:text-[#c9ff3d] flex items-center justify-center font-jetbrains font-bold text-base transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                (click)="incrementQty()"
+                [disabled]="quantity() >= maxSelectableQty(offer)"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              type="button"
+              class="flex-1 py-3 px-5 rounded-xl font-rajdhani font-bold text-sm tracking-wider uppercase bg-[#c9ff3d] text-[#0b0a1f] hover:bg-[#d8ff66] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#c9ff3d]/20 hover:scale-[1.02] cursor-pointer disabled:opacity-40 disabled:pointer-events-none disabled:grayscale"
+              [disabled]="maxSelectableQty(offer) <= 0"
+              (click)="confirmAddToCart()"
+            >
+              <span>🛒 {{ maxSelectableQty(offer) <= 0 ? 'Límite Máximo' : 'Añadir al Carrito' }}</span>
+              @if (maxSelectableQty(offer) > 0) {
+                <span class="font-jetbrains text-xs px-2 py-0.5 rounded bg-black/15 font-bold">
+                  ₽{{ offer.price * quantity() }}
+                </span>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  flex: 1;
+  padding: 10px;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.bento-container {
+  height: 100%;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}

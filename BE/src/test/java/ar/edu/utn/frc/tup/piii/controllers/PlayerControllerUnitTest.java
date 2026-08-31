@@ -7,6 +7,7 @@ import ar.edu.utn.frc.tup.piii.dtos.player.ResetPasswordRequest;
 import ar.edu.utn.frc.tup.piii.services.CollectionService;
 import ar.edu.utn.frc.tup.piii.services.DeckService;
 import ar.edu.utn.frc.tup.piii.services.PlayerService;
+import ar.edu.utn.frc.tup.piii.services.PlayerStatsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +33,7 @@ class PlayerControllerUnitTest {
     private PlayerService playerService;
     private DeckService deckService;
     private CollectionService collectionService;
+    private PlayerStatsService playerStatsService;
     private PlayerController controller;
 
     @BeforeEach
@@ -39,7 +41,8 @@ class PlayerControllerUnitTest {
         playerService = mock(PlayerService.class);
         deckService = mock(DeckService.class);
         collectionService = mock(CollectionService.class);
-        controller = new PlayerController(playerService, deckService, collectionService);
+        playerStatsService = mock(PlayerStatsService.class);
+        controller = new PlayerController(playerService, deckService, collectionService, playerStatsService);
     }
 
     // -----------------------------------------------------------------------

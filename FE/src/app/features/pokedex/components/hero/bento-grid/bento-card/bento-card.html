@@ -1,0 +1,203 @@
+<a
+  href="#"
+  (click)="navegar($event)"
+  class="group relative flex h-full flex-col justify-between rounded-2xl border border-white/15 bg-[#0b0a1f]/10 p-3.5 sm:p-4 shadow-2xl shadow-black/40 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#c9ff3d]/60 hover:bg-[#0b0a1f]/25 cursor-pointer overflow-visible"
+>
+  <!-- Background Ambient Glow -->
+  <div
+    class="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-gradient-to-br {{ card().glow }} to-transparent blur-3xl opacity-25 transition-opacity duration-300 group-hover:opacity-75"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Header: Icon + Badge -->
+  <div class="relative flex items-start justify-between gap-3 z-10 shrink-0">
+    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-[#c9ff3d] group-hover:bg-[#c9ff3d]/15 transition-colors">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        @switch (card().icon) {
+          @case ('sleeves') {
+            <rect x="11" y="1" width="10.5" height="15" rx="1.5" fill="currentColor" stroke="none" fill-opacity="0.35" />
+            <rect x="7" y="4.5" width="10.5" height="15" rx="1.5" fill="currentColor" stroke="none" fill-opacity="0.65" />
+            <rect x="3" y="7.5" width="10.5" height="15" rx="1.5" fill="currentColor" stroke="none" />
+          }
+          @case ('star') {
+            <path d="M12 3.5 L14 8.5 L19 9 L15.5 12.5 L16.5 18 L12 15 L7.5 18 L8.5 12.5 L5 9 L10 8.5 Z" fill="currentColor" fill-opacity="0.2" />
+          }
+          @case ('pack') {
+            <rect x="4" y="2" width="16" height="20" rx="2.5" />
+            <path d="M4 7h16" />
+            <rect x="10" y="3.5" width="4" height="3" rx="1" fill="currentColor" stroke="none" />
+          }
+          @case ('deckbox') {
+            <polygon points="5,5 16,5 19,2 8,2" fill="currentColor" fill-opacity="0.2" />
+            <polygon points="16,5 19,2 19,21 16,23" fill="currentColor" fill-opacity="0.1" />
+            <rect x="5" y="5" width="11" height="18" />
+            <path d="M5 8.5h11" stroke-width="2" />
+          }
+        }
+      </svg>
+    </div>
+
+    @if (card().badge) {
+      <span class="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 text-[11px] font-semibold text-[#c9ff3d] font-rajdhani tracking-wider uppercase group-hover:border-[#c9ff3d]/40 transition-colors">
+        {{ card().badge }}
+      </span>
+    }
+  </div>
+
+  <!-- Center: Rich Visual Stage -->
+  <div class="bento-visual-stage flex-1 flex items-center justify-center min-h-0 w-full my-0.5 relative pointer-events-none select-none z-0 overflow-visible">
+    @switch (card().sectionKey) {
+      @case ('sobres') {
+        <!-- Sobres: Booster Packs Showcase with 24 Rising Magic Sparkles & Glowing Fireflies -->
+        <div class="sobres-art-wrap relative w-full h-full flex items-center justify-center">
+          <div class="absolute w-56 h-56 rounded-full bg-amber-400/20 blur-3xl group-hover:scale-110 transition-transform duration-500 z-0"></div>
+
+          <!-- 24 Rising Floating Stars & Sparkles (Behind Image) -->
+          <div class="sparkles-container absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+            <span class="sparkle-rise spk-1 text-amber-300 text-xs">✦</span>
+            <span class="sparkle-rise spk-2 text-yellow-200 text-sm">★</span>
+            <span class="sparkle-rise spk-3 text-amber-200 text-base">✧</span>
+            <span class="sparkle-rise spk-4 text-yellow-300 text-xs">✦</span>
+            <span class="sparkle-rise spk-5 text-amber-400 text-sm">★</span>
+            <span class="sparkle-rise spk-6 text-yellow-100 text-xs">✧</span>
+            <span class="sparkle-rise spk-7 text-amber-300 text-sm">✦</span>
+            <span class="sparkle-rise spk-8 text-yellow-200 text-xs">★</span>
+            <span class="sparkle-rise spk-9 text-amber-100 text-base">✧</span>
+            <span class="sparkle-rise spk-10 text-yellow-300 text-xs">✦</span>
+            <span class="sparkle-rise spk-11 text-amber-300 text-sm">★</span>
+            <span class="sparkle-rise spk-12 text-yellow-200 text-xs">✧</span>
+            <span class="sparkle-rise spk-13 text-amber-200 text-sm">✦</span>
+            <span class="sparkle-rise spk-14 text-yellow-100 text-base">★</span>
+            <span class="sparkle-rise spk-15 text-amber-400 text-xs">✧</span>
+            <span class="sparkle-rise spk-16 text-yellow-300 text-sm">✦</span>
+            <span class="sparkle-rise spk-17 text-amber-200 text-xs">★</span>
+            <span class="sparkle-rise spk-18 text-yellow-200 text-base">✧</span>
+            <span class="sparkle-rise spk-19 text-amber-300 text-xs">✦</span>
+            <span class="sparkle-rise spk-20 text-yellow-400 text-sm">★</span>
+            <span class="sparkle-rise spk-21 text-amber-100 text-xs">✧</span>
+            <span class="sparkle-rise spk-22 text-yellow-300 text-sm">✦</span>
+            <span class="sparkle-rise spk-23 text-amber-200 text-xs">★</span>
+            <span class="sparkle-rise spk-24 text-yellow-100 text-base">✧</span>
+          </div>
+
+          <!-- Booster packs -->
+          <img
+            src="/assets/img/bento/sobres-art.png"
+            alt="Sobres Booster Packs"
+            class="sobres-img relative z-10"
+          />
+
+          <!-- Glowing Fireflies / Luciérnagas Orbiting Packs -->
+          <div class="fireflies-container absolute inset-0 pointer-events-none overflow-hidden select-none z-20">
+            <span class="firefly firefly-1"></span>
+            <span class="firefly firefly-2"></span>
+            <span class="firefly firefly-3"></span>
+            <span class="firefly firefly-4"></span>
+            <span class="firefly firefly-5"></span>
+            <span class="firefly firefly-6"></span>
+            <span class="firefly firefly-7"></span>
+            <span class="firefly firefly-8"></span>
+          </div>
+        </div>
+      }
+
+      @case ('decks') {
+        <!-- Decks: Metallic Deck Box with 60 Sleeved Cards & Tournament Coin -->
+        <div class="decks-art-wrap relative w-full h-full flex items-center justify-center">
+          <div class="absolute w-56 h-56 rounded-full bg-emerald-500/20 blur-3xl group-hover:scale-110 transition-transform duration-500"></div>
+          <img
+            src="/assets/img/bento/decks-art.png"
+            alt="Decks Pre-armados"
+            class="decks-img"
+          />
+        </div>
+      }
+
+      @case ('singles') {
+        <!-- Singles: 3 Real Random Pokemon Cards in 3D Acrylic Magnetic Toploaders Side by Side -->
+        <div class="singles-showcase relative flex items-center justify-center w-full h-full px-1 overflow-visible">
+          <div class="absolute w-56 h-56 rounded-full bg-cyan-400/20 blur-3xl pointer-events-none"></div>
+
+          @if (randomSinglesCards().length >= 3) {
+            <div class="slabs-row flex items-center justify-center w-full relative">
+              <!-- Left Slab (Angled subtly inward) -->
+              <div class="slab slab-3d-left w-[37%] max-w-[165px] aspect-[2.5/3.5] rounded-xl bg-white/10 border-2 border-white/40 backdrop-blur-md p-1 shadow-[0_16px_36px_rgba(0,0,0,0.7)] transition-all duration-500 ease-out flex flex-col items-center">
+                <div class="slab-screw w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 border border-white/70 shadow-sm shrink-0 mb-0.5"></div>
+                <div class="w-full flex-1 rounded-md overflow-hidden bg-black/40 shadow-inner">
+                  <img
+                    [src]="randomSinglesCards()[0].imageUrl"
+                    [alt]="randomSinglesCards()[0].name"
+                    class="w-full h-full object-cover rounded-sm"
+                    (error)="$any($event.target).src = 'https://images.pokemontcg.io/xy1/1.png'"
+                  />
+                </div>
+              </div>
+
+              <!-- Center Slab (Raised in front with Rainbow Prismatic Glare) -->
+              <div class="slab slab-3d-center w-[46%] max-w-[195px] aspect-[2.5/3.5] rounded-xl bg-white/15 border-2 border-white/70 backdrop-blur-md p-1.5 shadow-[0_22px_48px_rgba(0,170,255,0.55)] transition-all duration-500 ease-out flex flex-col items-center z-20 -mx-4">
+                <div class="slab-screw w-3 h-3 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 border border-white/90 shadow-md shrink-0 mb-0.5"></div>
+                <div class="relative w-full flex-1 rounded-md overflow-hidden bg-black/40 shadow-inner">
+                  <img
+                    [src]="randomSinglesCards()[1].imageUrl"
+                    [alt]="randomSinglesCards()[1].name"
+                    class="w-full h-full object-cover rounded-sm"
+                    (error)="$any($event.target).src = 'https://images.pokemontcg.io/xy1/29.png'"
+                  />
+                  <div class="slab-prism-foil absolute inset-0 opacity-45 group-hover:opacity-85 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
+              </div>
+
+              <!-- Right Slab (Angled subtly inward) -->
+              <div class="slab slab-3d-right w-[37%] max-w-[165px] aspect-[2.5/3.5] rounded-xl bg-white/10 border-2 border-white/40 backdrop-blur-md p-1 shadow-[0_16px_36px_rgba(0,0,0,0.7)] transition-all duration-500 ease-out flex flex-col items-center">
+                <div class="slab-screw w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 border border-white/70 shadow-sm shrink-0 mb-0.5"></div>
+                <div class="w-full flex-1 rounded-md overflow-hidden bg-black/40 shadow-inner">
+                  <img
+                    [src]="randomSinglesCards()[2].imageUrl"
+                    [alt]="randomSinglesCards()[2].name"
+                    class="w-full h-full object-cover rounded-sm"
+                    (error)="$any($event.target).src = 'https://images.pokemontcg.io/xy1/42.png'"
+                  />
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @case ('accesorios') {
+        <!-- Accesorios: Panoramic Accessories Showcase -->
+        <div class="accesorios-art-wrap relative w-full h-full flex items-center justify-center">
+          <div class="absolute w-3/4 h-32 rounded-full bg-amber-400/15 blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+          <img
+            src="/assets/img/bento/accesorios-art.png"
+            alt="Accesorios, Sleeves y Playmats"
+            class="accesorios-img"
+          />
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Footer: Title & Description (Layered on top Z-30) -->
+  <div class="relative mt-2 z-30 shrink-0 pointer-events-auto">
+    <h3 class="text-base font-bold text-[#edebff] font-rajdhani uppercase tracking-wide group-hover:text-[#c9ff3d] transition-colors drop-shadow-sm">
+      {{ card().title }}
+    </h3>
+
+    @if (card().description) {
+      <p class="mt-0.5 text-xs leading-relaxed text-[#c4c0e8] font-sans drop-shadow-sm">
+        {{ card().description }}
+      </p>
+    } @else if (card().words) {
+      <p class="mt-0.5 text-xs leading-relaxed text-[#9c98c7] font-sans" aria-live="polite">
+        <span class="inline-flex items-baseline overflow-hidden">
+          @for (word of card().words!; track word) {
+            @if (word === currentWord()) {
+              <span class="animate-fade-up inline-block text-[#c9ff3d] font-semibold">{{ word }}</span>
+            }
+          }
+        </span>
+      </p>
+    }
+  </div>
+</a>

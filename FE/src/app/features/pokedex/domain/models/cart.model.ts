@@ -1,4 +1,4 @@
-export type ShopItemType = 'card' | 'splashArt' | 'cardBack';
+export type ShopItemType = 'card' | 'splashArt' | 'cardBack' | 'pack';
 
 export interface CartItem {
   id: string;

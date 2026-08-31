@@ -1,0 +1,55 @@
+<section class="decks-section animate-fade-up">
+  <header class="decks-header flex items-center justify-between gap-4 mb-6">
+    <div>
+      <app-shiny-title text="Decks Preconstruidos" shineColor="#c9ff3d" [speed]="2" [fontSize]="'1.8rem'" />
+      <p class="text-xs text-[#9c98c7] font-sans mt-0.5">Mazos completos de 60 cartas listos para la arena de batalla</p>
+    </div>
+    <button type="button" class="font-rajdhani font-bold text-sm tracking-wider uppercase text-[#c9ff3d] hover:underline cursor-pointer" (click)="back.emit()">
+      ← Volver al Inicio
+    </button>
+  </header>
+
+  <div class="banner-notice p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 mb-6 flex items-center gap-3">
+    <span class="text-lg">🚧</span>
+    <div>
+      <h4 class="font-rajdhani font-bold text-sm text-amber-300 uppercase tracking-wide">Sección en Construcción</h4>
+      <p class="text-xs text-[#9c98c7] font-sans">Los mazos temáticos y competitivos estarán disponibles para su compra en la próxima actualización.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    @for (deck of decks; track deck.name) {
+      <div class="deck-card rounded-2xl border border-white/10 bg-[#14132b] p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:border-white/20">
+        <!-- Glow accent -->
+        <div
+          class="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-20 blur-2xl pointer-events-none"
+          [style.background-color]="deck.accentColor"
+        ></div>
+
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <app-energy-icon [type]="deck.type" [size]="28" />
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-rajdhani uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              Próximamente
+            </span>
+          </div>
+
+          <h3 class="font-rajdhani font-bold text-base text-[#edebff] uppercase tracking-wide mb-1">
+            {{ deck.name }}
+          </h3>
+          <p class="text-xs text-[#9c98c7] font-sans leading-relaxed mb-4">
+            {{ deck.description }}
+          </p>
+        </div>
+
+        <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <img src="/assets/img/Moneda.png" alt="Moneda" class="w-4 h-4 object-contain" />
+            <span class="font-jetbrains font-bold text-sm text-[#c9ff3d]">₽{{ deck.price }}</span>
+          </div>
+          <span class="text-[11px] font-mono text-[#9c98c7]">60 Cartas · Win {{ deck.winRate }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</section>

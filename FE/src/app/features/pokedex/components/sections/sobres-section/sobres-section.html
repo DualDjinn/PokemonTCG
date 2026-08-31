@@ -1,0 +1,156 @@
+<section class="sobres animate-fade-up h-full flex flex-col justify-between flex-1">
+  <header class="sobres-header flex items-center justify-between gap-4 mb-2">
+    <div>
+      <app-shiny-title text="Sobres Booster" shineColor="#c9ff3d" [speed]="2" [fontSize]="'1.8rem'" />
+      <p class="text-xs text-[#9c98c7] font-sans mt-0.5">Elegí tu sobre favorito y descubrí cartas únicas</p>
+    </div>
+    <button type="button" class="sobres-back font-rajdhani font-bold text-sm tracking-wider uppercase text-[#c9ff3d] hover:underline cursor-pointer" (click)="back.emit()">
+      ← Volver al Inicio
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="flex-1 flex items-center justify-center p-16">
+      <div class="w-10 h-10 border-4 border-white/10 border-t-[#c9ff3d] rounded-full animate-spin"></div>
+    </div>
+  } @else {
+    <!-- 3D Carousel Stage with Navigation Arrows -->
+    <div class="carousel-container relative flex items-center justify-center w-full my-auto flex-1">
+      <!-- Left Navigation Arrow -->
+      <button
+        type="button"
+        class="nav-arrow left-arrow absolute left-2 md:left-4 z-20 w-11 h-11 rounded-full border border-white/15 bg-[#14132b]/85 backdrop-blur text-[#c9ff3d] hover:bg-[#c9ff3d] hover:text-[#0b0a1f] flex items-center justify-center font-jetbrains font-bold text-lg transition-all shadow-xl shadow-black/60 hover:scale-110 cursor-pointer"
+        (click)="step(-1)"
+        aria-label="Sobre anterior"
+      >
+        ❮
+      </button>
+
+      <!-- Stage -->
+      <div
+        class="stage"
+        tabindex="0"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="Sobres de cartas"
+        (keydown.arrowleft)="step(-1)"
+        (keydown.arrowright)="step(1)"
+      >
+        <div class="deck" [style.width.px]="cardWidth" [style.height.px]="cardHeight">
+          @for (pack of packs(); track pack.type; let i = $index) {
+            <div
+              class="card"
+              [class.active-card]="i === active()"
+              [style.width.px]="cardWidth"
+              [style.height.px]="cardHeight"
+              [style.transform]="transform(i)"
+              [style.transition]="transitionCss()"
+              [style.opacity]="visible(i) ? 1 : 0"
+              [style.pointer-events]="visible(i) ? 'auto' : 'none'"
+              (click)="select(i)"
+              [attr.aria-label]="packTitle(pack.type)"
+            >
+              <div class="pack-wrapper relative">
+                @if (getPackPriceInfo(pack).hasDiscount) {
+                  <div class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-[#c9ff3d] text-[#0b0a1f] text-xs font-jetbrains font-extrabold shadow-lg shadow-[#c9ff3d]/40 z-20">
+                    {{ getPackPriceInfo(pack).highlight }}
+                  </div>
+                }
+                <img [src]="packImage(pack.type)" [alt]="packTitle(pack.type)" class="pack-img" draggable="false" />
+                <div class="pack-glow" [class]="'glow-' + pack.type.toLowerCase()"></div>
+              </div>
+              <div class="dim" [style.transition]="transitionCss()" [style.opacity]="i === active() ? 0 : dim"></div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right Navigation Arrow -->
+      <button
+        type="button"
+        class="nav-arrow right-arrow absolute right-2 md:right-4 z-20 w-11 h-11 rounded-full border border-white/15 bg-[#14132b]/85 backdrop-blur text-[#c9ff3d] hover:bg-[#c9ff3d] hover:text-[#0b0a1f] flex items-center justify-center font-jetbrains font-bold text-lg transition-all shadow-xl shadow-black/60 hover:scale-110 cursor-pointer"
+        (click)="step(1)"
+        aria-label="Sobre siguiente"
+      >
+        ❯
+      </button>
+    </div>
+
+    <!-- Navigation dots / selectors -->
+    <div class="flex justify-center gap-2 my-3">
+      @for (pack of packs(); track pack.type; let i = $index) {
+        <button
+          type="button"
+          class="w-2.5 h-2.5 rounded-full transition-all cursor-pointer"
+          [class.bg-[#c9ff3d]]="i === active()"
+          [class.w-6]="i === active()"
+          [class.bg-white/20]="i !== active()"
+          (click)="select(i)"
+          [attr.aria-label]="packTitle(pack.type)"
+        ></button>
+      }
+    </div>
+
+    <!-- Pack Detail & Add to Cart Controls -->
+    @if (activePack(); as pack) {
+      <footer class="sobres-footer rounded-2xl border border-white/10 bg-[#14132b] p-4 flex items-center justify-between gap-4 flex-wrap">
+        <div class="sobres-footer-info">
+          <div class="flex items-center gap-3">
+            <span class="sobres-footer-name font-rajdhani font-bold text-lg text-[#edebff] uppercase tracking-wide">
+              {{ packTitle(pack.type) }}
+            </span>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+              <img src="/assets/img/Moneda.png" alt="Moneda" class="w-4 h-4 object-contain" />
+              @if (getPackPriceInfo(pack).hasDiscount) {
+                <span class="font-jetbrains text-xs text-[#9c98c7] line-through">₽{{ getPackPriceInfo(pack).originalPrice }}</span>
+                <span class="font-jetbrains font-bold text-sm text-[#c9ff3d]">₽{{ getPackPriceInfo(pack).price }}</span>
+                <span class="text-[10px] font-bold font-jetbrains text-[#c9ff3d] bg-[#c9ff3d]/15 px-1.5 py-0.5 rounded">
+                  {{ getPackPriceInfo(pack).highlight }}
+                </span>
+              } @else {
+                <span class="font-jetbrains font-bold text-sm text-[#c9ff3d]">₽{{ getPackPriceInfo(pack).price }}</span>
+              }
+            </div>
+          </div>
+          <p class="text-xs text-[#9c98c7] font-sans mt-1">
+            {{ packDescription(pack) }}
+          </p>
+        </div>
+
+        <div class="sobres-footer-controls flex items-center gap-3 flex-wrap">
+          <!-- Quantity Selector -->
+          <div class="flex items-center gap-2 bg-[#0b0a1f] border border-white/10 rounded-xl px-3 py-1.5">
+            <button
+              type="button"
+              class="w-6 h-6 rounded border border-white/10 bg-white/5 text-xs text-[#edebff] hover:bg-white/15 flex items-center justify-center cursor-pointer"
+              (click)="decrement()"
+              title="Disminuir cantidad"
+            >
+              −
+            </button>
+            <span class="font-jetbrains font-bold text-sm text-[#edebff] min-w-[20px] text-center">
+              {{ cantidad() }}
+            </span>
+            <button
+              type="button"
+              class="w-6 h-6 rounded border border-white/10 bg-white/5 text-xs text-[#edebff] hover:bg-white/15 flex items-center justify-center cursor-pointer"
+              (click)="increment()"
+              title="Aumentar cantidad"
+            >
+              +
+            </button>
+          </div>
+
+          <!-- Botón Añadir al Carrito -->
+          <button
+            type="button"
+            class="px-5 py-2.5 rounded-xl font-rajdhani font-bold text-sm uppercase tracking-wider text-[#0b0a1f] bg-[#c9ff3d] hover:bg-[#d8ff66] transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(201,255,61,0.3)] hover:scale-105 active:scale-95 cursor-pointer"
+            (click)="addToCart()"
+          >
+            🛒 + Añadir al Carrito (₽{{ getPackPriceInfo(pack).price * cantidad() }})
+          </button>
+        </div>
+      </footer>
+    }
+  }
+</section>

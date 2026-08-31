@@ -28,6 +28,7 @@ describe('PlayerProfilePage', () => {
     coins: 500,
     activeDeckId: null,
     collectionCardIds: ['card-1', 'card-2'],
+    collectionQuantities: { 'card-1': 1, 'card-2': 1 },
     decks: [{ id: 'deck-1', name: 'Liga Indigo', cardCount: 60 }],
   };
 

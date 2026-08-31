@@ -22,6 +22,11 @@ export class CartService {
     this.persist();
   }
 
+  getItemQuantity(id: string): number {
+    const item = this._items().find(i => i.id === id);
+    return item ? item.quantity : 0;
+  }
+
   removeItem(id: string): void {
     this._items.update(items => items.filter(i => i.id !== id));
     this.persist();

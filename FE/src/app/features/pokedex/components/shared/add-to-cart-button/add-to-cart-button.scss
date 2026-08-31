@@ -1,0 +1,39 @@
+.add-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #c9ff3d;
+  border: 1px solid #c9ff3d;
+  border-radius: 0.5rem;
+  color: #0b0a1f;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  padding: 0.35rem 0.9rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px rgba(201, 255, 61, 0.25);
+
+  &:hover:not(:disabled) {
+    background-color: #d8ff66;
+    box-shadow: 0 0 20px rgba(201, 255, 61, 0.5);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,169 @@
+<section class="singles-section animate-fade-up">
+  <header class="flex items-center justify-between gap-4 mb-5 flex-wrap">
+    <div>
+      <app-shiny-title text="Singles / Cartas" shineColor="#c9ff3d" [speed]="2" [fontSize]="'1.8rem'" />
+      <p class="text-xs text-[#9c98c7] font-sans mt-0.5">
+        Catálogo completo de cartas sueltas para mejorar tu colección y armar estrategias
+      </p>
+    </div>
+    <button
+      type="button"
+      class="font-rajdhani font-bold text-sm tracking-wider uppercase text-[#c9ff3d] hover:underline cursor-pointer"
+      (click)="back.emit()"
+    >
+      ← Volver al Inicio
+    </button>
+  </header>
+
+  <!-- Filtros -->
+  <div class="filters-bar rounded-2xl border border-white/10 bg-[#14132b] p-4 mb-6 flex flex-col gap-4">
+    <!-- Buscador y selector de rareza -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <div class="search-input-wrap flex-1 min-w-[220px] relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#9c98c7]">🔍</span>
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Buscar Pokémon por nombre..."
+          class="w-full bg-[#0b0a1f] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-[#edebff] placeholder-[#9c98c7]/50 focus:outline-none focus:border-[#c9ff3d]/60 font-sans"
+        />
+      </div>
+
+      <!-- Rarezas -->
+      <div class="flex items-center gap-1.5 flex-wrap">
+        @for (r of rarities; track r) {
+          <button
+            type="button"
+            class="rarity-pill text-[11px] font-rajdhani font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider transition-all cursor-pointer"
+            [class.active]="selectedRarity() === r"
+            (click)="toggleRarity(r)"
+          >
+            {{ r }}
+          </button>
+        }
+      </div>
+
+      @if (selectedType() || selectedRarity() || searchControl.value) {
+        <button
+          type="button"
+          class="text-xs font-rajdhani font-bold text-[#ff3366] hover:underline uppercase tracking-wider px-2 py-1 cursor-pointer"
+          (click)="resetFilters()"
+        >
+          Limpiar
+        </button>
+      }
+    </div>
+
+    <!-- Quick Energy Filter Pills -->
+    <div class="flex items-center gap-2.5 overflow-x-auto pb-1.5 scrollbar-none">
+      <span class="text-sm font-rajdhani font-bold text-[#9c98c7] uppercase tracking-wider shrink-0 mr-1 text-[0.95rem]">
+        Tipo:
+      </span>
+      @for (e of energyTypes; track e.key) {
+        <button
+          type="button"
+          class="energy-pill flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-[#0b0a1f] text-sm font-rajdhani font-semibold text-[#edebff] hover:border-white/30 transition-all shrink-0 cursor-pointer"
+          [class.active-energy]="selectedType() === e.key"
+          (click)="toggleType(e.key)"
+        >
+          <app-energy-icon [type]="e.icon" [size]="20" />
+          <span>{{ e.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex-1 flex flex-col items-center justify-center p-16 gap-3">
+      <div class="w-10 h-10 border-4 border-white/10 border-t-[#c9ff3d] rounded-full animate-spin"></div>
+      <span class="text-xs text-[#9c98c7] font-rajdhani uppercase tracking-wider">Cargando catálogo de cartas...</span>
+    </div>
+  } @else if (cards().length === 0) {
+    <div class="flex-1 flex flex-col items-center justify-center p-16 rounded-2xl border border-white/10 bg-[#14132b] text-center">
+      <span class="text-3xl mb-2">🃏</span>
+      <h3 class="font-rajdhani font-bold text-base text-[#edebff] uppercase">No se encontraron cartas</h3>
+      <p class="text-xs text-[#9c98c7] mt-1 font-sans">Prueba cambiando los filtros o la búsqueda.</p>
+    </div>
+  } @else {
+    <!-- Grid de Cartas Scrolleable -->
+    <div class="cards-scroll-container">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3.5 w-full">
+        @for (card of cards(); track card.id) {
+          <div
+            class="card-tile group rounded-2xl border border-white/10 bg-[#14132b] p-3 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c9ff3d]/50 shadow-lg shadow-black/30 cursor-pointer"
+            (click)="openDetail(card)"
+          >
+            <!-- Card Image & Cart Badge -->
+            <div class="card-img-wrap relative aspect-[2.5/3.5] rounded-xl overflow-hidden bg-black/40 mb-2 flex items-center justify-center">
+              @if (getCardPriceInfo(card).hasDiscount) {
+                <div class="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-[#c9ff3d] text-[#0b0a1f] text-[10px] font-jetbrains font-extrabold shadow-lg shadow-[#c9ff3d]/30 z-10">
+                  {{ getCardPriceInfo(card).highlight }}
+                </div>
+              }
+              <img
+                [src]="card.images.small"
+                [alt]="card.name"
+                class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+              @if (getQtyInCart(card.id); as qty) {
+                <div class="absolute top-2 right-2 min-w-[20px] h-5 rounded-full bg-[#c9ff3d] text-[#0b0a1f] text-xs font-jetbrains font-bold flex items-center justify-center px-1 shadow-md z-10">
+                  ×{{ qty }}
+                </div>
+              }
+            </div>
+
+            <!-- Metadata -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between gap-1">
+                <h4 class="font-rajdhani font-bold text-sm text-[#edebff] uppercase truncate group-hover:text-[#c9ff3d] transition-colors">
+                  {{ card.name }}
+                </h4>
+                @if (card.types && card.types[0]) {
+                  <app-energy-icon [type]="card.types[0]" [size]="14" />
+                }
+              </div>
+
+              <div class="flex items-center justify-between text-[10px] text-[#9c98c7] font-sans">
+                <span class="truncate">{{ card.supertype }}</span>
+                <span class="font-semibold text-white/70">{{ card.rarity }}</span>
+              </div>
+
+              <!-- Price and Add to Cart button -->
+              <div class="flex items-center justify-between pt-2 mt-1 border-t border-white/10">
+                <div class="flex items-center gap-1">
+                  <img src="/assets/img/Moneda.png" alt="Moneda" class="w-3.5 h-3.5 object-contain" />
+                  @if (getCardPriceInfo(card).hasDiscount) {
+                    <div class="flex flex-col leading-none">
+                      <span class="font-jetbrains text-[9px] text-[#9c98c7] line-through">₽{{ getCardPriceInfo(card).originalPrice }}</span>
+                      <span class="font-jetbrains font-bold text-xs text-[#c9ff3d]">₽{{ getCardPriceInfo(card).price }}</span>
+                    </div>
+                  } @else {
+                    <span class="font-jetbrains font-bold text-xs text-[#c9ff3d]">₽{{ getCardPriceInfo(card).price }}</span>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  class="add-single-btn px-2.5 py-1 rounded-lg text-xs font-rajdhani font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-white/10 disabled:hover:text-[#9c98c7]"
+                  [class.bg-white/10]="!isCardAtMax(card.id)"
+                  [class.hover:bg-[#c9ff3d]]="!isCardAtMax(card.id)"
+                  [class.text-[#edebff]]="!isCardAtMax(card.id)"
+                  [class.hover:text-[#0b0a1f]]="!isCardAtMax(card.id)"
+                  [class.bg-white/5]="isCardAtMax(card.id)"
+                  [class.text-[#9c98c7]]="isCardAtMax(card.id)"
+                  [disabled]="isCardAtMax(card.id)"
+                  (click)="addToCart(card, $event)"
+                  [title]="isCardAtMax(card.id) ? 'Límite de 4 copias alcanzado' : 'Añadir al carrito'"
+                >
+                  {{ isCardAtMax(card.id) ? '4/4 Máx' : '+ Carrito' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

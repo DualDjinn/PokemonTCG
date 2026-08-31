@@ -1,0 +1,96 @@
+:host {
+  display: inline-block;
+}
+
+.sparkle-text {
+  --font-size: 2rem;
+  --color: #c9ff3d;
+  --shadow: #7c4dff;
+  --glare: #ffffff;
+
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0 4px;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-content {
+  display: inline-block;
+  font-size: var(--font-size);
+  text-transform: none;
+  color: #c9ff3d;
+  background:
+    linear-gradient(
+        110deg,
+        #c9ff3d 0%,
+        #c9ff3d 35%,
+        #ffffff 45%,
+        #ffffff 55%,
+        #c9ff3d 65%,
+        #c9ff3d 100%
+      );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(124, 77, 255, 0.7));
+  animation: text-glare-sweep 3.5s ease-in-out infinite;
+}
+
+@keyframes text-glare-sweep {
+  0% {
+    background-position: 150% 0;
+  }
+  60% {
+    background-position: -150% 0;
+  }
+  100% {
+    background-position: -150% 0;
+  }
+}
+
+.sparkle-star {
+  position: absolute;
+  z-index: 10;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+.sparkle-star path {
+  fill: #c9ff3d;
+  filter: drop-shadow(0 0 6px #c9ff3d) drop-shadow(0 0 12px #7c4dff);
+}
+
+.sparkle-star:nth-of-type(1) {
+  top: 5%;
+  left: -8%;
+}
+
+.sparkle-star:nth-of-type(2) {
+  top: 85%;
+  left: 20%;
+}
+
+.sparkle-star:nth-of-type(3) {
+  top: -10%;
+  left: 50%;
+}
+
+.sparkle-star:nth-of-type(4) {
+  top: 90%;
+  left: 78%;
+}
+
+.sparkle-star:nth-of-type(5) {
+  top: 15%;
+  left: 106%;
+}

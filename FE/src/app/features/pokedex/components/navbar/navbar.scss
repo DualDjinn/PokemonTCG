@@ -1,0 +1,29 @@
+.shop-nav {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav-link {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  color: #9c98c7;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+
+  &:hover {
+    color: #edebff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &.active {
+    color: #c9ff3d;
+    background: rgba(201, 255, 61, 0.1);
+    border-color: rgba(201, 255, 61, 0.3);
+    text-shadow: 0 0 10px rgba(201, 255, 61, 0.4);
+  }
+}
+
+.cart-btn:active, .buy-coins-btn:active, .exit-btn:active {
+  transform: scale(0.96);
+}

@@ -1,0 +1,313 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+/* ===== SOBRES ===== */
+.sobres-art-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  animation: float-slow 4s ease-in-out infinite;
+}
+.sobres-img {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(255, 190, 0, 0.5));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===== 24 RISING SPARKLES (Behind Image, Slow & High) ===== */
+.sparkles-container {
+  position: absolute;
+  inset: -40px -20px -40px -20px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.sparkle-rise {
+  position: absolute;
+  bottom: -30px;
+  opacity: 0;
+  animation: sparkle-rise-up 7.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 220, 0, 0.95));
+}
+
+@keyframes sparkle-rise-up {
+  0% {
+    transform: translateY(0px) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+    transform: translateY(-50px) scale(1) rotate(40deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-180px) scale(1.35) rotate(140deg);
+  }
+  75% {
+    opacity: 0.8;
+    transform: translateY(-300px) scale(1) rotate(240deg);
+  }
+  100% {
+    transform: translateY(-420px) scale(0.2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.spk-1  { left: 4%;  animation-delay: 0s;    animation-duration: 7.2s; }
+.spk-2  { left: 12%; animation-delay: 2.5s;  animation-duration: 8.4s; }
+.spk-3  { left: 20%; animation-delay: 4.2s;  animation-duration: 6.8s; }
+.spk-4  { left: 28%; animation-delay: 1.0s;  animation-duration: 9.0s; }
+.spk-5  { left: 36%; animation-delay: 3.6s;  animation-duration: 7.8s; }
+.spk-6  { left: 43%; animation-delay: 5.4s;  animation-duration: 8.2s; }
+.spk-7  { left: 50%; animation-delay: 1.8s;  animation-duration: 7.0s; }
+.spk-8  { left: 58%; animation-delay: 4.6s;  animation-duration: 8.6s; }
+.spk-9  { left: 66%; animation-delay: 2.8s;  animation-duration: 7.4s; }
+.spk-10 { left: 74%; animation-delay: 0.4s;  animation-duration: 8.0s; }
+.spk-11 { left: 82%; animation-delay: 3.8s;  animation-duration: 7.6s; }
+.spk-12 { left: 90%; animation-delay: 5.8s;  animation-duration: 8.8s; }
+.spk-13 { left: 8%;  animation-delay: 6.2s;  animation-duration: 8.0s; }
+.spk-14 { left: 16%; animation-delay: 1.4s;  animation-duration: 7.2s; }
+.spk-15 { left: 24%; animation-delay: 5.0s;  animation-duration: 8.4s; }
+.spk-16 { left: 32%; animation-delay: 2.2s;  animation-duration: 7.6s; }
+.spk-17 { left: 40%; animation-delay: 6.6s;  animation-duration: 9.0s; }
+.spk-18 { left: 48%; animation-delay: 3.2s;  animation-duration: 7.0s; }
+.spk-19 { left: 56%; animation-delay: 0.8s;  animation-duration: 8.2s; }
+.spk-20 { left: 64%; animation-delay: 5.6s;  animation-duration: 7.4s; }
+.spk-21 { left: 72%; animation-delay: 3.0s;  animation-duration: 8.6s; }
+.spk-22 { left: 80%; animation-delay: 7.0s;  animation-duration: 7.8s; }
+.spk-23 { left: 88%; animation-delay: 1.6s;  animation-duration: 8.4s; }
+.spk-24 { left: 96%; animation-delay: 4.4s;  animation-duration: 7.2s; }
+
+/* ===== FIREFLIES (LUCIÉRNAGAS CON GLOW) ===== */
+.fireflies-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.firefly {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffe853;
+  box-shadow: 
+    0 0 6px 2px #ffe853,
+    0 0 14px 4px rgba(255, 200, 0, 0.85),
+    0 0 25px 8px rgba(255, 170, 0, 0.45);
+  opacity: 0;
+}
+
+.firefly-1 { top: 22%; left: 18%; animation: firefly-wander-1 5.5s ease-in-out infinite; }
+.firefly-2 { top: 58%; left: 82%; animation: firefly-wander-2 6.2s ease-in-out infinite 0.8s; }
+.firefly-3 { top: 38%; left: 12%; animation: firefly-wander-3 7.0s ease-in-out infinite 1.5s; }
+.firefly-4 { top: 72%; left: 28%; animation: firefly-wander-1 5.8s ease-in-out infinite 2.2s; }
+.firefly-5 { top: 18%; left: 76%; animation: firefly-wander-2 6.5s ease-in-out infinite 3.0s; }
+.firefly-6 { top: 48%; left: 86%; animation: firefly-wander-3 6.0s ease-in-out infinite 1.2s; }
+.firefly-7 { top: 78%; left: 68%; animation: firefly-wander-1 7.2s ease-in-out infinite 2.8s; }
+.firefly-8 { top: 32%; left: 52%; animation: firefly-wander-2 5.2s ease-in-out infinite 0.4s; }
+
+@keyframes firefly-wander-1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(0.6);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(14px, -18px) scale(1.2);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-10px, -35px) scale(0.8);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translate(-22px, -12px) scale(1.3);
+    opacity: 0.95;
+  }
+}
+
+@keyframes firefly-wander-2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(0.7);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translate(-16px, 14px) scale(1.3);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(12px, -20px) scale(0.8);
+    opacity: 0.5;
+  }
+  85% {
+    transform: translate(22px, 8px) scale(1.1);
+    opacity: 0.85;
+  }
+}
+
+@keyframes firefly-wander-3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(0.8);
+    opacity: 0.5;
+  }
+  35% {
+    transform: translate(18px, 15px) scale(1.2);
+    opacity: 0.9;
+  }
+  70% {
+    transform: translate(-15px, -22px) scale(0.6);
+    opacity: 0.3;
+  }
+}
+
+/* ===== DECKS ===== */
+.decks-art-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  animation: float-slow 4.5s ease-in-out infinite;
+}
+.decks-img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(16, 185, 129, 0.45));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===== SINGLES ===== */
+.singles-showcase {
+  perspective: 900px;
+  width: 100%;
+  height: 100%;
+}
+
+.slabs-row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slab-3d-left {
+  transform: perspective(600px) rotateY(16deg) scale(1.22);
+  transform-origin: center left;
+  z-index: 1;
+  position: relative;
+}
+
+.slab-3d-right {
+  transform: perspective(600px) rotateY(-16deg) scale(1.22);
+  transform-origin: center right;
+  z-index: 1;
+  position: relative;
+}
+
+.slab-3d-center {
+  transform: perspective(600px) rotateY(0deg) scale(1.42);
+  z-index: 20 !important;
+  position: relative;
+}
+
+.slab-prism-foil {
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255, 80, 200, 0.4) 0%,
+    rgba(80, 150, 255, 0.4) 12%,
+    rgba(80, 255, 180, 0.4) 24%,
+    rgba(255, 220, 80, 0.4) 36%,
+    rgba(255, 80, 200, 0.4) 48%
+  );
+  background-size: 200% 200%;
+  mix-blend-mode: color-dodge;
+}
+
+/* ===== ACCESORIOS ===== */
+.accesorios-art-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+.accesorios-img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transform: scale(1.15);
+  filter: drop-shadow(0 14px 32px rgba(255, 180, 0, 0.45));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===== HOVER STATES ===== */
+.group:hover {
+  .sobres-img {
+    transform: scale(1.06);
+  }
+  .decks-img {
+    transform: scale(1.06) translateY(-4px);
+  }
+  .accesorios-img {
+    transform: scale(1.20);
+  }
+  .slab-3d-left {
+    transform: perspective(600px) rotateY(10deg) scale(1.28) translateX(-8px);
+  }
+  .slab-3d-right {
+    transform: perspective(600px) rotateY(-10deg) scale(1.28) translateX(8px);
+  }
+  .slab-3d-center {
+    transform: perspective(600px) rotateY(0deg) scale(1.5) translateY(-6px);
+  }
+  .slab-prism-foil {
+    animation: prism-drift 2.5s linear infinite;
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes prism-drift {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+

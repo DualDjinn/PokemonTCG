@@ -1,0 +1,60 @@
+<div class="neon-root" #root aria-hidden="true">
+  <div class="neon-group" #groupA>
+    @for (layer of glowLayers; track layer.reach) {
+      <div
+        class="neon-glow"
+        [style.inset]="'-' + glowOuter() + 'px'"
+        [style.padding]="glowOuter() + 'px'"
+        [style.border-radius]="radius() + glowOuter() + 'px'"
+        [style.opacity]="layer.opacity"
+        [style.filter]="'blur(' + layer.blur + 'px)'"
+      >
+        <div
+          class="neon-band"
+          [style.inset]="glowOuter() - ringAt(layer.reach) + 'px'"
+          [style.padding]="ringAt(layer.reach) + 'px'"
+          [style.border-radius]="radius() + ringAt(layer.reach) + 'px'"
+        ></div>
+      </div>
+    }
+    @for (edge of edgeCopies; track edge) {
+      <div class="neon-edge">
+        <div
+          class="neon-band"
+          [style.inset]="'-' + thick() + 'px'"
+          [style.padding]="thick() + 'px'"
+          [style.border-radius]="radius() + thick() + 'px'"
+        ></div>
+      </div>
+    }
+  </div>
+  <div class="neon-group" #groupB>
+    @for (layer of glowLayers; track layer.reach) {
+      <div
+        class="neon-glow"
+        [style.inset]="'-' + glowOuter() + 'px'"
+        [style.padding]="glowOuter() + 'px'"
+        [style.border-radius]="radius() + glowOuter() + 'px'"
+        [style.opacity]="layer.opacity"
+        [style.filter]="'blur(' + layer.blur + 'px)'"
+      >
+        <div
+          class="neon-band"
+          [style.inset]="glowOuter() - ringAt(layer.reach) + 'px'"
+          [style.padding]="ringAt(layer.reach) + 'px'"
+          [style.border-radius]="radius() + ringAt(layer.reach) + 'px'"
+        ></div>
+      </div>
+    }
+    @for (edge of edgeCopies; track edge) {
+      <div class="neon-edge">
+        <div
+          class="neon-band"
+          [style.inset]="'-' + thick() + 'px'"
+          [style.padding]="thick() + 'px'"
+          [style.border-radius]="radius() + thick() + 'px'"
+        ></div>
+      </div>
+    }
+  </div>
+</div>

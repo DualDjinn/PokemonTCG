@@ -168,13 +168,12 @@ interface FlyCardData {
           } @else {
             <div class="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3 p-2">
               <div class="relative flex flex-col items-center gap-1.5 cursor-pointer select-none" (click)="equipCardBack(null)">
-                <div class="w-full rounded-lg border-2 flex items-center justify-center transition-all duration-300 bg-gradient-to-br from-[#16213e] to-[#0f3460]"
-                     [style.borderColor]="activeCardBackId() === null ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.15)'"
-                     [style.boxShadow]="activeCardBackId() === null ? '0 0 12px rgba(0,204,170,0.5)' : 'none'"
-                     style="aspect-ratio:63/88">
-                  <span class="text-4xl font-bold text-white/25">?</span>
-                </div>
-                @if (activeCardBackId() === null) {
+                <img src="/assets/img/card-backs/backCardPixel.png" alt="Pixel Art"
+                     class="w-full rounded-lg border-2 transition-all duration-300 object-cover"
+                     [style.borderColor]="isDefaultActive() ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.15)'"
+                     [style.boxShadow]="isDefaultActive() ? '0 0 12px rgba(0,204,170,0.5)' : 'none'"
+                     style="aspect-ratio:63/88" />
+                @if (isDefaultActive()) {
                   <div class="absolute top-1.5 right-1.5">
                     <my-badge [text]="'PLAYER_PROFILE.EQUIPPED' | translate" color="rgba(0,204,170,0.25)" textColor="#00ccaa" borderColor="rgba(0,204,170,0.5)"></my-badge>
                   </div>
@@ -184,7 +183,7 @@ interface FlyCardData {
 
               @for (back of ownedBacks(); track back.id) {
                 <div class="relative flex flex-col items-center gap-1.5 cursor-pointer select-none" (click)="equipCardBack(back.id)">
-                  <img [src]="back.imageUrl" [alt]="back.name" class="w-full rounded-lg border-2 transition-all duration-300 object-cover"
+                  <img [src]="back.imageUrl" [alt]="back.name" (error)="$any($event.target).src = '/assets/img/card-backs/backCardPixel.png'" class="w-full rounded-lg border-2 transition-all duration-300 object-cover"
                        [style.borderColor]="activeCardBackId() === back.id ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.15)'"
                        [style.boxShadow]="activeCardBackId() === back.id ? '0 0 12px rgba(0,204,170,0.5)' : 'none'"
                        style="aspect-ratio:63/88" />
@@ -664,7 +663,12 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
   readonly savingCosmetic = signal(false);
 
   readonly activeCardBackId = computed(() => this.cardBacks()?.activeCardBackId ?? null);
-  readonly ownedBacks = computed(() => this.cardBacks()?.owned ?? []);
+  readonly ownedBacks = computed(() => this.cardBacks()?.owned?.filter(b => b.id !== 'pixel' && b.origin !== 'DEFAULT') ?? []);
+
+  isDefaultActive(): boolean {
+    const active = this.activeCardBackId();
+    return active === null || active === 'pixel';
+  }
 
   readonly showNameModal = signal(false);
   readonly showCharacterModal = signal(false);
@@ -796,13 +800,20 @@ export class PlayerProfilePage implements AfterViewInit, OnDestroy {
   }
 
   equipCardBack(cardBackId: string | null): void {
-    if (this.savingCosmetic() || this.activeCardBackId() === cardBackId) {
+    const isTargetDefault = cardBackId === null || cardBackId === 'pixel';
+    if (this.savingCosmetic()) {
+      return;
+    }
+    if (isTargetDefault && this.isDefaultActive()) {
+      return;
+    }
+    if (!isTargetDefault && this.activeCardBackId() === cardBackId) {
       return;
     }
 
     this.sfx.play('Click.mp3');
     this.savingCosmetic.set(true);
-    this.cosmetics.equipCardBack(cardBackId)
+    this.cosmetics.equipCardBack(isTargetDefault ? null : cardBackId)
       .pipe(
         finalize(() => this.savingCosmetic.set(false)),
         takeUntilDestroyed(this.destroyRef)

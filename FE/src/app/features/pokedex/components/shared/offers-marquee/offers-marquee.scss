@@ -1,0 +1,93 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.marquee {
+  overflow: hidden;
+  border-block: 1px solid rgba(237, 235, 255, 0.08);
+  padding-block: 0.4rem;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  font-size: 0.85rem;
+  width: 100%;
+  position: relative;
+}
+
+.marquee-track {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  width: max-content;
+  white-space: nowrap;
+  animation: marquee-teleprompter 35s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.offer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(237, 235, 255, 0.1);
+  border-radius: 9999px;
+  background: #14132b;
+  color: #edebff;
+  font-size: 0.85rem;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.02em;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #c9ff3d;
+    background: rgba(20, 19, 43, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(201, 255, 61, 0.2);
+  }
+}
+
+.offer-chip .name {
+  font-weight: 600;
+}
+
+.offer-chip .old {
+  color: #9c98c7;
+  text-decoration: line-through;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.offer-chip .price {
+  color: #c9ff3d;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.offer-chip .highlight {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(201, 255, 61, 0.18);
+  color: #c9ff3d;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid rgba(201, 255, 61, 0.3);
+}
+
+@keyframes marquee-teleprompter {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0%, 0, 0);
+  }
+}

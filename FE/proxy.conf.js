@@ -1,25 +1,25 @@
 const TARGET = 'http://localhost:8080';
 
 const proxyConfig = {
-  '/api/**': {
+  '/api': {
     target: TARGET,
     secure: false,
     changeOrigin: true,
     logLevel: 'info',
   },
-  '/cards/**': {
+  '/cards': {
     target: TARGET,
     secure: false,
     changeOrigin: true,
     logLevel: 'info',
   },
-  '/full-art-pokemon/**': {
+  '/full-art-pokemon': {
     target: TARGET,
     secure: false,
     changeOrigin: true,
     logLevel: 'info',
   },
-  '/media/**': {
+  '/media': {
     target: TARGET,
     secure: false,
     changeOrigin: true,
@@ -29,7 +29,7 @@ const proxyConfig = {
       return null;
     },
   },
-  '/ws/**': {
+  '/ws': {
     target: TARGET,
     secure: false,
     ws: true,

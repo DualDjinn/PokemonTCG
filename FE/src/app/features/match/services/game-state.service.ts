@@ -331,8 +331,8 @@ export class GameStateService {
   });
 
   readonly myPrizeCards = computed(() => this.resolveMyState()?.prizeCards ?? []);
-  readonly myCardBackUrl = computed(() => this.resolveMyState()?.cardBackUrl);
-  readonly opponentCardBackUrl = computed(() => this.resolveOpponentState()?.cardBackUrl);
+  readonly myCardBackUrl = computed(() => this.resolveMyState()?.cardBackUrl || '/assets/img/card-backs/backCardPixel.png');
+  readonly opponentCardBackUrl = computed(() => this.resolveOpponentState()?.cardBackUrl || '/assets/img/card-backs/backCardPixel.png');
 
   readonly isVictory = computed(() => {
     const state = this.matchState();

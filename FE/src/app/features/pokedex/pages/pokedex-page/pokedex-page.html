@@ -1,551 +1,305 @@
-<video class="bg-video" autoplay muted loop playsinline preload="auto">
-  <source src="/assets/video/pokeShop.webm" type="video/webm" />
-</video>
-<div class="bg-overlay"></div>
-<main class="max-w-[1400px] mx-auto p-6">
+<div class="shop-wrapper h-screen max-h-screen bg-[#0b0a1f] text-[#edebff] flex flex-col font-sans relative overflow-hidden selection:bg-[#c9ff3d]/30 selection:text-[#0b0a1f]">
+  <!-- Ambient Store Background Image -->
+  <div class="pointer-events-none fixed inset-0 z-0 bg-cover bg-center opacity-65" style="background-image: url('/assets/img/bento/store-bg.jpg');"></div>
+  <!-- Radial Background Glow & Vignette -->
+  <div class="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_15%_0%,rgba(124,77,255,0.2),transparent_50%),radial-gradient(circle_at_85%_6%,rgba(201,255,61,0.1),transparent_45%),linear-gradient(to_bottom,rgba(11,10,31,0.4),rgba(11,10,31,0.65))]"></div>
 
-  <!-- Header -->
-  <header class="mb-6 flex items-center justify-between gap-4 flex-wrap">
-    <div class="flex items-center gap-4">
-      <!-- Botón Volver: cierra la transición circular y vuelve al juego -->
-      <my-button
-        [text]="'← ' + ('POKEDEX.EXIT' | translate)"
-        variant="pixel"
-        size="small"
-        color="var(--neon-magenta)"
-        (clicked)="onExit()"
-      />
-      <div>
-        <!-- Título de la shop traducido -->
-        <my-text [text]="'POKEDEX.TITLE' | translate" tag="h1" size="1.575rem" weight="bold" color="var(--neon-cyan)" />
-        <my-text [text]="activeTab() === 'cards' ? cards().length + ' ' + ('POKEDEX.CARDS_TAB' | translate).toLowerCase() : splashArts().length + ' ' + ('POKEDEX.SPLASH_ARTS_COUNT' | translate)" tag="p" size="0.765rem" color="var(--text-secondary)" />
-      </div>
-    </div>
+  <!-- Sticky Navbar -->
+  <app-shop-navbar
+    [activeSection]="activeSection()"
+    (navigateSection)="onSectionChange($event)"
+    (openCart)="cartOpen.set(true)"
+    (openCoinsModal)="coinsModalOpen.set(true)"
+    (exit)="onExit()"
+  />
 
-    <!-- Botón comprar coins con MercadoPago -->
-    <div class="inline-flex items-center gap-1.5">
-      <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5" />
-      <my-button
-        [text]="'COINS_SHOP.TITLE' | translate"
-        variant="pixel"
-        color="var(--neon-cyan)"
-        size="small"
-        (clicked)="coinsModalOpen.set(true)"
-      />
-    </div>
-  </header>
+  <!-- Main Content -->
+  <main class="flex-1 w-full relative z-10 px-3 sm:px-6 lg:px-8 py-2 flex flex-col overflow-hidden min-h-0">
+    <app-shop-hero
+      class="flex-1 w-full flex flex-col min-h-0 overflow-hidden"
+      [activeSection]="activeSection()"
+      (sectionChange)="onSectionChange($event)"
+      (packOpened)="onPackOpened($event)"
+      (cardDetail)="openCardDetail($event)"
+      (splashDetail)="openSplashDetail($event)"
+      (cardBackDetail)="openCardBackDetail($event)"
+    />
+  </main>
 
-  <!-- Tabs -->
-  <div class="flex gap-2 mb-5 flex-wrap">
-    <my-button [text]="'POKEDEX.CARDS_TAB' | translate"      variant="pixel" [color]="activeTab() === 'cards'     ? 'var(--neon-cyan)' : 'var(--text-secondary)'" size="small" (clicked)="switchTab('cards')" />
-    <my-button [text]="'POKEDEX.SPLASH_ART_TAB' | translate" variant="pixel" [color]="activeTab() === 'splashArt' ? 'var(--neon-cyan)' : 'var(--text-secondary)'" size="small" (clicked)="switchTab('splashArt')" />
-    <my-button [text]="'POKEDEX.CARD_BACKS_TAB' | translate" variant="pixel" [color]="activeTab() === 'cardBacks' ? 'var(--neon-cyan)' : 'var(--text-secondary)'" size="small" (clicked)="switchTab('cardBacks')" />
-    <my-button [text]="'POKEDEX.PACKS_TAB' | translate"      variant="pixel" [color]="activeTab() === 'packs'     ? 'var(--neon-cyan)' : 'var(--text-secondary)'" size="small" (clicked)="switchTab('packs')" />
-  </div>
+  <!-- Pack Opening Animation -->
+  <app-pack-opening-animation
+    [opened]="openedPack()"
+    (closed)="onPackAnimationClosed()"
+  />
 
-  <!-- Tienda de sobres -->
-  @if (activeTab() === 'packs') {
-    <app-pack-shop (packOpened)="onPackOpened($event)" />
-  }
+  <!-- Cart Drawer -->
+  <app-cart-drawer
+    [open]="cartOpen()"
+    (closed)="cartOpen.set(false); refreshOwnedCardBacks()"
+    (packsOpened)="onPacksOpened($event)"
+  />
 
-  <!-- Filters: Cards -->
-  @if (activeTab() === 'cards') {
-    <form appPixelPanel class="flex flex-wrap gap-3 items-end p-5 mb-6 opacity-80" [formGroup]="filterForm" (ngSubmit)="onFilter()">
-      <!-- Labels del formulario de filtros traducidas -->
-      <div class="flex flex-col gap-1 flex-[1_1_150px]">
-        <my-text [text]="'POKEDEX.NAME_LABEL' | translate" tag="label" size="0.63rem" weight="bold" color="var(--text-secondary)" />
-        <my-input formControlName="name" [placeholder]="'POKEDEX.SEARCH_NAME_EXAMPLE' | translate" variant="pixel" />
-      </div>
-
-      <div class="flex flex-col gap-1 flex-[1_1_150px]">
-        <my-text [text]="'POKEDEX.SUPERTYPE_LABEL' | translate" tag="label" size="0.63rem" weight="bold" color="var(--text-secondary)" />
-        <my-select formControlName="supertype" [options]="supertypeOptions()" [placeholder]="'POKEDEX.FILTER_ALL' | translate" variant="pixel" />
-      </div>
-
-      <div class="flex flex-col gap-1 flex-[1_1_150px]">
-        <my-text [text]="'POKEDEX.TYPE_LABEL' | translate" tag="label" size="0.63rem" weight="bold" color="var(--text-secondary)" />
-        <my-select formControlName="type" [options]="typeOptions()" [placeholder]="'POKEDEX.FILTER_ALL' | translate" variant="pixel" />
-      </div>
-
-      <div class="flex flex-col gap-1 flex-[1_1_150px]">
-        <my-text [text]="'POKEDEX.RARITY_LABEL' | translate" tag="label" size="0.63rem" weight="bold" color="var(--text-secondary)" />
-        <my-select formControlName="rarity" [options]="rarityOptions()" [placeholder]="'POKEDEX.FILTER_ALL' | translate" variant="pixel" />
-      </div>
-
-      <div class="flex flex-col gap-1 flex-[1_1_150px]">
-        <my-text [text]="'POKEDEX.SUBTYPE_LABEL' | translate" tag="label" size="0.63rem" weight="bold" color="var(--text-secondary)" />
-        <my-select formControlName="subtype" [options]="subtypeOptions()" [placeholder]="'POKEDEX.FILTER_ALL' | translate" variant="pixel" />
-      </div>
-
-      <div class="flex gap-2 items-end">
-        <my-button [text]="'POKEDEX.FILTER' | translate" type="submit" variant="pixel" size="small" />
-        <my-button [text]="'POKEDEX.CLEAR' | translate" variant="pixel" color="var(--text-secondary)" size="small" (clicked)="onReset()" />
-      </div>
-    </form>
-  }
-
-  <!-- Filters: Splash Art -->
-  @if (activeTab() === 'splashArt') {
-    <form appPixelPanel class="flex flex-wrap gap-3 items-end p-5 mb-6 opacity-80" [formGroup]="splashFilterForm" (ngSubmit)="onFilterSplash()">
-      <div class="flex flex-col gap-1 flex-[1_1_250px]">
-        <my-text [text]="'POKEDEX.POKEMON_LABEL' | translate" tag="label" size="0.63rem" weight="bold" color="var(--text-secondary)" />
-        <my-input formControlName="name" [placeholder]="'POKEDEX.SEARCH_SPLASH_EXAMPLE' | translate" variant="pixel" />
-      </div>
-
-      <div class="flex gap-2 items-end">
-        <my-button [text]="'POKEDEX.SEARCH' | translate" type="submit" variant="pixel" size="small" />
-        <my-button [text]="'POKEDEX.CLEAR' | translate" variant="pixel" color="var(--text-secondary)" size="small" (clicked)="onResetSplash()" />
-      </div>
-    </form>
-  }
-
-  <!-- Card Backs loading spinner -->
-  @if (activeTab() === 'cardBacks' && cardBacksLoading()) {
-    <div class="flex flex-col items-center justify-center p-12 gap-4">
-      <div class="w-10 h-10 border-4 border-white/10 border-t-[var(--neon-cyan)] rounded-full animate-spin"></div>
-      <my-text [text]="'POKEDEX.LOADING' | translate" tag="p" size="0.855rem" color="var(--text-secondary)" />
-    </div>
-  }
-
-  <!-- Card Backs Grid -->
-  @if (activeTab() === 'cardBacks' && !cardBacksLoading()) {
-    @if (cardBacks().length === 0) {
-      <div class="flex flex-col items-center justify-center p-12 gap-4">
-        <my-text [text]="'POKEDEX.CARD_BACKS_NO_ITEMS' | translate" tag="p" size="0.855rem" color="var(--text-secondary)" />
-      </div>
-    } @else {
-      <section appPixelPanel class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-5 p-5 opacity-80">
-        @for (cb of cardBacks(); track cb.id) {
-          <div class="flex flex-col gap-2" [attr.data-card-id]="cb.id">
-            <div class="relative cursor-pointer" (click)="openCardBackDetail(cb, $event)">
-              <div class="w-full aspect-[2.5/3.5] overflow-hidden bg-white/5 rounded-xl flex items-center justify-center relative">
-                <img [src]="cb.imageUrl" [alt]="cb.name" class="w-full h-full object-contain" loading="lazy" />
-              </div>
-              @if (isCardBackOwned(cb.id)) {
-                <div class="absolute top-2 right-2 z-10">
-                  <my-badge [text]="'POKEDEX.CARD_BACKS_OWNED' | translate" color="var(--neon-cyan)" />
-                </div>
-              } @else if (getCardInCart(cb.id); as qty) {
-                <div class="absolute top-2 right-2 z-10">
-                  <my-badge [text]="'×' + qty" color="var(--neon-cyan)" />
-                </div>
-              }
-            </div>
-
-            <div class="px-1 flex flex-col gap-1">
-              <my-text [text]="cb.name" tag="h3" size="0.765rem" weight="bold" color="var(--text-primary)" />
-              <div class="flex flex-wrap gap-1 items-center"></div>
-              <div class="flex items-center justify-between mt-1">
-                <my-text [text]="cb.price ? ('₽ ' + cb.price) : '—'" tag="span" size="0.81rem" weight="bold" color="var(--neon-cyan)" />
-                @if (!isCardBackOwned(cb.id) && cb.price) {
-                  @if (getCardInCart(cb.id)) {
-                    <my-icon-button icon="−" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Quitar del carrito" (clicked)="cartService.removeItem(cb.id)" />
-                  } @else {
-                    <my-icon-button icon="＋" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" [ariaLabel]="'POKEDEX.CARD_BACKS_BUY' | translate" (clicked)="addCardBackToCart(cb)" />
-                  }
-                }
-              </div>
-            </div>
-          </div>
-        }
-      </section>
-    }
-  }
-
-  <!-- Content -->
-  @if (loading()) {
-    <div class="flex flex-col items-center justify-center p-12 gap-4">
-      <div class="w-10 h-10 border-4 border-white/10 border-t-[var(--neon-cyan)] rounded-full animate-spin"></div>
-      <my-text [text]="'POKEDEX.LOADING' | translate" tag="p" size="0.855rem" color="var(--text-secondary)" />
-    </div>
-  } @else if (error()) {
-    <div class="flex flex-col items-center justify-center p-12 gap-4">
-      <my-text [text]="'⚠️ ' + error()" tag="p" size="0.855rem" color="var(--neon-magenta)" />
-    </div>
-  } @else if (activeTab() === 'cards' && cards().length === 0) {
-    <div class="flex flex-col items-center justify-center p-12 gap-4">
-      <my-text [text]="'POKEDEX.NO_CARDS' | translate" tag="p" size="0.855rem" color="var(--text-secondary)" />
-    </div>
-  } @else if (activeTab() === 'splashArt' && splashArts().length === 0) {
-    <div class="flex flex-col items-center justify-center p-12 gap-4">
-      <my-text [text]="'POKEDEX.NO_SPLASH' | translate" tag="p" size="0.855rem" color="var(--text-secondary)" />
-    </div>
-  } @else {
-
-    <!-- Cards Grid -->
-    @if (activeTab() === 'cards') {
-      <section appPixelPanel class="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-5 p-5 opacity-80">
-        @for (card of cards(); track card.id) {
-          <div class="flex flex-col gap-2" [attr.data-card-id]="card.id" [class.opacity-35]="isMaxedOut(card.id)" [class.grayscale]="isMaxedOut(card.id)">
-            <div class="relative cursor-pointer" (click)="openCardDetail(card, $event)">
-              <app-deck-card-detail [card]="toCardSummary(card)" [showCount]="false" />
-              @if (getCardInCart(card.id); as qty) {
-                <div class="absolute top-2 right-2 z-10">
-                  <my-badge [text]="'×' + qty" color="var(--neon-cyan)" />
-                </div>
-              }
-            </div>
-
-            <div class="px-1 flex flex-col gap-1">
-              <my-text [text]="card.name" tag="h3" size="0.765rem" weight="bold" color="var(--text-primary)" />
-
-              <div class="flex flex-wrap gap-1 items-center">
-                <my-badge [text]="card.supertype" color="var(--neon-blue)" />
-                @if (card.hp) {
-                  <my-badge [text]="card.hp + ' HP'" color="var(--neon-magenta)" />
-                }
-              </div>
-
-              <my-text [text]="card.rarity" tag="p" size="0.585rem" color="var(--text-secondary)" />
-
-              <div class="flex items-center justify-between mt-1">
-                <my-text [text]="'₽ ' + getCardPrice(card)" tag="span" size="0.81rem" weight="bold" color="var(--neon-cyan)" />
-              </div>
-            </div>
-          </div>
-        }
-      </section>
-    }
-
-    <!-- Splash Art Grid -->
-    @if (activeTab() === 'splashArt') {
-      <section appPixelPanel class="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-5 p-5 opacity-80">
-        @for (sa of splashArts(); track sa.id) {
-          <div class="flex flex-col gap-2" [attr.data-card-id]="sa.id">
-            <div class="relative cursor-pointer" (click)="openSplashDetail(sa, $event)">
-              <app-deck-card-detail [card]="toSplashSummary(sa)" [showCount]="false" />
-              @if (getCardInCart(sa.id); as qty) {
-                <div class="absolute top-2 right-2 z-10">
-                  <my-badge [text]="'×' + qty" color="var(--neon-cyan)" />
-                </div>
-              }
-            </div>
-
-            <div class="px-1 flex flex-col gap-1">
-              <my-text [text]="sa.name" tag="h3" size="0.765rem" weight="bold" color="var(--text-primary)" />
-
-              <div class="flex flex-wrap gap-1 items-center">
-                <my-badge [text]="'POKEDEX.SPLASH_ART_BADGE' | translate" color="var(--neon-blue)" />
-                <my-badge [text]="sa.rarity" color="var(--neon-magenta)" />
-              </div>
-
-              <my-text [text]="sa.pokemonName" tag="p" size="0.585rem" color="var(--text-secondary)" />
-
-              <div class="flex items-center justify-between mt-1">
-                <my-text [text]="'₽ ' + getSplashPrice(sa)" tag="span" size="0.81rem" weight="bold" color="var(--neon-cyan)" />
-                @if (getCardInCart(sa.id); as qty) {
-                  <div class="flex items-center gap-1.5">
-                    <my-icon-button icon="−" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Quitar uno" (clicked)="decrementItem(sa.id)" />
-                    <my-text [text]="'' + qty" tag="span" size="0.765rem" weight="bold" color="var(--text-primary)" align="center" />
-                    <my-icon-button icon="＋" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Agregar uno más" (clicked)="incrementItem(sa.id, sa.name, sa.imageUrl, 'splashArt', sa.rarity)" />
-                  </div>
-                } @else {
-                  <my-icon-button icon="＋" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Agregar al carrito" (clicked)="addSplashToCart(sa)" />
-                }
-              </div>
-            </div>
-          </div>
-        }
-      </section>
-    }
-  }
-</main>
-
-<!-- Animación de apertura de sobre -->
-<app-pack-opening-animation
-  [opened]="openedPack()"
-  (closed)="onPackAnimationClosed()" />
-
-<!-- Floating cart button (estilo pixel, como los paneles del resto de las páginas) -->
-<button type="button" appPixelBorder="3px" class="fixed bottom-6 right-6 z-[900] w-14 h-14 bg-[var(--pixel-card-bg)] flex items-center justify-center text-xl shadow-[0_0_20px_rgba(0,170,255,0.4)] transition-transform duration-150 hover:scale-110 active:scale-95 cursor-pointer" (click)="cartOpen.set(true)" data-cart-btn [attr.aria-label]="'POKEDEX.OPEN_CART' | translate">
-  🛒
-  @if (cartService.totalItems() > 0) {
-    <span class="absolute -top-1 -right-1 min-w-[20px] h-5 rounded-full bg-[var(--neon-magenta)] text-white text-xs font-bold flex items-center justify-center px-1">{{ cartService.totalItems() }}</span>
-  }
-</button>
-
-<!-- Card detail modal -->
-@if (selectedCard(); as card) {
-  <my-modal [open]="true" [title]="''" variant="pixel" width="40rem" (close)="closeCardDetail()">
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <my-text [text]="card.name" tag="h3" size="0.855rem" weight="bold" color="var(--text-primary)" />
-        <div class="flex items-center gap-1.5">
-          <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5 inline-block align-middle" />
-          <my-text [text]="'₽ ' + getCardPrice(card)" tag="span" size="0.9rem" weight="bold" color="var(--neon-cyan)" />
-        </div>
-      </div>
-
-      <div class="flex flex-col md:flex-row gap-6">
-        <div class="flex-shrink-0 w-full md:w-[240px]">
-          <app-deck-card-detail [card]="toCardSummary(card)" [showCount]="false" />
-        </div>
-
-        <div class="flex-1 flex flex-col gap-3 min-w-0">
-          <div class="flex flex-wrap gap-1.5">
-            <my-badge [text]="card.supertype" color="var(--neon-blue)" />
-            @if (card.hp) {
-              <my-badge [text]="card.hp + ' HP'" color="var(--neon-magenta)" />
-            }
-            <my-badge [text]="card.rarity" color="var(--text-secondary)" />
-          </div>
-
-          @if (card.types && card.types.length > 0) {
-            <div class="flex flex-wrap gap-1">
-              @for (t of card.types; track t) {
-                <my-badge [text]="t" [color]="typeColorMap[t.toLowerCase()] ?? '#6b7280'" />
-              }
-            </div>
-          }
-
-          @if (card.subtypes && card.subtypes.length > 0) {
-            <my-text [text]="card.subtypes.join(' · ')" tag="p" size="0.72rem" color="var(--text-secondary)" />
-          }
-
-          @if (card.abilities && card.abilities.length > 0) {
-            <div class="flex flex-col gap-1.5 mt-1">
-              <my-text [text]="'POKEDEX.ABILITIES' | translate" tag="h4" size="0.675rem" weight="bold" color="var(--neon-cyan)" />
-              @for (a of card.abilities; track a.name) {
-                <div class="p-2 rounded-lg bg-white/[0.03] border border-white/10">
-                  <my-text [text]="a.name" tag="span" size="0.72rem" weight="bold" color="var(--text-primary)" />
-                  <my-text [text]="a.text" tag="p" size="0.63rem" color="var(--text-secondary)" />
-                </div>
-              }
-            </div>
-          }
-
-          @if (card.attacks && card.attacks.length > 0) {
-            <div class="flex flex-col gap-1.5 mt-1">
-              <my-text [text]="'POKEDEX.ATTACKS' | translate" tag="h4" size="0.675rem" weight="bold" color="var(--neon-cyan)" />
-              @for (a of card.attacks; track a.name) {
-                <div class="p-2 rounded-lg bg-white/[0.03] border border-white/10">
-                  <div class="flex items-center justify-between gap-2">
-                    <my-text [text]="a.name" tag="span" size="0.72rem" weight="bold" color="var(--text-primary)" />
-                    @if (a.damage) {
-                      <my-badge [text]="a.damage" color="var(--neon-magenta)" />
-                    }
-                  </div>
-                  @if (a.text) {
-                    <my-text [text]="a.text" tag="p" size="0.63rem" color="var(--text-secondary)" />
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          @if (card.weaknesses && card.weaknesses.length > 0) {
-            <div class="flex items-center gap-2 mt-1">
-              <my-text [text]="'POKEDEX.WEAKNESS' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" />
-              @for (w of card.weaknesses; track w.type) {
-                <my-badge [text]="w.type + ' ' + w.value" color="#a16207" />
-              }
-            </div>
-          }
-
-          @if (card.resistances && card.resistances.length > 0) {
-            <div class="flex items-center gap-2">
-              <my-text [text]="'POKEDEX.RESISTANCE' | translate" tag="span" size="0.675rem" weight="bold" color="var(--text-secondary)" />
-              @for (r of card.resistances; track r.type) {
-                <my-badge [text]="r.type + ' ' + r.value" color="#4ade80" />
-              }
-            </div>
-          }
-
-          <div class="mt-3 pt-3 border-t border-white/10">
-            @if (getCardInCart(card.id); as qty) {
-              <div class="flex items-center gap-2">
-                <my-icon-button icon="−" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Quitar uno" (clicked)="decrementItem(card.id)" />
-                <my-text [text]="'' + qty" tag="span" size="0.9rem" weight="bold" color="var(--text-primary)" align="center" />
-                <my-icon-button icon="＋" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Agregar uno más" [disabled]="maxBuyable(card.id) <= 0" (clicked)="incrementItem(card.id, card.name, card.images.small, 'card', card.rarity)" />
-              </div>
-            } @else if (maxBuyable(card.id) > 0) {
-              <div class="flex items-center gap-2">
-                <my-icon-button icon="−" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Reducir cantidad" [disabled]="getPendingQty(card.id) <= 1" (clicked)="changePendingQty(card.id, -1)" />
-                <my-text [text]="'' + getPendingQty(card.id)" tag="span" size="0.9rem" weight="bold" color="var(--text-primary)" align="center" />
-                <my-icon-button icon="＋" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Aumentar cantidad" [disabled]="getPendingQty(card.id) >= maxBuyable(card.id)" (clicked)="changePendingQty(card.id, 1)" />
-                <my-button [text]="'POKEDEX.ADD_TO_CART' | translate" variant="pixel" color="var(--neon-cyan)" textColor="var(--bg-dark)" size="small" (clicked)="confirmAddToCart(card)" />
-              </div>
-            } @else {
-              <my-text [text]="'POKEDEX.MAX_COPIES' | translate" tag="span" size="0.72rem" color="var(--text-secondary)" />
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  </my-modal>
-}
-
-<!-- Full Art detail modal -->
-@if (selectedSplash(); as sa) {
-  <my-modal [open]="true" [title]="sa.name" variant="pixel" width="40rem" (close)="closeSplashDetail()">
-    <div class="flex flex-col md:flex-row gap-6">
-      <div class="flex-shrink-0 w-full md:w-[240px]">
-        <app-deck-card-detail [card]="toSplashSummary(sa)" [showCount]="false" />
-      </div>
-
-      <div class="flex-1 flex flex-col gap-3 min-w-0">
-        <div class="flex flex-wrap gap-1.5">
-          <my-badge [text]="'POKEDEX.SPLASH_ART_BADGE' | translate" color="var(--neon-blue)" />
-          <my-badge [text]="sa.rarity" color="var(--neon-magenta)" />
-          <my-badge
-            [text]="(sa.kind === 'original' ? 'POKEDEX.FULL_ART_ORIGINAL' : 'POKEDEX.FULL_ART_ALTERNATIVE') | translate"
-            color="var(--text-secondary)" />
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <my-text [text]="'POKEDEX.POKEMON_LABEL' | translate" tag="h4" size="0.675rem" weight="bold" color="var(--neon-cyan)" />
-          <my-text [text]="sa.pokemonName" tag="p" size="0.81rem" color="var(--text-primary)" />
-        </div>
-
-        <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-          <my-text [text]="'₽ ' + getSplashPrice(sa)" tag="span" size="0.99rem" weight="bold" color="var(--neon-cyan)" />
-          @if (getCardInCart(sa.id); as qty) {
-            <div class="flex items-center gap-2">
-              <my-icon-button icon="−" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Quitar uno" (clicked)="decrementItem(sa.id)" />
-              <my-text [text]="'' + qty" tag="span" size="0.9rem" weight="bold" color="var(--text-primary)" align="center" />
-              <my-icon-button icon="＋" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Agregar uno más" (clicked)="incrementItem(sa.id, sa.name, sa.imageUrl, 'splashArt', sa.rarity)" />
-            </div>
-          } @else {
-            <my-button [text]="'POKEDEX.ADD_TO_CART' | translate" variant="pixel" color="var(--neon-cyan)" textColor="var(--bg-dark)" size="small" (clicked)="addSplashToCart(sa)" />
-          }
-        </div>
-      </div>
-    </div>
-  </my-modal>
-}
-
-<!-- Card Back detail modal -->
-@if (selectedCardBack(); as cb) {
-  <my-modal [open]="true" [title]="cb.name" variant="pixel" width="36rem" (close)="closeCardBackDetail()">
-    <div class="flex flex-col md:flex-row gap-6">
-      <!-- imagen hero target -->
-      <div class="flex-shrink-0 w-full md:w-[180px] aspect-[2.5/3.5] bg-white/5 rounded-xl flex items-center justify-center overflow-hidden">
-        <img data-hero-img [src]="cb.imageUrl" [alt]="cb.name" class="w-full h-full object-contain" />
-      </div>
-
-      <div class="flex-1 flex flex-col gap-3 min-w-0">
-        <div class="flex flex-wrap gap-1.5">
-          <my-badge [text]="'POKEDEX.CARD_BACKS_TAB' | translate" color="var(--neon-blue)" />
-          @if (isCardBackOwned(cb.id)) {
-            <my-badge [text]="'POKEDEX.CARD_BACKS_OWNED' | translate" color="var(--neon-cyan)" />
-          }
-        </div>
-
-        @if (cb.price) {
-          <div class="flex flex-col gap-1">
-            <my-text [text]="'POKEDEX.CARD_BACKS_PRICE' | translate" tag="h4" size="0.675rem" weight="bold" color="var(--neon-cyan)" />
-            <p class="m-0 p-0 leading-[1.4] flex items-center gap-1" [style.fontSize]="'1rem'" [style.fontWeight]="'bold'" [style.color]="'var(--text-primary)'">
-              <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5" />
-              {{ cb.price }}
-            </p>
-          </div>
-        } @else if (cb.origin === 'PACK') {
-          <my-text [text]="'POKEDEX.CARD_BACKS_HOW_PACK' | translate" tag="p" size="0.765rem" color="var(--text-secondary)" />
-        } @else if (cb.origin === 'BATTLE' && cb.unlockValue) {
-          <my-text [text]="('POKEDEX.CARD_BACKS_HOW_BATTLE' | translate) + ' ' + cb.unlockValue" tag="p" size="0.765rem" color="var(--text-secondary)" />
-        } @else if (cb.origin === 'LEVEL' && cb.unlockValue) {
-          <my-text [text]="('POKEDEX.CARD_BACKS_HOW_LEVEL' | translate) + ' ' + cb.unlockValue" tag="p" size="0.765rem" color="var(--text-secondary)" />
-        } @else if (cb.origin === 'DEFAULT') {
-          <my-text [text]="'POKEDEX.CARD_BACKS_HOW_DEFAULT' | translate" tag="p" size="0.765rem" color="var(--text-secondary)" />
-        }
-
-        <div class="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
-          <my-text [text]="cb.price ? ('₽ ' + cb.price) : ''" tag="span" size="0.99rem" weight="bold" color="var(--neon-cyan)" />
-          @if (isCardBackOwned(cb.id)) {
-            <my-badge [text]="'✓ ' + ('POKEDEX.CARD_BACKS_OWNED' | translate)" color="var(--neon-cyan)" />
-          } @else if (cb.price) {
-            @if (getCardInCart(cb.id)) {
-              <my-icon-button icon="−" size="small" color="var(--neon-cyan)" background="rgba(0,170,255,0.12)" ariaLabel="Quitar del carrito" (clicked)="cartService.removeItem(cb.id)" />
-            } @else {
-              <my-button [text]="'POKEDEX.ADD_TO_CART' | translate" variant="pixel" color="var(--neon-cyan)" textColor="var(--bg-dark)" size="small" (clicked)="addCardBackToCart(cb)" />
-            }
-          }
-        </div>
-      </div>
-    </div>
-  </my-modal>
-}
-
-<!-- Coins shop modal -->
-<my-modal
-  [open]="coinsModalOpen()"
-  [title]="'COINS_SHOP.TITLE' | translate"
-  variant="pixel"
-  width="38rem"
-  (close)="coinsModalOpen.set(false)"
->
-  <div class="flex flex-col gap-5">
-    <my-text [text]="'COINS_SHOP.SUBTITLE' | translate" tag="p" size="0.855rem" color="var(--text-secondary)" />
-
-    <div class="grid grid-cols-2 gap-3">
-      @for (pkg of COIN_PACKAGES; track pkg.coins) {
-        <div appPixelPanel="card" class="relative flex flex-col items-center gap-3 p-5">
-
-          @if (pkg.badge) {
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-              <my-badge [text]="pkg.badge | translate" [color]="pkg.badgeColor ?? 'var(--neon-cyan)'" />
-            </div>
-          }
-
-          <img src="/assets/img/Moneda.png" alt="Moneda" class="w-10 h-10 mt-1" />
-
-          <my-text
-            [text]="pkg.coins + ' ' + ('COINS_SHOP.COINS' | translate)"
-            tag="span"
-            size="1.125rem"
-            weight="bold"
-            color="var(--text-primary)"
-            align="center"
-          />
-
-          <my-text
-            [text]="'$ ' + pkg.price + ' ARS'"
-            tag="span"
-            size="0.9rem"
-            color="var(--neon-cyan)"
-            weight="bold"
-            align="center"
-          />
-
-          <!-- Botón MercadoPago -->
+  <!-- Card Detail Modal -->
+  @if (selectedCard(); as card) {
+    <div class="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeCardDetail()"></div>
+      <div class="relative z-10 w-full max-w-2xl bg-[#14132b] border border-white/10 rounded-2xl p-6 shadow-2xl animate-fade-up max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+          <h3 class="font-rajdhani font-bold text-xl text-[#edebff] uppercase tracking-wide">{{ card.name }}</h3>
           <button
             type="button"
-            class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-bold text-white transition-opacity border-none cursor-pointer mt-1"
-            [style.background]="coinsBuyLoading() !== null ? 'rgba(0,158,227,0.4)' : 'linear-gradient(135deg, #009ee3 0%, #00b1f2 100%)'"
-            [style.box-shadow]="coinsBuyLoading() !== null ? 'none' : '0 0 12px rgba(0,158,227,0.3)'"
-            [disabled]="coinsBuyLoading() !== null"
-            (click)="buyCoinPackage(pkg)"
+            class="w-8 h-8 rounded-full border border-white/10 bg-white/5 text-[#9c98c7] hover:text-white flex items-center justify-center cursor-pointer"
+            (click)="closeCardDetail()"
           >
-            @if (coinsBuyLoading() === pkg.coins) {
-              <span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              {{ 'PAYMENT.PROCESSING' | translate }}
-            } @else {
-              <span class="text-base">💳</span>
-              {{ 'COINS_SHOP.BUY_MP' | translate }}
-            }
+            ✕
           </button>
         </div>
-      }
+
+        <div class="flex flex-col md:flex-row gap-6">
+          <div class="w-full md:w-[220px] flex-shrink-0 flex items-center justify-center">
+            <app-deck-card-detail [card]="toCardSummary(card)" [showCount]="false" />
+          </div>
+
+          <div class="flex-1 flex flex-col gap-3 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#00aaff]/20 text-[#00aaff] border border-[#00aaff]/30">
+                {{ card.supertype }}
+              </span>
+              @if (card.hp) {
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-[#ff3366]/20 text-[#ff3366] border border-[#ff3366]/30">
+                  {{ card.hp }} HP
+                </span>
+              }
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold font-rajdhani uppercase tracking-wider bg-white/5 text-[#9c98c7] border border-white/10">
+                {{ card.rarity }}
+              </span>
+            </div>
+
+            @if (card.subtypes && card.subtypes.length > 0) {
+              <p class="text-xs text-[#9c98c7] font-sans">{{ card.subtypes.join(' · ') }}</p>
+            }
+
+            @if (card.abilities && card.abilities.length > 0) {
+              <div class="flex flex-col gap-1 mt-1">
+                <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider">Habilidades</span>
+                @for (a of card.abilities; track a.name) {
+                  <div class="p-2 rounded-lg bg-[#0b0a1f] border border-white/10 text-xs">
+                    <strong class="text-[#edebff]">{{ a.name }}:</strong>
+                    <span class="text-[#9c98c7] ml-1">{{ a.text }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (card.attacks && card.attacks.length > 0) {
+              <div class="flex flex-col gap-1 mt-1">
+                <span class="text-xs font-rajdhani font-bold text-[#c9ff3d] uppercase tracking-wider">Ataques</span>
+                @for (a of card.attacks; track a.name) {
+                  <div class="p-2 rounded-lg bg-[#0b0a1f] border border-white/10 text-xs">
+                    <div class="flex items-center justify-between gap-2">
+                      <strong class="text-[#edebff]">{{ a.name }}</strong>
+                      @if (a.damage) {
+                        <span class="font-jetbrains font-bold text-[#ff3366]">{{ a.damage }} DMG</span>
+                      }
+                    </div>
+                    @if (a.text) {
+                      <p class="text-[#9c98c7] mt-0.5 text-[11px]">{{ a.text }}</p>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="pt-4 border-t border-white/10 flex items-center justify-between mt-auto">
+              <div class="flex items-center gap-1.5">
+                <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5 object-contain" />
+                @if (getCardPriceInfo(card).hasDiscount) {
+                  <div class="flex items-baseline gap-2">
+                    <span class="font-jetbrains text-xs text-[#9c98c7] line-through">₽{{ getCardPriceInfo(card).originalPrice }}</span>
+                    <span class="font-jetbrains font-bold text-lg text-[#c9ff3d]">₽{{ getCardPriceInfo(card).price }}</span>
+                    <span class="text-xs font-bold font-jetbrains text-[#c9ff3d] bg-[#c9ff3d]/15 px-2 py-0.5 rounded border border-[#c9ff3d]/30">
+                      {{ getCardPriceInfo(card).highlight }}
+                    </span>
+                  </div>
+                } @else {
+                  <span class="font-jetbrains font-bold text-lg text-[#c9ff3d]">₽{{ getCardPriceInfo(card).price }}</span>
+                }
+              </div>
+              <button
+                type="button"
+                class="px-5 py-2.5 rounded-xl font-rajdhani font-bold text-sm uppercase tracking-wider transition-all cursor-pointer disabled:opacity-40 disabled:grayscale disabled:pointer-events-none"
+                [class.bg-[#c9ff3d]]="!isCardAtMax(card.id)"
+                [class.text-[#0b0a1f]]="!isCardAtMax(card.id)"
+                [class.hover:bg-[#d8ff66]]="!isCardAtMax(card.id)"
+                [class.shadow-[0_0_15px_rgba(201,255,61,0.3)]]="!isCardAtMax(card.id)"
+                [class.bg-white/10]="isCardAtMax(card.id)"
+                [class.text-[#9c98c7]]="isCardAtMax(card.id)"
+                [disabled]="isCardAtMax(card.id)"
+                (click)="confirmAddToCart(card)"
+              >
+                {{ isCardAtMax(card.id) ? '4/4 Máx en Colección' : '+ Añadir al Carrito' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  }
 
-    <p class="text-center text-xs" style="color: rgba(255,255,255,0.3);">
-      {{ 'COINS_SHOP.SECURE_NOTE' | translate }}
-    </p>
-  </div>
-</my-modal>
+  <!-- Splash Art Detail Modal -->
+  @if (selectedSplash(); as sa) {
+    <div class="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeSplashDetail()"></div>
+      <div class="relative z-10 w-full max-w-md bg-[#14132b] border border-white/10 rounded-2xl p-6 shadow-2xl animate-fade-up max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+          <h3 class="font-rajdhani font-bold text-xl text-[#edebff] uppercase tracking-wide">{{ sa.name }}</h3>
+          <button
+            type="button"
+            class="w-8 h-8 rounded-full border border-white/10 bg-white/5 text-[#9c98c7] hover:text-white flex items-center justify-center cursor-pointer"
+            (click)="closeSplashDetail()"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="flex flex-col gap-4">
+          <div class="aspect-[2.5/3.5] max-w-[240px] mx-auto rounded-xl overflow-hidden bg-black/40">
+            <img [src]="sa.imageUrl" [alt]="sa.name" class="w-full h-full object-contain" />
+          </div>
+          <div class="flex items-center justify-between pt-3 border-t border-white/10">
+            <div class="flex items-center gap-1.5">
+              <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5 object-contain" />
+              <span class="font-jetbrains font-bold text-lg text-[#c9ff3d]">₽{{ getSplashPrice(sa) }}</span>
+            </div>
+            <button
+              type="button"
+              class="px-5 py-2.5 rounded-xl font-rajdhani font-bold text-sm uppercase tracking-wider text-[#0b0a1f] bg-[#c9ff3d] hover:bg-[#d8ff66] transition-all shadow-[0_0_15px_rgba(201,255,61,0.3)] cursor-pointer"
+              (click)="addSplashToCart(sa)"
+            >
+              + Añadir al Carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 
-<!-- Cart drawer -->
-<app-cart-drawer [open]="cartOpen()" (closed)="cartOpen.set(false); refreshOwnedCardBacks()" />
+  <!-- Card Back Detail Modal -->
+  @if (selectedCardBack(); as cb) {
+    <div class="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="closeCardBackDetail()"></div>
+      <div class="relative z-10 w-full max-w-md bg-[#14132b] border border-white/10 rounded-2xl p-6 shadow-2xl animate-fade-up max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+          <h3 class="font-rajdhani font-bold text-xl text-[#edebff] uppercase tracking-wide">{{ cb.name }}</h3>
+          <button
+            type="button"
+            class="w-8 h-8 rounded-full border border-white/10 bg-white/5 text-[#9c98c7] hover:text-white flex items-center justify-center cursor-pointer"
+            (click)="closeCardBackDetail()"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="flex flex-col gap-4">
+          <div class="aspect-[2.5/3.5] max-w-[220px] mx-auto rounded-xl overflow-hidden bg-black/40">
+            <img [src]="cb.imageUrl" [alt]="cb.name" (error)="$any($event.target).src = '/assets/img/card-backs/backCardPixel.png'" class="w-full h-full object-contain" />
+          </div>
+          <div class="flex items-center justify-between pt-3 border-t border-white/10">
+            <div class="flex items-center gap-1.5">
+              <img src="/assets/img/Moneda.png" alt="Moneda" class="w-5 h-5 object-contain" />
+              <span class="font-jetbrains font-bold text-lg text-[#c9ff3d]">
+                {{ cb.price ? ('₽' + cb.price) : 'Gratis' }}
+              </span>
+            </div>
+            @if (!isCardBackOwned(cb.id) && cb.price) {
+              <button
+                type="button"
+                class="px-5 py-2.5 rounded-xl font-rajdhani font-bold text-sm uppercase tracking-wider text-[#0b0a1f] bg-[#c9ff3d] hover:bg-[#d8ff66] transition-all shadow-[0_0_15px_rgba(201,255,61,0.3)] cursor-pointer"
+                (click)="addCardBackToCart(cb)"
+              >
+                + Añadir al Carrito
+              </button>
+            } @else {
+              <span class="px-3 py-1 rounded-full bg-[#00aaff]/20 text-[#00aaff] text-xs font-rajdhani font-bold uppercase tracking-wider">
+                Adquirido
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 
-<app-pokenav-device
-  [isOpen]="showMenu() && !showOptions()"
-  (resume)="showMenu.set(false)"
-  (showProfile)="onMenuProfile()"
-  (showDecks)="onMenuDecks()"
-  (showOptions)="showMenu.set(false); showOptions.set(true)"
-  (exit)="onMenuExit()"
-  (resetCharacter)="showMenu.set(false)"
-></app-pokenav-device>
-@if (showOptions()) {
-  <app-game-options (back)="showOptions.set(false); showMenu.set(true)"></app-game-options>
-}
+  <!-- Modal Comprar Monedas (MercadoPago) -->
+  @if (coinsModalOpen()) {
+    <div class="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="coinsModalOpen.set(false)"></div>
+      <div class="relative z-10 w-full max-w-2xl bg-[#14132b] border border-white/10 rounded-2xl p-6 shadow-2xl animate-fade-up max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+          <div class="flex items-center gap-2">
+            <img src="/assets/img/Moneda.png" alt="Moneda" class="w-6 h-6 object-contain" />
+            <h3 class="font-rajdhani font-bold text-xl text-[#edebff] uppercase tracking-wide">Comprar Pokécoins</h3>
+          </div>
+          <button
+            type="button"
+            class="w-8 h-8 rounded-full border border-white/10 bg-white/5 text-[#9c98c7] hover:text-white flex items-center justify-center cursor-pointer"
+            (click)="coinsModalOpen.set(false)"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+          @for (pkg of COIN_PACKAGES; track pkg.coins) {
+            <div class="p-4 rounded-xl border border-white/10 bg-[#0b0a1f] hover:border-[#c9ff3d]/40 transition-all flex flex-col justify-between gap-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <img src="/assets/img/Moneda.png" alt="Moneda" class="w-6 h-6 object-contain" />
+                  <span class="font-jetbrains font-bold text-lg text-[#c9ff3d]">{{ pkg.coins }}</span>
+                </div>
+                @if (pkg.badge) {
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-rajdhani uppercase tracking-wider bg-[#c9ff3d]/20 text-[#c9ff3d] border border-[#c9ff3d]/30">
+                    {{ pkg.badge | translate }}
+                  </span>
+                }
+              </div>
+
+              <div class="flex items-center justify-between pt-2 border-t border-white/10">
+                <span class="font-jetbrains font-bold text-sm text-[#edebff]">$ {{ pkg.price }} ARS</span>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg text-xs font-rajdhani font-bold uppercase tracking-wider text-white bg-gradient-to-r from-[#009ee3] to-[#00b1f2] hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                  [disabled]="coinsBuyLoading() !== null"
+                  (click)="buyCoinPackage(pkg)"
+                >
+                  @if (coinsBuyLoading() === pkg.coins) {
+                    Procesando...
+                  } @else {
+                    💳 Pagar con MercadoPago
+                  }
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <p class="text-center text-xs text-[#9c98c7]/50 mt-4">
+          Pagos procesados de forma segura a través de MercadoPago.
+        </p>
+      </div>
+    </div>
+  }
+
+  <!-- Pokenav Device Component -->
+  <app-pokenav-device
+    [isOpen]="showMenu() && !showOptions()"
+    (resume)="showMenu.set(false)"
+    (showProfile)="onMenuProfile()"
+    (showDecks)="onMenuDecks()"
+    (showOptions)="showMenu.set(false); showOptions.set(true)"
+    (exit)="onMenuExit()"
+    (resetCharacter)="showMenu.set(false)"
+  ></app-pokenav-device>
+
+  @if (showOptions()) {
+    <app-game-options (back)="showOptions.set(false); showMenu.set(true)"></app-game-options>
+  }
+</div>
